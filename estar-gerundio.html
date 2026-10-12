@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¡Música a tope! · Support de séance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #F2EAD9; --cream-dark: #E8DCC4; --cream-soft: #FDF6E8;
+    --ink: #1F1410; --ink-soft: #4A3A2E;
+    --rojo: #B8321A; --rojo-deep: #7A1F0E;
+    --ocre: #C8862E; --verde: #3F5A3A;
+    --line: rgba(31, 20, 16, 0.15);
+  }
+  html, body { height: 100%; overflow: hidden; font-family: 'Manrope', sans-serif; background: var(--ink); color: var(--ink); }
+  .slide-deck { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
+  .slide {
+    position: absolute; inset: 0; background: var(--cream);
+    padding: 50px 70px; display: flex; flex-direction: column; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+    background-image: radial-gradient(circle at 15% 10%, rgba(200, 134, 46, 0.10) 0%, transparent 50%), radial-gradient(circle at 85% 85%, rgba(184, 50, 26, 0.08) 0%, transparent 50%);
+  }
+  .slide.active { opacity: 1; pointer-events: all; }
+  .nav-info { position: fixed; top: 20px; right: 28px; z-index: 100; display: flex; gap: 10px; align-items: center; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-soft); background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(8px); padding: 7px 13px; border-radius: 100px; font-weight: 600; }
+  .nav-info .phase-name { color: var(--rojo); }
+  .nav-hint { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 100; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-soft); background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(8px); padding: 7px 14px; border-radius: 100px; opacity: 0.6; transition: opacity 0.5s; font-weight: 500; }
+  .nav-buttons { position: fixed; bottom: 18px; right: 28px; z-index: 100; display: flex; gap: 8px; }
+  .nav-btn { width: 48px; height: 48px; border-radius: 50%; background: var(--ink); color: var(--cream); border: none; cursor: pointer; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, background 0.2s; box-shadow: 0 4px 12px rgba(31, 20, 16, 0.2); }
+  .nav-btn:hover { background: var(--rojo); transform: scale(1.08); }
+  .nav-btn:active { transform: scale(0.95); }
+  .reveal { opacity: 0; transition: opacity 0.3s ease; display: inline-block; }
+  .reveal.visible { opacity: 1; }
+  [data-step] { opacity: 0; transition: opacity 0.35s ease; }
+  [data-step].visible { opacity: 1; }
+  .title-display { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; line-height: 0.9; letter-spacing: -0.04em; color: var(--ink); }
+  .accent { color: var(--rojo); font-style: italic; font-family: 'Fraunces', serif; }
+  .slide-title { text-align: center; align-items: center; }
+  .slide-title .tag { display: inline-block; background: var(--ink); color: var(--cream); padding: 10px 22px; border-radius: 100px; font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 32px; font-weight: 600; }
+  .slide-title h1 { font-size: clamp(4rem, 10vw, 8rem); margin-bottom: 24px; }
+  .slide-title .objective { font-family: 'Fraunces', serif; font-style: italic; font-size: clamp(1.3rem, 2.2vw, 1.8rem); color: var(--ink-soft); margin-top: 32px; max-width: 820px; line-height: 1.4; }
+  .slide-title .objective strong { color: var(--rojo); font-weight: 600; }
+  .pixel-stage { width: 100%; flex-grow: 1; background: #1F1410; border-radius: 18px; position: relative; overflow: hidden; box-shadow: 0 16px 50px rgba(31, 20, 16, 0.25), inset 0 0 0 4px var(--ocre), inset 0 0 0 8px var(--ink); margin-bottom: 22px; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .pixel-stage svg { width: 100%; height: 100%; max-height: 100%; image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges; shape-rendering: crispEdges; display: block; }
+
+  /* ===== 6 FRAMES ANIMATIONS ===== */
+  @keyframes f6a { 0%, 15% { opacity: 1; } 17%, 100% { opacity: 0; } }
+  @keyframes f6b { 0%, 15% { opacity: 0; } 17%, 32% { opacity: 1; } 34%, 100% { opacity: 0; } }
+  @keyframes f6c { 0%, 32% { opacity: 0; } 34%, 49% { opacity: 1; } 51%, 100% { opacity: 0; } }
+  @keyframes f6d { 0%, 49% { opacity: 0; } 51%, 65% { opacity: 1; } 67%, 100% { opacity: 0; } }
+  @keyframes f6e { 0%, 65% { opacity: 0; } 67%, 82% { opacity: 1; } 84%, 100% { opacity: 0; } }
+  @keyframes f6f { 0%, 82% { opacity: 0; } 84%, 100% { opacity: 1; } }
+  .fa { animation: f6a 1.8s steps(1) infinite; }
+  .fb { animation: f6b 1.8s steps(1) infinite; }
+  .fc { animation: f6c 1.8s steps(1) infinite; }
+  .fd { animation: f6d 1.8s steps(1) infinite; }
+  .fe { animation: f6e 1.8s steps(1) infinite; }
+  .ff { animation: f6f 1.8s steps(1) infinite; }
+  .sp-fast .fa, .sp-fast .fb, .sp-fast .fc, .sp-fast .fd, .sp-fast .fe, .sp-fast .ff { animation-duration: 1.5s; }
+  .sp-med  .fa, .sp-med  .fb, .sp-med  .fc, .sp-med  .fd, .sp-med  .fe, .sp-med  .ff { animation-duration: 1.8s; }
+  .sp-slow .fa, .sp-slow .fb, .sp-slow .fc, .sp-slow .fd, .sp-slow .fe, .sp-slow .ff { animation-duration: 2.4s; }
+  .delay-1 .fa, .delay-1 .fb, .delay-1 .fc, .delay-1 .fd, .delay-1 .fe, .delay-1 .ff { animation-delay: 0.2s; }
+  .delay-2 .fa, .delay-2 .fb, .delay-2 .fc, .delay-2 .fd, .delay-2 .fe, .delay-2 .ff { animation-delay: 0.4s; }
+  .delay-3 .fa, .delay-3 .fb, .delay-3 .fc, .delay-3 .fd, .delay-3 .fe, .delay-3 .ff { animation-delay: 0.6s; }
+  .delay-4 .fa, .delay-4 .fb, .delay-4 .fc, .delay-4 .fd, .delay-4 .fe, .delay-4 .ff { animation-delay: 0.8s; }
+  .delay-5 .fa, .delay-5 .fb, .delay-5 .fc, .delay-5 .fd, .delay-5 .fe, .delay-5 .ff { animation-delay: 1.0s; }
+
+  @keyframes firework-burst { 0%, 20% { opacity: 0; transform: scale(0.3); } 25% { opacity: 1; transform: scale(0.7); } 40% { opacity: 1; transform: scale(1); } 65% { opacity: 0.6; transform: scale(1.3); } 100% { opacity: 0; transform: scale(1.5); } }
+  .firework-1 { animation: firework-burst 2.5s ease-out infinite; transform-origin: center; transform-box: fill-box; }
+  .firework-2 { animation: firework-burst 2.5s ease-out infinite 0.5s; transform-origin: center; transform-box: fill-box; }
+  .firework-3 { animation: firework-burst 2.5s ease-out infinite 1s; transform-origin: center; transform-box: fill-box; }
+  .firework-4 { animation: firework-burst 3s ease-out infinite 0.3s; transform-origin: center; transform-box: fill-box; }
+  .firework-5 { animation: firework-burst 2.8s ease-out infinite 1.5s; transform-origin: center; transform-box: fill-box; }
+  .firework-6 { animation: firework-burst 3.2s ease-out infinite 2s; transform-origin: center; transform-box: fill-box; }
+  @keyframes rocket-trail { 0%, 15% { opacity: 1; transform: translateY(0); } 25% { opacity: 0; transform: translateY(-15px); } 100% { opacity: 0; transform: translateY(-15px); } }
+  .rocket-1 { animation: rocket-trail 2.5s ease-in infinite; transform-box: fill-box; }
+  .rocket-2 { animation: rocket-trail 2.5s ease-in infinite 0.5s; transform-box: fill-box; }
+  .rocket-3 { animation: rocket-trail 2.8s ease-in infinite 1.5s; transform-box: fill-box; }
+  @keyframes ferris-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .ferris-wheel { animation: ferris-rotate 25s linear infinite; transform-origin: 90px 78px; transform-box: fill-box; }
+  @keyframes note-rise { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(-40px); opacity: 0; } }
+  .pix-note-1 { animation: note-rise 3.5s ease-out infinite; transform-box: fill-box; }
+  .pix-note-2 { animation: note-rise 3.5s ease-out infinite 1.2s; transform-box: fill-box; }
+  .pix-note-3 { animation: note-rise 3.5s ease-out infinite 2.4s; transform-box: fill-box; }
+  @keyframes star-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+  .star-blink-1 { animation: star-blink 1.6s steps(1) infinite; }
+  .star-blink-2 { animation: star-blink 1.6s steps(1) infinite 0.8s; }
+  .star-blink-3 { animation: star-blink 2.2s steps(1) infinite 0.4s; }
+  @keyframes lantern-glow { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+  .lantern-light { animation: lantern-glow 2s ease-in-out infinite; }
+  .lantern-light-2 { animation: lantern-glow 2s ease-in-out infinite 1s; }
+  @keyframes led-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .led-1 { animation: led-blink 1.2s steps(1) infinite; }
+  .led-2 { animation: led-blink 1.2s steps(1) infinite 0.3s; }
+  .led-3 { animation: led-blink 1.2s steps(1) infinite 0.6s; }
+  .led-4 { animation: led-blink 1.2s steps(1) infinite 0.9s; }
+  @keyframes palm-sway { 0%, 100% { transform: rotate(-1deg); } 50% { transform: rotate(1deg); } }
+  .palm-left { animation: palm-sway 4s ease-in-out infinite; transform-origin: bottom center; transform-box: fill-box; }
+  .palm-right { animation: palm-sway 4s ease-in-out infinite 2s; transform-origin: bottom center; transform-box: fill-box; }
+  @keyframes flag-wave { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1px); } }
+  .flag-row { animation: flag-wave 2.5s steps(2) infinite; transform-box: fill-box; }
+
+  .accroche-question { text-align: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
+  .slide-discovery { padding: 40px 70px; }
+  .slide-discovery h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 2.1rem; font-weight: 700; margin-bottom: 22px; letter-spacing: -0.02em; }
+  .learn-table { width: 100%; border-collapse: collapse; background: white; border: 2px solid var(--ink); border-radius: 8px; overflow: hidden; flex-grow: 1; table-layout: fixed; }
+  .learn-table th, .learn-table td { padding: 18px 28px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; width: 50%; height: 60px; }
+  .learn-table th:first-child, .learn-table td:first-child { border-right: 2px solid var(--ink); }
+  .learn-table tbody tr:last-child td { border-bottom: none; }
+  .learn-table thead th { background: var(--ink); color: var(--cream); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 1.05rem; letter-spacing: -0.01em; padding: 16px 28px; border-bottom: 2px solid var(--ink); }
+  .learn-table thead th.right { background: var(--rojo); }
+  .learn-table thead th .sub { display: block; font-family: 'Fraunces', serif; font-style: italic; font-size: 0.78rem; font-weight: 400; margin-top: 3px; opacity: 0.85; }
+  .learn-table tbody td { background: var(--cream-dark); font-family: 'Fraunces', serif; font-style: italic; font-size: 1.35rem; color: var(--ink); }
+  .gerund { color: var(--rojo); font-weight: 600; }
+  .ending { background: rgba(200, 134, 46, 0.35); padding: 0 4px; border-radius: 3px; font-weight: 700; }
+  .discovery-rule { margin-top: 20px; padding: 18px 28px; background: var(--ink); color: var(--cream); border-radius: 8px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.35rem; font-weight: 600; text-align: center; letter-spacing: -0.01em; }
+  .discovery-rule .ending { background: var(--ocre); color: var(--ink); padding: 2px 9px; border-radius: 4px; margin: 0 2px; }
+  .slide-trace { padding: 40px 80px; }
+  .trace-paper { background: white; border-radius: 8px; padding: 36px 50px; box-shadow: 0 12px 40px rgba(31, 20, 16, 0.10); flex-grow: 1; display: flex; flex-direction: column; border-top: 4px solid var(--rojo); }
+  .trace-paper h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.9rem; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.02em; color: var(--rojo-deep); }
+  .trace-paper .objective { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.05rem; color: var(--ink-soft); margin-bottom: 22px; }
+  .trace-rule { background: var(--cream-dark); border-left: 4px solid var(--rojo); padding: 16px 22px; margin-bottom: 18px; border-radius: 4px; }
+  .trace-rule .formula { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.45rem; font-weight: 700; color: var(--ink); margin-bottom: 6px; letter-spacing: -0.01em; }
+  .trace-rule .formula .key { color: var(--rojo); }
+  .trace-rule .formula .ending { background: var(--ocre); color: var(--ink); padding: 0 8px; border-radius: 3px; }
+  .trace-rule .detail { font-size: 0.92rem; color: var(--ink-soft); font-family: 'Fraunces', serif; font-style: italic; }
+  .trace-rule .detail strong { color: var(--rojo-deep); font-style: normal; font-family: 'Manrope', sans-serif; font-weight: 700; }
+  .trace-examples h3 { font-family: 'Manrope', sans-serif; font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--rojo); font-weight: 700; margin-bottom: 12px; }
+  .trace-examples { counter-reset: ex; }
+  .trace-example { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.15rem; color: var(--ink); padding: 9px 0 9px 28px; border-bottom: 1px dashed var(--line); position: relative; }
+  .trace-example:last-child { border-bottom: none; }
+  .trace-example::before { content: counter(ex); counter-increment: ex; position: absolute; left: 0; top: 10px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; color: var(--ocre); font-style: normal; }
+  .trace-example .gerund { background: rgba(200, 134, 46, 0.25); padding: 0 4px; border-radius: 3px; color: var(--rojo-deep); font-weight: 600; }
+  .slide-production { padding: 30px 60px; }
+  .production-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 14px; }
+  .production-header .left-block { flex: 1; }
+  .production-header .small-tag { display: inline-block; background: var(--rojo); color: var(--cream); padding: 6px 16px; border-radius: 100px; font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
+  .production-header h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(1.4rem, 2.6vw, 2rem); font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; }
+  .production-header h2 .key { color: var(--rojo); font-family: 'Fraunces', serif; font-style: italic; }
+  .production-header .timer { display: flex; align-items: center; gap: 8px; background: var(--ink); color: var(--cream); padding: 10px 18px; border-radius: 100px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+  .production-header .timer .clock { font-size: 1.2rem; }
+  .verb-bank { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; background: white; padding: 12px 16px; border-radius: 12px; margin-bottom: 14px; border: 2px dashed var(--ocre); }
+  .verb-bank .label { font-family: 'Manrope', sans-serif; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--rojo); font-weight: 700; padding: 4px 10px; align-self: center; }
+  .verb-bank .verb-pill { background: var(--cream-dark); padding: 6px 14px; border-radius: 100px; font-family: 'Fraunces', serif; font-style: italic; font-size: 1rem; color: var(--ink); border: 1px solid var(--line); }
+  .slide-production .pixel-stage { flex-grow: 1; margin-bottom: 0; }
+  .slide-pingpong { padding: 40px 70px; }
+  .slide-pingpong h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.9rem; font-weight: 700; margin-bottom: 14px; letter-spacing: -0.02em; text-align: center; }
+  .slide-pingpong .rules { text-align: center; font-family: 'Fraunces', serif; font-style: italic; font-size: 1.15rem; color: var(--ink-soft); margin-bottom: 22px; }
+  .slide-pingpong .rules strong { color: var(--rojo); font-weight: 600; }
+  .slide-bilan { text-align: center; align-items: center; }
+  .slide-bilan .pre-tag { background: var(--verde); color: var(--cream); padding: 10px 22px; border-radius: 100px; font-size: 0.78rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 28px; font-weight: 600; }
+  .slide-bilan h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(2.2rem, 4.5vw, 3.5rem); font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 40px; max-width: 1000px; }
+  .slide-bilan h2 .accent { font-family: 'Fraunces', serif; font-style: italic; color: var(--rojo); }
+  .bilan-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1000px; width: 100%; }
+  .bilan-card { background: white; padding: 26px 22px; border-radius: 12px; text-align: left; box-shadow: 0 4px 18px rgba(31, 20, 16, 0.06); border-top: 3px solid var(--ocre); }
+  .bilan-card .num { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.9rem; font-weight: 700; color: var(--ocre); margin-bottom: 6px; }
+  .bilan-card p { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.05rem; color: var(--ink); line-height: 1.4; }
+  .homework-banner { margin-top: 32px; padding: 18px 28px; background: var(--ink); color: var(--cream); border-radius: 100px; font-size: 0.92rem; font-weight: 500; max-width: 800px; display: flex; align-items: center; gap: 12px; }
+  .homework-banner .icon { font-size: 1.3rem; }
+  .homework-banner strong { color: var(--ocre); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="nav-info">
+  <span class="phase-name" id="phaseName">Présentation</span>
+  <span>·</span>
+  <span id="slideCounter">1/7</span>
+</div>
+<div class="nav-hint" id="navHint">← → ou espace · F : plein écran</div>
+<div class="nav-buttons">
+  <button class="nav-btn" onclick="prev()" aria-label="Précédent">‹</button>
+  <button class="nav-btn" onclick="next()" aria-label="Suivant">›</button>
+</div>
+
+<!-- ====================================================== -->
+<!-- SCÈNE 1 : ANDALOUSIE                                    -->
+<!-- ====================================================== -->
+<svg id="scene-1-template" style="display:none">
+  <symbol id="fiesta-scene-1" viewBox="0 0 320 160" shape-rendering="crispEdges">
+    <!-- CIEL coucher de soleil -->
+    <rect x="0" y="0" width="320" height="35" fill="#2A1A3E"/>
+    <rect x="0" y="35" width="320" height="15" fill="#5A2D5A"/>
+    <rect x="0" y="50" width="320" height="15" fill="#C77DFF" opacity="0.5"/>
+    <rect x="0" y="65" width="320" height="15" fill="#FB5607" opacity="0.5"/>
+    <rect x="0" y="80" width="320" height="10" fill="#FFCC00" opacity="0.3"/>
+
+    <!-- Étoiles -->
+    <rect class="star-blink-1" x="20" y="10" width="2" height="2" fill="#FFD60A"/>
+    <rect class="star-blink-2" x="45" y="6" width="2" height="2" fill="#FDF6E8"/>
+    <rect class="star-blink-3" x="78" y="14" width="2" height="2" fill="#FFD60A"/>
+    <rect class="star-blink-1" x="105" y="8" width="2" height="2" fill="#FDF6E8"/>
+    <rect class="star-blink-2" x="140" y="12" width="2" height="2" fill="#FFD60A"/>
+    <rect class="star-blink-3" x="178" y="6" width="2" height="2" fill="#FDF6E8"/>
+    <rect class="star-blink-1" x="215" y="10" width="2" height="2" fill="#FFD60A"/>
+    <rect class="star-blink-2" x="250" y="14" width="2" height="2" fill="#FDF6E8"/>
+    <rect class="star-blink-3" x="290" y="20" width="2" height="2" fill="#FFD60A"/>
+    <rect class="star-blink-1" x="305" y="12" width="2" height="2" fill="#FDF6E8"/>
+
+    <!-- Soleil couchant -->
+    <rect x="265" y="72" width="14" height="14" fill="#FFCC00" opacity="0.9"/>
+    <rect x="263" y="74" width="2" height="10" fill="#FFCC00" opacity="0.9"/>
+    <rect x="279" y="74" width="2" height="10" fill="#FFCC00" opacity="0.9"/>
+    <rect x="267" y="70" width="10" height="2" fill="#FFCC00" opacity="0.9"/>
+    <rect x="267" y="86" width="10" height="2" fill="#FFCC00" opacity="0.9"/>
+
+    <!-- PALMIER GAUCHE -->
+    <g class="palm-left">
+      <rect x="48" y="60" width="3" height="50" fill="#5A3A1E"/>
+      <rect x="48" y="65" width="3" height="1" fill="#3A2A1E"/>
+      <rect x="48" y="75" width="3" height="1" fill="#3A2A1E"/>
+      <rect x="48" y="85" width="3" height="1" fill="#3A2A1E"/>
+      <rect x="48" y="95" width="3" height="1" fill="#3A2A1E"/>
+      <rect x="44" y="58" width="11" height="2" fill="#3F5A3A"/>
+      <rect x="40" y="56" width="8" height="2" fill="#3F5A3A"/>
+      <rect x="51" y="56" width="8" height="2" fill="#3F5A3A"/>
+      <rect x="36" y="54" width="6" height="2" fill="#2F4A2A"/>
+      <rect x="57" y="54" width="6" height="2" fill="#2F4A2A"/>
+      <rect x="40" y="52" width="4" height="2" fill="#2F4A2A"/>
+      <rect x="55" y="52" width="4" height="2" fill="#2F4A2A"/>
+      <rect x="46" y="50" width="2" height="3" fill="#3F5A3A"/>
+      <rect x="51" y="50" width="2" height="3" fill="#3F5A3A"/>
+      <rect x="48" y="48" width="3" height="2" fill="#2F4A2A"/>
+      <rect x="44" y="60" width="2" height="2" fill="#5A3A1E"/>
+      <rect x="53" y="60" width="2" height="2" fill="#5A3A1E"/>
+    </g>
+
+    <!-- PALMIER DROIT -->
+    <g class="palm-right">
+      <rect x="252" y="60" width="3" height="50" fill="#5A3A1E"/>
+      <rect x="252" y="65" width="3" height="1" fill="#3A2A1E"/>
+      <rect x="252" y="75" width="3" height="1" fill="#3A2A1E"/>
+      <rect x="252" y="85" width="3" height="1" fill="#3A2A1E"/>
+      <rect x="248" y="58" width="11" height="2" fill="#3F5A3A"/>
+      <rect x="244" y="56" width="8" height="2" fill="#3F5A3A"/>
+      <rect x="255" y="56" width="8" height="2" fill="#3F5A3A"/>
+      <rect x="240" y="54" width="6" height="2" fill="#2F4A2A"/>
+      <rect x="261" y="54" width="6" height="2" fill="#2F4A2A"/>
+      <rect x="244" y="52" width="4" height="2" fill="#2F4A2A"/>
+      <rect x="259" y="52" width="4" height="2" fill="#2F4A2A"/>
+      <rect x="250" y="50" width="2" height="3" fill="#3F5A3A"/>
+      <rect x="255" y="50" width="2" height="3" fill="#3F5A3A"/>
+      <rect x="252" y="48" width="3" height="2" fill="#2F4A2A"/>
+      <rect x="248" y="60" width="2" height="2" fill="#5A3A1E"/>
+      <rect x="257" y="60" width="2" height="2" fill="#5A3A1E"/>
+    </g>
+
+    <!-- Bâtiment gauche -->
+    <rect x="0" y="65" width="42" height="45" fill="#FDF6E8"/>
+    <rect x="0" y="63" width="42" height="2" fill="#C8862E"/>
+    <rect x="0" y="61" width="4" height="2" fill="#C8862E"/>
+    <rect x="8" y="61" width="4" height="2" fill="#C8862E"/>
+    <rect x="16" y="61" width="4" height="2" fill="#C8862E"/>
+    <rect x="24" y="61" width="4" height="2" fill="#C8862E"/>
+    <rect x="32" y="61" width="4" height="2" fill="#C8862E"/>
+    <rect x="6" y="70" width="6" height="8" fill="#2A1A3E"/>
+    <rect x="7" y="71" width="2" height="6" fill="#FFCC00" class="lantern-light"/>
+    <rect x="9" y="71" width="1" height="6" fill="#1F1410"/>
+    <rect x="22" y="70" width="6" height="8" fill="#2A1A3E"/>
+    <rect x="23" y="71" width="2" height="6" fill="#FFCC00" class="lantern-light-2"/>
+    <rect x="25" y="71" width="1" height="6" fill="#1F1410"/>
+    <rect x="4" y="86" width="20" height="1" fill="#1F1410"/>
+    <rect x="4" y="86" width="1" height="6" fill="#1F1410"/>
+    <rect x="8" y="88" width="1" height="3" fill="#1F1410"/>
+    <rect x="12" y="88" width="1" height="3" fill="#1F1410"/>
+    <rect x="16" y="88" width="1" height="3" fill="#1F1410"/>
+    <rect x="20" y="88" width="1" height="3" fill="#1F1410"/>
+    <rect x="23" y="86" width="1" height="6" fill="#1F1410"/>
+    <rect x="10" y="82" width="4" height="4" fill="#7A1F0E"/>
+    <rect x="11" y="82" width="2" height="3" fill="#4A3A2E"/>
+    <rect x="9" y="79" width="2" height="2" fill="#C1121F"/>
+    <rect x="11" y="78" width="2" height="2" fill="#C1121F"/>
+    <rect x="13" y="79" width="2" height="2" fill="#C1121F"/>
+    <rect x="10" y="80" width="1" height="1" fill="#06D6A0"/>
+    <rect x="13" y="80" width="1" height="1" fill="#06D6A0"/>
+    <rect x="14" y="82" width="4" height="4" fill="#7A1F0E"/>
+    <rect x="15" y="82" width="2" height="3" fill="#4A3A2E"/>
+    <rect x="13" y="79" width="2" height="2" fill="#C1121F"/>
+    <rect x="15" y="78" width="2" height="2" fill="#C1121F"/>
+    <rect x="17" y="79" width="2" height="2" fill="#C1121F"/>
+    <rect x="30" y="90" width="2" height="2" fill="#3A6BAA"/>
+    <rect x="34" y="90" width="2" height="2" fill="#3A6BAA"/>
+    <rect x="32" y="92" width="2" height="2" fill="#3A6BAA"/>
+    <rect x="30" y="94" width="2" height="2" fill="#3A6BAA"/>
+    <rect x="34" y="94" width="2" height="2" fill="#3A6BAA"/>
+    <rect x="12" y="100" width="10" height="12" fill="#7A1F0E"/>
+    <rect x="13" y="98" width="8" height="2" fill="#7A1F0E"/>
+    <rect x="14" y="97" width="6" height="1" fill="#7A1F0E"/>
+    <rect x="13" y="100" width="8" height="10" fill="#4A1F0E"/>
+    <rect x="16" y="105" width="1" height="1" fill="#FFCC00"/>
+
+    <!-- Bâtiment central avec arche mauresque -->
+    <rect x="115" y="40" width="90" height="80" fill="#F2EAD9"/>
+    <rect x="115" y="40" width="90" height="2" fill="#C8862E"/>
+    <rect x="115" y="36" width="4" height="4" fill="#C1121F"/>
+    <rect x="123" y="36" width="4" height="4" fill="#C1121F"/>
+    <rect x="131" y="36" width="4" height="4" fill="#C1121F"/>
+    <rect x="139" y="36" width="4" height="4" fill="#C1121F"/>
+    <rect x="147" y="36" width="4" height="4" fill="#C1121F"/>
+    <rect x="155" y="36" width="4" height="4" fill="#C1121F"/>
+    <rect x="163" y="36" width="4" height="4" fill="#C1121F"/>
+    <rect x="171" y="36" width="4" height="4" fill="#C1121F"/>
+    <rect x="179" y="36" width="4" height="4" fill="#C1121F"/>
+    <rect x="187" y="36" width="4" height="4" fill="#C1121F"/>
+    <rect x="195" y="36" width="4" height="4" fill="#C1121F"/>
+    <rect x="120" y="50" width="4" height="4" fill="#3A6BAA"/>
+    <rect x="121" y="51" width="2" height="2" fill="#74C0FC"/>
+    <rect x="126" y="50" width="4" height="4" fill="#C1121F"/>
+    <rect x="127" y="51" width="2" height="2" fill="#FFCC00"/>
+    <rect x="132" y="50" width="4" height="4" fill="#3A6BAA"/>
+    <rect x="133" y="51" width="2" height="2" fill="#74C0FC"/>
+    <rect x="190" y="50" width="4" height="4" fill="#3A6BAA"/>
+    <rect x="191" y="51" width="2" height="2" fill="#74C0FC"/>
+    <rect x="196" y="50" width="4" height="4" fill="#C1121F"/>
+    <rect x="197" y="51" width="2" height="2" fill="#FFCC00"/>
+    <rect x="140" y="65" width="40" height="55" fill="#2A1A3E"/>
+    <rect x="142" y="60" width="36" height="5" fill="#2A1A3E"/>
+    <rect x="146" y="56" width="28" height="4" fill="#2A1A3E"/>
+    <rect x="152" y="53" width="16" height="3" fill="#2A1A3E"/>
+    <rect x="156" y="51" width="8" height="2" fill="#2A1A3E"/>
+    <rect x="138" y="60" width="2" height="2" fill="#C8862E"/>
+    <rect x="180" y="60" width="2" height="2" fill="#C8862E"/>
+    <rect x="144" y="54" width="2" height="2" fill="#C8862E"/>
+    <rect x="174" y="54" width="2" height="2" fill="#C8862E"/>
+    <rect x="150" y="50" width="2" height="2" fill="#C8862E"/>
+    <rect x="168" y="50" width="2" height="2" fill="#C8862E"/>
+    <rect x="158" y="48" width="4" height="2" fill="#C8862E"/>
+    <rect x="143" y="68" width="2" height="2" fill="#FFCC00"/>
+    <rect x="143" y="74" width="2" height="2" fill="#06D6A0"/>
+    <rect x="143" y="80" width="2" height="2" fill="#FFCC00"/>
+    <rect x="143" y="86" width="2" height="2" fill="#06D6A0"/>
+    <rect x="143" y="92" width="2" height="2" fill="#FFCC00"/>
+    <rect x="143" y="98" width="2" height="2" fill="#06D6A0"/>
+    <rect x="175" y="68" width="2" height="2" fill="#FFCC00"/>
+    <rect x="175" y="74" width="2" height="2" fill="#06D6A0"/>
+    <rect x="175" y="80" width="2" height="2" fill="#FFCC00"/>
+    <rect x="175" y="86" width="2" height="2" fill="#06D6A0"/>
+    <rect x="175" y="92" width="2" height="2" fill="#FFCC00"/>
+    <rect x="175" y="98" width="2" height="2" fill="#06D6A0"/>
+    <rect x="120" y="68" width="6" height="8" fill="#2A1A3E"/>
+    <rect x="121" y="69" width="2" height="6" fill="#FFCC00" class="lantern-light"/>
+    <rect x="123" y="69" width="1" height="6" fill="#1F1410"/>
+    <rect x="194" y="68" width="6" height="8" fill="#2A1A3E"/>
+    <rect x="195" y="69" width="2" height="6" fill="#FFCC00" class="lantern-light-2"/>
+    <rect x="197" y="69" width="1" height="6" fill="#1F1410"/>
+    <rect x="122" y="80" width="3" height="3" fill="#7A1F0E"/>
+    <rect x="121" y="77" width="2" height="2" fill="#C1121F"/>
+    <rect x="123" y="76" width="2" height="2" fill="#C1121F"/>
+    <rect x="195" y="80" width="3" height="3" fill="#7A1F0E"/>
+    <rect x="194" y="77" width="2" height="2" fill="#C1121F"/>
+    <rect x="196" y="76" width="2" height="2" fill="#C1121F"/>
+
+    <!-- Bâtiment droit -->
+    <rect x="270" y="60" width="50" height="50" fill="#FDF6E8"/>
+    <rect x="270" y="58" width="50" height="2" fill="#C8862E"/>
+    <rect x="270" y="56" width="4" height="2" fill="#C8862E"/>
+    <rect x="278" y="56" width="4" height="2" fill="#C8862E"/>
+    <rect x="286" y="56" width="4" height="2" fill="#C8862E"/>
+    <rect x="294" y="56" width="4" height="2" fill="#C8862E"/>
+    <rect x="302" y="56" width="4" height="2" fill="#C8862E"/>
+    <rect x="310" y="56" width="4" height="2" fill="#C8862E"/>
+    <rect x="278" y="66" width="6" height="8" fill="#2A1A3E"/>
+    <rect x="279" y="67" width="2" height="6" fill="#FFCC00" class="lantern-light"/>
+    <rect x="281" y="67" width="1" height="6" fill="#1F1410"/>
+    <rect x="296" y="66" width="6" height="8" fill="#2A1A3E"/>
+    <rect x="297" y="67" width="2" height="6" fill="#FFCC00" class="lantern-light-2"/>
+    <rect x="299" y="67" width="1" height="6" fill="#1F1410"/>
+    <rect x="276" y="80" width="22" height="1" fill="#1F1410"/>
+    <rect x="276" y="80" width="1" height="6" fill="#1F1410"/>
+    <rect x="280" y="82" width="1" height="3" fill="#1F1410"/>
+    <rect x="284" y="82" width="1" height="3" fill="#1F1410"/>
+    <rect x="288" y="82" width="1" height="3" fill="#1F1410"/>
+    <rect x="292" y="82" width="1" height="3" fill="#1F1410"/>
+    <rect x="296" y="82" width="1" height="3" fill="#1F1410"/>
+    <rect x="297" y="80" width="1" height="6" fill="#1F1410"/>
+    <rect x="282" y="77" width="4" height="3" fill="#7A1F0E"/>
+    <rect x="281" y="74" width="2" height="2" fill="#C1121F"/>
+    <rect x="283" y="73" width="2" height="2" fill="#C1121F"/>
+    <rect x="285" y="74" width="2" height="2" fill="#C1121F"/>
+    <rect x="288" y="77" width="4" height="3" fill="#7A1F0E"/>
+    <rect x="287" y="74" width="2" height="2" fill="#C1121F"/>
+    <rect x="289" y="73" width="2" height="2" fill="#C1121F"/>
+    <rect x="291" y="74" width="2" height="2" fill="#C1121F"/>
+    <rect x="290" y="95" width="8" height="15" fill="#7A1F0E"/>
+    <rect x="291" y="93" width="6" height="2" fill="#7A1F0E"/>
+
+    <!-- Drapeaux espagnols -->
+    <g class="flag-row">
+      <rect x="0" y="28" width="320" height="1" fill="#4A3A2E"/>
+      <g><rect x="10" y="29" width="5" height="2" fill="#C1121F"/><rect x="10" y="31" width="5" height="2" fill="#FFCC00"/><rect x="10" y="33" width="5" height="2" fill="#C1121F"/></g>
+      <g><rect x="25" y="29" width="5" height="2" fill="#C1121F"/><rect x="25" y="31" width="5" height="2" fill="#FFCC00"/><rect x="25" y="33" width="5" height="2" fill="#C1121F"/></g>
+      <g><rect x="40" y="29" width="5" height="2" fill="#C1121F"/><rect x="40" y="31" width="5" height="2" fill="#FFCC00"/><rect x="40" y="33" width="5" height="2" fill="#C1121F"/></g>
+      <g><rect x="55" y="29" width="5" height="2" fill="#C1121F"/><rect x="55" y="31" width="5" height="2" fill="#FFCC00"/><rect x="55" y="33" width="5" height="2" fill="#C1121F"/></g>
+      <g><rect x="70" y="29" width="5" height="2" fill="#C1121F"/><rect x="70" y="31" width="5" height="2" fill="#FFCC00"/><rect x="70" y="33" width="5" height="2" fill="#C1121F"/></g>
+      <g><rect x="85" y="29" width="5" height="2" fill="#C1121F"/><rect x="85" y="31" width="5" height="2" fill="#FFCC00"/><rect x="85" y="33" width="5" height="2" fill="#C1121F"/></g>
+      <g><rect x="100" y="29" width="5" height="2" fill="#C1121F"/><rect x="100" y="31" width="5" height="2" fill="#FFCC00"/><rect x="100" y="33" width="5" height="2" fill="#C1121F"/></g>
+      <g><rect x="215" y="29" width="5" height="2" fill="#C1121F"/><rect x="215" y="31" width="5" height="2" fill="#FFCC00"/><rect x="215" y="33" width="5" height="2" fill="#C1121F"/></g>
+      <g><rect x="230" y="29" width="5" height="2" fill="#C1121F"/><rect x="230" y="31" width="5" height="2" fill="#FFCC00"/><rect x="230" y="33" width="5" height="2" fill="#C1121F"/></g>
+      <g><rect x="245" y="29" width="5" height="2" fill="#C1121F"/><rect x="245" y="31" width="5" height="2" fill="#FFCC00"/><rect x="245" y="33" width="5" height="2" fill="#C1121F"/></g>
+      <g><rect x="260" y="29" width="5" height="2" fill="#C1121F"/><rect x="260" y="31" width="5" height="2" fill="#FFCC00"/><rect x="260" y="33" width="5" height="2" fill="#C1121F"/></g>
+      <g><rect x="275" y="29" width="5" height="2" fill="#C1121F"/><rect x="275" y="31" width="5" height="2" fill="#FFCC00"/><rect x="275" y="33" width="5" height="2" fill="#C1121F"/></g>
+      <g><rect x="290" y="29" width="5" height="2" fill="#C1121F"/><rect x="290" y="31" width="5" height="2" fill="#FFCC00"/><rect x="290" y="33" width="5" height="2" fill="#C1121F"/></g>
+      <g><rect x="305" y="29" width="5" height="2" fill="#C1121F"/><rect x="305" y="31" width="5" height="2" fill="#FFCC00"/><rect x="305" y="33" width="5" height="2" fill="#C1121F"/></g>
+    </g>
+
+    <!-- Lanternes -->
+    <rect x="68" y="38" width="1" height="6" fill="#4A3A2E"/>
+    <rect x="64" y="44" width="9" height="2" fill="#7A1F0E"/>
+    <rect x="65" y="46" width="7" height="6" fill="#FFD60A" class="lantern-light"/>
+    <rect x="64" y="52" width="9" height="2" fill="#7A1F0E"/>
+    <rect x="67" y="54" width="3" height="2" fill="#7A1F0E"/>
+    <rect x="237" y="38" width="1" height="6" fill="#4A3A2E"/>
+    <rect x="233" y="44" width="9" height="2" fill="#7A1F0E"/>
+    <rect x="234" y="46" width="7" height="6" fill="#FFD60A" class="lantern-light-2"/>
+    <rect x="233" y="52" width="9" height="2" fill="#7A1F0E"/>
+    <rect x="236" y="54" width="3" height="2" fill="#7A1F0E"/>
+
+    <!-- BANNIÈRE ¡FIESTA! -->
+    <rect x="115" y="13" width="90" height="13" fill="#C1121F"/>
+    <rect x="115" y="13" width="90" height="2" fill="#7A1F0E"/>
+    <rect x="115" y="24" width="90" height="2" fill="#7A1F0E"/>
+    <rect x="110" y="13" width="5" height="2" fill="#4A3A2E"/>
+    <rect x="205" y="13" width="5" height="2" fill="#4A3A2E"/>
+    <!-- ¡ INVERSÉ : point en HAUT, barre en bas -->
+    <rect x="121" y="16" width="2" height="2" fill="#FFCC00"/>
+    <rect x="121" y="19" width="2" height="4" fill="#FFCC00"/>
+    <!-- F -->
+    <rect x="126" y="16" width="2" height="7" fill="#FFCC00"/>
+    <rect x="126" y="16" width="5" height="2" fill="#FFCC00"/>
+    <rect x="126" y="19" width="4" height="1" fill="#FFCC00"/>
+    <!-- I -->
+    <rect x="134" y="16" width="2" height="7" fill="#FFCC00"/>
+    <!-- E -->
+    <rect x="139" y="16" width="2" height="7" fill="#FFCC00"/>
+    <rect x="139" y="16" width="5" height="2" fill="#FFCC00"/>
+    <rect x="139" y="19" width="4" height="1" fill="#FFCC00"/>
+    <rect x="139" y="21" width="5" height="2" fill="#FFCC00"/>
+    <!-- S -->
+    <rect x="147" y="16" width="5" height="2" fill="#FFCC00"/>
+    <rect x="147" y="18" width="2" height="2" fill="#FFCC00"/>
+    <rect x="147" y="19" width="5" height="1" fill="#FFCC00"/>
+    <rect x="150" y="20" width="2" height="2" fill="#FFCC00"/>
+    <rect x="147" y="21" width="5" height="2" fill="#FFCC00"/>
+    <!-- T -->
+    <rect x="155" y="16" width="6" height="2" fill="#FFCC00"/>
+    <rect x="157" y="16" width="2" height="7" fill="#FFCC00"/>
+    <!-- A -->
+    <rect x="172" y="16" width="2" height="7" fill="#FFCC00"/>
+    <rect x="176" y="16" width="2" height="7" fill="#FFCC00"/>
+    <rect x="173" y="16" width="4" height="2" fill="#FFCC00"/>
+    <rect x="173" y="19" width="4" height="1" fill="#FFCC00"/>
+    <!-- ! -->
+    <rect x="182" y="16" width="2" height="4" fill="#FFCC00"/>
+    <rect x="182" y="21" width="2" height="2" fill="#FFCC00"/>
+
+    <!-- Notes -->
+    <g class="pix-note-1" transform="translate(75 110)"><rect x="0" y="0" width="3" height="3" fill="#FFD60A"/><rect x="2" y="-7" width="1" height="7" fill="#FFD60A"/><rect x="2" y="-7" width="4" height="1" fill="#FFD60A"/></g>
+    <g class="pix-note-2" transform="translate(165 115)"><rect x="0" y="0" width="3" height="3" fill="#FDF6E8"/><rect x="2" y="-7" width="1" height="7" fill="#FDF6E8"/><rect x="2" y="-7" width="4" height="1" fill="#FDF6E8"/></g>
+    <g class="pix-note-3" transform="translate(245 110)"><rect x="0" y="0" width="3" height="3" fill="#FFD60A"/><rect x="2" y="-7" width="1" height="7" fill="#FFD60A"/><rect x="2" y="-7" width="4" height="1" fill="#FFD60A"/></g>
+
+    <!-- Sol pavé -->
+    <rect x="0" y="135" width="320" height="25" fill="#7A1F0E"/>
+    <rect x="0" y="135" width="320" height="2" fill="#C8862E"/>
+    <rect x="0" y="142" width="20" height="1" fill="#4A1F0E"/>
+    <rect x="30" y="142" width="25" height="1" fill="#4A1F0E"/>
+    <rect x="70" y="142" width="20" height="1" fill="#4A1F0E"/>
+    <rect x="105" y="142" width="22" height="1" fill="#4A1F0E"/>
+    <rect x="142" y="142" width="20" height="1" fill="#4A1F0E"/>
+    <rect x="178" y="142" width="25" height="1" fill="#4A1F0E"/>
+    <rect x="218" y="142" width="20" height="1" fill="#4A1F0E"/>
+    <rect x="253" y="142" width="22" height="1" fill="#4A1F0E"/>
+    <rect x="290" y="142" width="20" height="1" fill="#4A1F0E"/>
+    <rect x="15" y="148" width="18" height="1" fill="#4A1F0E"/>
+    <rect x="48" y="148" width="22" height="1" fill="#4A1F0E"/>
+    <rect x="85" y="148" width="18" height="1" fill="#4A1F0E"/>
+    <rect x="118" y="148" width="22" height="1" fill="#4A1F0E"/>
+    <rect x="155" y="148" width="18" height="1" fill="#4A1F0E"/>
+    <rect x="188" y="148" width="22" height="1" fill="#4A1F0E"/>
+    <rect x="225" y="148" width="18" height="1" fill="#4A1F0E"/>
+    <rect x="258" y="148" width="22" height="1" fill="#4A1F0E"/>
+    <rect x="295" y="148" width="18" height="1" fill="#4A1F0E"/>
+
+    <!-- SPRITE 1 : BAILAR (6 frames - cycle flamenco complet) -->
+    <g transform="translate(15 100)" class="sp-med">
+      <!-- COMMUN : tête, visage, buste -->
+      <rect x="8" y="2" width="6" height="2" fill="#1F1410"/>
+      <rect x="14" y="0" width="4" height="2" fill="#1F1410"/>
+      <rect x="13" y="2" width="3" height="2" fill="#1F1410"/>
+      <rect x="15" y="-1" width="3" height="3" fill="#C1121F"/>
+      <rect x="16" y="0" width="1" height="1" fill="#FFCC00"/>
+      <rect x="8" y="4" width="6" height="5" fill="#E8B888"/>
+      <rect x="9" y="6" width="1" height="1" fill="#1F1410"/>
+      <rect x="12" y="6" width="1" height="1" fill="#1F1410"/>
+      <rect x="10" y="8" width="2" height="1" fill="#C1121F"/>
+      <rect x="7" y="10" width="8" height="6" fill="#C1121F"/>
+      <rect x="7" y="12" width="8" height="1" fill="#7A1F0E"/>
+      <rect x="9" y="22" width="2" height="4" fill="#E8B888"/>
+      <rect x="14" y="22" width="2" height="4" fill="#E8B888"/>
+      <rect x="8" y="26" width="3" height="1" fill="#1F1410"/>
+      <rect x="14" y="26" width="3" height="1" fill="#1F1410"/>
+      <!-- Frame A : bras bas, position centrée -->
+      <g class="fa">
+        <rect x="5" y="11" width="2" height="3" fill="#E8B888"/>
+        <rect x="6" y="11" width="2" height="2" fill="#C1121F"/>
+        <rect x="15" y="11" width="2" height="3" fill="#E8B888"/>
+        <rect x="14" y="11" width="2" height="2" fill="#C1121F"/>
+        <rect x="6" y="16" width="10" height="2" fill="#C1121F"/>
+        <rect x="6" y="18" width="10" height="2" fill="#7A1F0E"/>
+      </g>
+      <!-- Frame B : bras droit montant, jupe gauche -->
+      <g class="fb">
+        <rect x="4" y="9" width="2" height="2" fill="#E8B888"/>
+        <rect x="3" y="11" width="3" height="3" fill="#C1121F"/>
+        <rect x="16" y="11" width="2" height="2" fill="#E8B888"/>
+        <rect x="15" y="13" width="2" height="3" fill="#C1121F"/>
+        <rect x="3" y="8" width="2" height="2" fill="#7A1F0E"/>
+        <rect x="5" y="18" width="13" height="2" fill="#C1121F"/>
+        <rect x="5" y="20" width="15" height="2" fill="#7A1F0E"/>
+        <rect x="7" y="19" width="2" height="1" fill="#FFCC00"/>
+        <rect x="17" y="19" width="2" height="1" fill="#FFCC00"/>
+      </g>
+      <!-- Frame C : bras en haut, jupe au max -->
+      <g class="fc">
+        <rect x="3" y="11" width="2" height="2" fill="#E8B888"/>
+        <rect x="5" y="11" width="2" height="2" fill="#C1121F"/>
+        <rect x="17" y="11" width="2" height="2" fill="#E8B888"/>
+        <rect x="15" y="11" width="2" height="2" fill="#C1121F"/>
+        <rect x="2" y="10" width="2" height="2" fill="#7A1F0E"/>
+        <rect x="18" y="10" width="2" height="2" fill="#7A1F0E"/>
+        <rect x="4" y="18" width="14" height="2" fill="#C1121F"/>
+        <rect x="3" y="20" width="16" height="2" fill="#7A1F0E"/>
+        <rect x="6" y="19" width="2" height="1" fill="#FFCC00"/>
+        <rect x="11" y="19" width="2" height="1" fill="#FFCC00"/>
+        <rect x="16" y="19" width="2" height="1" fill="#FFCC00"/>
+        <rect x="0" y="9" width="1" height="1" fill="#FFCC00"/>
+      </g>
+      <!-- Frame D : pose flamenca, bras croisés en haut -->
+      <g class="fd">
+        <rect x="2" y="9" width="2" height="2" fill="#E8B888"/>
+        <rect x="4" y="11" width="3" height="2" fill="#C1121F"/>
+        <rect x="18" y="9" width="2" height="2" fill="#E8B888"/>
+        <rect x="15" y="11" width="3" height="2" fill="#C1121F"/>
+        <rect x="1" y="8" width="2" height="2" fill="#7A1F0E"/>
+        <rect x="19" y="8" width="2" height="2" fill="#7A1F0E"/>
+        <rect x="5" y="18" width="14" height="2" fill="#C1121F"/>
+        <rect x="4" y="20" width="16" height="2" fill="#7A1F0E"/>
+        <rect x="6" y="19" width="2" height="1" fill="#FFCC00"/>
+        <rect x="12" y="19" width="2" height="1" fill="#FFCC00"/>
+        <rect x="17" y="19" width="2" height="1" fill="#FFCC00"/>
+        <rect x="22" y="9" width="1" height="1" fill="#FFCC00"/>
+      </g>
+      <!-- Frame E : bras descendant à gauche, jupe à droite -->
+      <g class="fe">
+        <rect x="4" y="11" width="2" height="2" fill="#E8B888"/>
+        <rect x="5" y="13" width="2" height="3" fill="#C1121F"/>
+        <rect x="16" y="9" width="2" height="2" fill="#E8B888"/>
+        <rect x="16" y="11" width="3" height="3" fill="#C1121F"/>
+        <rect x="3" y="10" width="2" height="2" fill="#7A1F0E"/>
+        <rect x="17" y="8" width="2" height="2" fill="#7A1F0E"/>
+        <rect x="4" y="18" width="13" height="2" fill="#C1121F"/>
+        <rect x="2" y="20" width="15" height="2" fill="#7A1F0E"/>
+        <rect x="4" y="19" width="2" height="1" fill="#FFCC00"/>
+        <rect x="8" y="19" width="2" height="1" fill="#FFCC00"/>
+        <rect x="14" y="19" width="2" height="1" fill="#FFCC00"/>
+      </g>
+      <!-- Frame F : retour position centrale -->
+      <g class="ff">
+        <rect x="5" y="11" width="2" height="3" fill="#E8B888"/>
+        <rect x="6" y="11" width="2" height="2" fill="#C1121F"/>
+        <rect x="15" y="11" width="2" height="3" fill="#E8B888"/>
+        <rect x="14" y="11" width="2" height="2" fill="#C1121F"/>
+        <rect x="6" y="16" width="10" height="2" fill="#C1121F"/>
+        <rect x="6" y="18" width="10" height="2" fill="#7A1F0E"/>
+        <rect x="7" y="17" width="2" height="1" fill="#FFCC00"/>
+        <rect x="13" y="17" width="2" height="1" fill="#FFCC00"/>
+      </g>
+    </g>
+
+    <!-- SPRITE 2 : CANTAR (6 frames bouche progressive + notes) -->
+    <g transform="translate(65 102)" class="sp-fast delay-1">
+      <rect x="7" y="2" width="8" height="3" fill="#4A3A2E"/>
+      <rect x="6" y="3" width="1" height="3" fill="#4A3A2E"/>
+      <rect x="15" y="3" width="1" height="3" fill="#4A3A2E"/>
+      <rect x="7" y="5" width="8" height="5" fill="#E8B888"/>
+      <rect x="9" y="7" width="1" height="1" fill="#1F1410"/>
+      <rect x="12" y="7" width="1" height="1" fill="#1F1410"/>
+      <rect x="5" y="11" width="12" height="9" fill="#2D4A6B"/>
+      <rect x="5" y="13" width="12" height="1" fill="#1F3050"/>
+      <rect x="6" y="20" width="4" height="6" fill="#1F1410"/>
+      <rect x="12" y="20" width="4" height="6" fill="#1F1410"/>
+      <rect x="5" y="26" width="5" height="1" fill="#1F1410"/>
+      <rect x="12" y="26" width="5" height="1" fill="#1F1410"/>
+      <rect x="4" y="9" width="2" height="2" fill="#E8B888"/>
+      <rect x="4" y="10" width="2" height="2" fill="#2D4A6B"/>
+      <rect x="2" y="11" width="2" height="2" fill="#E8B888"/>
+      <rect x="-1" y="6" width="3" height="5" fill="#1F1410"/>
+      <rect x="0" y="5" width="3" height="2" fill="#1F1410"/>
+      <rect x="1" y="4" width="2" height="2" fill="#FFCC00"/>
+      <rect x="17" y="11" width="2" height="6" fill="#2D4A6B"/>
+      <rect x="17" y="16" width="2" height="2" fill="#E8B888"/>
+      <g class="fa"><rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/></g>
+      <g class="fb"><rect x="10" y="9" width="3" height="1" fill="#1F1410"/><rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/></g>
+      <g class="fc"><rect x="9" y="8" width="4" height="2" fill="#1F1410"/><rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/><rect x="20" y="6" width="2" height="2" fill="#FFCC00"/><rect x="21" y="4" width="1" height="3" fill="#FFCC00"/></g>
+      <g class="fd"><rect x="9" y="8" width="4" height="3" fill="#1F1410"/><rect x="10" y="9" width="2" height="2" fill="#7A1F0E"/><rect x="20" y="5" width="2" height="2" fill="#FFCC00"/><rect x="21" y="3" width="1" height="3" fill="#FFCC00"/><rect x="22" y="8" width="2" height="2" fill="#FFCC00"/><rect x="23" y="6" width="1" height="3" fill="#FFCC00"/></g>
+      <g class="fe"><rect x="9" y="8" width="4" height="3" fill="#1F1410"/><rect x="10" y="9" width="2" height="2" fill="#7A1F0E"/><rect x="20" y="3" width="2" height="2" fill="#FFCC00"/><rect x="21" y="1" width="1" height="3" fill="#FFCC00"/><rect x="22" y="6" width="2" height="2" fill="#FFCC00"/><rect x="23" y="4" width="1" height="3" fill="#FFCC00"/><rect x="24" y="9" width="2" height="2" fill="#FFCC00"/><rect x="25" y="7" width="1" height="3" fill="#FFCC00"/></g>
+      <g class="ff"><rect x="9" y="8" width="4" height="2" fill="#1F1410"/><rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/><rect x="20" y="2" width="2" height="2" fill="#FFCC00"/><rect x="21" y="0" width="1" height="3" fill="#FFCC00"/></g>
+    </g>
+
+    <!-- SPRITE 3 : TOCAR LA GUITARRA (6 frames main qui descend puis remonte) -->
+    <g transform="translate(110 100)" class="sp-med delay-2">
+      <rect x="6" y="0" width="14" height="1" fill="#1F1410"/>
+      <rect x="3" y="1" width="20" height="2" fill="#1F1410"/>
+      <rect x="8" y="-1" width="10" height="2" fill="#1F1410"/>
+      <rect x="9" y="3" width="8" height="5" fill="#E8B888"/>
+      <rect x="11" y="5" width="1" height="1" fill="#1F1410"/>
+      <rect x="14" y="5" width="1" height="1" fill="#1F1410"/>
+      <rect x="12" y="7" width="2" height="1" fill="#7A1F0E"/>
+      <rect x="6" y="9" width="14" height="7" fill="#3F5A3A"/>
+      <rect x="6" y="11" width="14" height="1" fill="#2F4A2A"/>
+      <rect x="2" y="13" width="22" height="2" fill="#7A1F0E"/>
+      <rect x="0" y="15" width="26" height="3" fill="#C8862E"/>
+      <rect x="-1" y="18" width="28" height="4" fill="#C8862E"/>
+      <rect x="0" y="22" width="26" height="2" fill="#C8862E"/>
+      <rect x="2" y="24" width="22" height="1" fill="#7A1F0E"/>
+      <rect x="-1" y="18" width="1" height="4" fill="#7A1F0E"/>
+      <rect x="26" y="18" width="1" height="4" fill="#7A1F0E"/>
+      <rect x="11" y="17" width="4" height="4" fill="#1F1410"/>
+      <rect x="12" y="18" width="2" height="2" fill="#000000"/>
+      <rect x="26" y="16" width="10" height="3" fill="#4A3A2E"/>
+      <rect x="26" y="17" width="10" height="1" fill="#7A1F0E"/>
+      <rect x="36" y="15" width="3" height="5" fill="#1F1410"/>
+      <rect x="0" y="16" width="36" height="1" fill="#FDF6E8" opacity="0.85"/>
+      <rect x="0" y="20" width="11" height="1" fill="#FDF6E8" opacity="0.7"/>
+      <rect x="15" y="20" width="11" height="1" fill="#FDF6E8" opacity="0.7"/>
+      <rect x="29" y="14" width="3" height="3" fill="#E8B888"/>
+      <rect x="28" y="13" width="2" height="2" fill="#3F5A3A"/>
+      <rect x="7" y="25" width="4" height="6" fill="#1F1410"/>
+      <rect x="15" y="25" width="4" height="6" fill="#1F1410"/>
+      <rect x="6" y="31" width="5" height="1" fill="#1F1410"/>
+      <rect x="15" y="31" width="5" height="1" fill="#1F1410"/>
+      <g class="fa"><rect x="13" y="13" width="3" height="3" fill="#E8B888"/></g>
+      <g class="fb"><rect x="13" y="16" width="3" height="3" fill="#E8B888"/><rect x="20" y="10" width="1" height="1" fill="#FFCC00"/></g>
+      <g class="fc"><rect x="13" y="19" width="3" height="3" fill="#E8B888"/><rect x="20" y="10" width="1" height="1" fill="#FFCC00"/><rect x="22" y="12" width="1" height="1" fill="#FFCC00"/></g>
+      <g class="fd"><rect x="13" y="22" width="3" height="3" fill="#E8B888"/><rect x="20" y="10" width="1" height="1" fill="#FFCC00"/><rect x="22" y="12" width="1" height="1" fill="#FFCC00"/><rect x="24" y="14" width="1" height="1" fill="#FFCC00"/></g>
+      <g class="fe"><rect x="13" y="19" width="3" height="3" fill="#E8B888"/><rect x="22" y="12" width="1" height="1" fill="#FFCC00"/><rect x="24" y="14" width="1" height="1" fill="#FFCC00"/><rect x="22" y="8" width="1" height="1" fill="#FFCC00"/></g>
+      <g class="ff"><rect x="13" y="16" width="3" height="3" fill="#E8B888"/><rect x="24" y="14" width="1" height="1" fill="#FFCC00"/><rect x="22" y="8" width="1" height="1" fill="#FFCC00"/></g>
+    </g>
+
+    <!-- SPRITE 4 : COMER tapa (6 frames cycle complet) -->
+    <g transform="translate(165 102)" class="sp-slow">
+      <rect x="7" y="2" width="8" height="3" fill="#1F1410"/>
+      <rect x="6" y="3" width="1" height="3" fill="#1F1410"/>
+      <rect x="15" y="3" width="1" height="3" fill="#1F1410"/>
+      <rect x="7" y="5" width="8" height="5" fill="#E8B888"/>
+      <rect x="9" y="7" width="1" height="1" fill="#1F1410"/>
+      <rect x="12" y="7" width="1" height="1" fill="#1F1410"/>
+      <rect x="5" y="11" width="12" height="9" fill="#FB5607"/>
+      <rect x="5" y="13" width="12" height="1" fill="#E64A00"/>
+      <rect x="6" y="20" width="4" height="6" fill="#4A3A2E"/>
+      <rect x="12" y="20" width="4" height="6" fill="#4A3A2E"/>
+      <rect x="5" y="26" width="5" height="1" fill="#1F1410"/>
+      <rect x="12" y="26" width="5" height="1" fill="#1F1410"/>
+      <rect x="17" y="11" width="2" height="6" fill="#FB5607"/>
+      <rect x="17" y="16" width="2" height="2" fill="#E8B888"/>
+      <!-- FA : tapa loin -->
+      <g class="fa">
+        <rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/>
+        <rect x="3" y="11" width="2" height="3" fill="#FB5607"/>
+        <rect x="3" y="13" width="2" height="2" fill="#E8B888"/>
+        <rect x="-1" y="11" width="6" height="2" fill="#FFCC00"/>
+        <rect x="-1" y="10" width="6" height="1" fill="#C8862E"/>
+        <rect x="-1" y="13" width="6" height="2" fill="#FFCC00"/>
+        <rect x="-1" y="15" width="6" height="1" fill="#C8862E"/>
+        <rect x="0" y="12" width="2" height="1" fill="#C1121F"/>
+        <rect x="3" y="12" width="2" height="1" fill="#3F5A3A"/>
+      </g>
+      <!-- FB : tapa qui s'approche -->
+      <g class="fb">
+        <rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/>
+        <rect x="6" y="9" width="2" height="3" fill="#FB5607"/>
+        <rect x="6" y="11" width="2" height="2" fill="#E8B888"/>
+        <rect x="2" y="9" width="6" height="2" fill="#FFCC00"/>
+        <rect x="2" y="8" width="6" height="1" fill="#C8862E"/>
+        <rect x="2" y="11" width="6" height="2" fill="#FFCC00"/>
+        <rect x="2" y="13" width="6" height="1" fill="#C8862E"/>
+        <rect x="3" y="10" width="2" height="1" fill="#C1121F"/>
+        <rect x="6" y="10" width="2" height="1" fill="#3F5A3A"/>
+      </g>
+      <!-- FC : tapa près de la bouche -->
+      <g class="fc">
+        <rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/>
+        <rect x="7" y="9" width="2" height="3" fill="#FB5607"/>
+        <rect x="7" y="11" width="2" height="2" fill="#E8B888"/>
+        <rect x="4" y="9" width="5" height="2" fill="#FFCC00"/>
+        <rect x="4" y="8" width="5" height="1" fill="#C8862E"/>
+        <rect x="4" y="11" width="5" height="2" fill="#FFCC00"/>
+        <rect x="4" y="13" width="5" height="1" fill="#C8862E"/>
+        <rect x="5" y="10" width="2" height="1" fill="#C1121F"/>
+      </g>
+      <!-- FD : MORDS ! bouche ouverte -->
+      <g class="fd">
+        <rect x="9" y="8" width="4" height="3" fill="#1F1410"/>
+        <rect x="10" y="8" width="2" height="2" fill="#FFCC00"/>
+        <rect x="8" y="9" width="2" height="2" fill="#C8862E"/>
+        <rect x="13" y="9" width="2" height="2" fill="#C8862E"/>
+        <rect x="7" y="9" width="2" height="3" fill="#FB5607"/>
+        <rect x="7" y="11" width="2" height="2" fill="#E8B888"/>
+        <rect x="3" y="9" width="4" height="2" fill="#FFCC00"/>
+        <rect x="3" y="8" width="4" height="1" fill="#C8862E"/>
+        <rect x="3" y="11" width="4" height="2" fill="#FFCC00"/>
+        <rect x="3" y="13" width="4" height="1" fill="#C8862E"/>
+        <rect x="3" y="6" width="1" height="1" fill="#C8862E"/>
+        <rect x="6" y="5" width="1" height="1" fill="#FFCC00"/>
+      </g>
+      <!-- FE : mastication, joue gauche gonflée -->
+      <g class="fe">
+        <rect x="9" y="8" width="4" height="2" fill="#1F1410"/>
+        <rect x="9" y="9" width="2" height="1" fill="#7A1F0E"/>
+        <rect x="6" y="6" width="2" height="2" fill="#FFB89A"/>
+        <rect x="4" y="12" width="2" height="3" fill="#FB5607"/>
+        <rect x="4" y="14" width="2" height="2" fill="#E8B888"/>
+        <rect x="0" y="12" width="6" height="2" fill="#FFCC00"/>
+        <rect x="0" y="11" width="6" height="1" fill="#C8862E"/>
+        <rect x="0" y="14" width="6" height="2" fill="#FFCC00"/>
+        <rect x="0" y="16" width="6" height="1" fill="#C8862E"/>
+        <rect x="18" y="5" width="1" height="1" fill="#FFCC00"/>
+      </g>
+      <!-- FF : mastication, joue droite gonflée -->
+      <g class="ff">
+        <rect x="9" y="8" width="4" height="2" fill="#1F1410"/>
+        <rect x="11" y="9" width="2" height="1" fill="#7A1F0E"/>
+        <rect x="13" y="6" width="2" height="2" fill="#FFB89A"/>
+        <rect x="4" y="12" width="2" height="3" fill="#FB5607"/>
+        <rect x="4" y="14" width="2" height="2" fill="#E8B888"/>
+        <rect x="0" y="12" width="6" height="2" fill="#FFCC00"/>
+        <rect x="0" y="11" width="6" height="1" fill="#C8862E"/>
+        <rect x="0" y="14" width="6" height="2" fill="#FFCC00"/>
+        <rect x="0" y="16" width="6" height="1" fill="#C8862E"/>
+        <rect x="20" y="7" width="1" height="1" fill="#FFCC00"/>
+      </g>
+    </g>
+
+    <!-- SPRITE 5 : BEBER (6 frames cycle complet boire) -->
+    <g transform="translate(215 102)" class="sp-med delay-3">
+      <rect x="7" y="2" width="8" height="3" fill="#C8862E"/>
+      <rect x="6" y="3" width="1" height="3" fill="#C8862E"/>
+      <rect x="15" y="3" width="1" height="3" fill="#C8862E"/>
+      <rect x="7" y="5" width="8" height="5" fill="#E8B888"/>
+      <rect x="9" y="7" width="1" height="1" fill="#1F1410"/>
+      <rect x="12" y="7" width="1" height="1" fill="#1F1410"/>
+      <rect x="5" y="11" width="12" height="9" fill="#5A189A"/>
+      <rect x="5" y="13" width="12" height="1" fill="#3F0A6F"/>
+      <rect x="6" y="20" width="4" height="6" fill="#4A3A2E"/>
+      <rect x="12" y="20" width="4" height="6" fill="#4A3A2E"/>
+      <rect x="5" y="26" width="5" height="1" fill="#1F1410"/>
+      <rect x="12" y="26" width="5" height="1" fill="#1F1410"/>
+      <rect x="3" y="11" width="2" height="6" fill="#5A189A"/>
+      <rect x="3" y="16" width="2" height="2" fill="#E8B888"/>
+      <!-- FA : verre bas -->
+      <g class="fa">
+        <rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/>
+        <rect x="17" y="14" width="2" height="3" fill="#5A189A"/>
+        <rect x="17" y="16" width="2" height="2" fill="#E8B888"/>
+        <rect x="15" y="17" width="6" height="6" fill="#FDF6E8" opacity="0.4"/>
+        <rect x="15" y="17" width="6" height="1" fill="#FDF6E8"/>
+        <rect x="15" y="22" width="6" height="1" fill="#FDF6E8"/>
+        <rect x="15" y="17" width="1" height="6" fill="#FDF6E8"/>
+        <rect x="20" y="17" width="1" height="6" fill="#FDF6E8"/>
+        <rect x="16" y="20" width="4" height="2" fill="#C1121F"/>
+        <rect x="17" y="18" width="2" height="1" fill="#FFCC00"/>
+      </g>
+      <!-- FB : verre se lève -->
+      <g class="fb">
+        <rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/>
+        <rect x="17" y="11" width="2" height="2" fill="#5A189A"/>
+        <rect x="17" y="13" width="2" height="2" fill="#E8B888"/>
+        <rect x="15" y="14" width="6" height="6" fill="#FDF6E8" opacity="0.4"/>
+        <rect x="15" y="14" width="6" height="1" fill="#FDF6E8"/>
+        <rect x="15" y="19" width="6" height="1" fill="#FDF6E8"/>
+        <rect x="15" y="14" width="1" height="6" fill="#FDF6E8"/>
+        <rect x="20" y="14" width="1" height="6" fill="#FDF6E8"/>
+        <rect x="16" y="17" width="4" height="2" fill="#C1121F"/>
+        <rect x="17" y="15" width="2" height="1" fill="#FFCC00"/>
+      </g>
+      <!-- FC : verre arrive à la bouche -->
+      <g class="fc">
+        <rect x="10" y="8" width="2" height="2" fill="#1F1410"/>
+        <rect x="14" y="9" width="2" height="2" fill="#5A189A"/>
+        <rect x="13" y="10" width="2" height="2" fill="#E8B888"/>
+        <rect x="11" y="9" width="7" height="5" fill="#FDF6E8" opacity="0.4"/>
+        <rect x="11" y="9" width="7" height="1" fill="#FDF6E8"/>
+        <rect x="11" y="13" width="4" height="1" fill="#FDF6E8"/>
+        <rect x="11" y="9" width="1" height="5" fill="#FDF6E8"/>
+        <rect x="17" y="9" width="1" height="6" fill="#FDF6E8"/>
+        <rect x="12" y="11" width="5" height="2" fill="#C1121F"/>
+      </g>
+      <!-- FD : boit (tête penchée en arrière) -->
+      <g class="fd">
+        <rect x="11" y="6" width="7" height="5" fill="#FDF6E8" opacity="0.4"/>
+        <rect x="11" y="6" width="7" height="1" fill="#FDF6E8"/>
+        <rect x="11" y="10" width="4" height="1" fill="#FDF6E8"/>
+        <rect x="11" y="6" width="1" height="5" fill="#FDF6E8"/>
+        <rect x="17" y="6" width="1" height="6" fill="#FDF6E8"/>
+        <rect x="12" y="8" width="5" height="3" fill="#C1121F"/>
+        <rect x="13" y="11" width="1" height="2" fill="#C1121F"/>
+        <rect x="9" y="11" width="2" height="3" fill="#5A189A"/>
+        <rect x="9" y="11" width="2" height="2" fill="#E8B888"/>
+        <rect x="10" y="9" width="2" height="2" fill="#1F1410"/>
+      </g>
+      <!-- FE : verre redescend -->
+      <g class="fe">
+        <rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/>
+        <rect x="15" y="14" width="2" height="2" fill="#5A189A"/>
+        <rect x="15" y="15" width="2" height="2" fill="#E8B888"/>
+        <rect x="14" y="17" width="6" height="5" fill="#FDF6E8" opacity="0.4"/>
+        <rect x="14" y="17" width="6" height="1" fill="#FDF6E8"/>
+        <rect x="14" y="21" width="6" height="1" fill="#FDF6E8"/>
+        <rect x="14" y="17" width="1" height="5" fill="#FDF6E8"/>
+        <rect x="19" y="17" width="1" height="5" fill="#FDF6E8"/>
+        <rect x="15" y="20" width="4" height="2" fill="#C1121F" opacity="0.6"/>
+        <rect x="16" y="14" width="1" height="2" fill="#C1121F"/>
+      </g>
+      <!-- FF : "Ahh!" satisfaction -->
+      <g class="ff">
+        <rect x="9" y="9" width="4" height="1" fill="#7A1F0E"/>
+        <rect x="10" y="10" width="2" height="1" fill="#C1121F"/>
+        <rect x="17" y="16" width="2" height="2" fill="#5A189A"/>
+        <rect x="17" y="17" width="2" height="2" fill="#E8B888"/>
+        <rect x="15" y="18" width="6" height="5" fill="#FDF6E8" opacity="0.4"/>
+        <rect x="15" y="18" width="6" height="1" fill="#FDF6E8"/>
+        <rect x="15" y="22" width="6" height="1" fill="#FDF6E8"/>
+        <rect x="15" y="18" width="1" height="5" fill="#FDF6E8"/>
+        <rect x="20" y="18" width="1" height="5" fill="#FDF6E8"/>
+        <rect x="16" y="20" width="4" height="2" fill="#C1121F" opacity="0.5"/>
+        <rect x="0" y="6" width="1" height="1" fill="#FFCC00"/>
+        <rect x="2" y="4" width="1" height="1" fill="#FFCC00"/>
+      </g>
+    </g>
+
+    <!-- SPRITE 6 : APLAUDIR (6 frames double clap) -->
+    <g transform="translate(265 102)" class="sp-fast delay-4">
+      <rect x="6" y="2" width="10" height="3" fill="#7A1F0E"/>
+      <rect x="5" y="3" width="1" height="4" fill="#7A1F0E"/>
+      <rect x="16" y="3" width="1" height="4" fill="#7A1F0E"/>
+      <rect x="5" y="6" width="1" height="3" fill="#7A1F0E"/>
+      <rect x="16" y="6" width="1" height="3" fill="#7A1F0E"/>
+      <rect x="7" y="5" width="8" height="5" fill="#E8B888"/>
+      <rect x="9" y="7" width="1" height="1" fill="#1F1410"/>
+      <rect x="12" y="7" width="1" height="1" fill="#1F1410"/>
+      <rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/>
+      <rect x="5" y="11" width="12" height="9" fill="#FF006E"/>
+      <rect x="5" y="13" width="12" height="1" fill="#C40058"/>
+      <rect x="6" y="20" width="4" height="6" fill="#2D4A6B"/>
+      <rect x="12" y="20" width="4" height="6" fill="#2D4A6B"/>
+      <rect x="5" y="26" width="5" height="1" fill="#1F1410"/>
+      <rect x="12" y="26" width="5" height="1" fill="#1F1410"/>
+      <g class="fa"><rect x="-2" y="12" width="5" height="2" fill="#FF006E"/><rect x="-4" y="12" width="2" height="2" fill="#E8B888"/><rect x="19" y="12" width="5" height="2" fill="#FF006E"/><rect x="24" y="12" width="2" height="2" fill="#E8B888"/></g>
+      <g class="fb"><rect x="2" y="12" width="4" height="2" fill="#FF006E"/><rect x="0" y="12" width="2" height="2" fill="#E8B888"/><rect x="16" y="12" width="4" height="2" fill="#FF006E"/><rect x="20" y="12" width="2" height="2" fill="#E8B888"/></g>
+      <g class="fc"><rect x="6" y="11" width="10" height="3" fill="#FF006E"/><rect x="8" y="12" width="6" height="2" fill="#E8B888"/><rect x="2" y="10" width="1" height="1" fill="#FFCC00"/><rect x="1" y="13" width="2" height="1" fill="#FFCC00"/><rect x="19" y="10" width="1" height="1" fill="#FFCC00"/><rect x="20" y="13" width="2" height="1" fill="#FFCC00"/><rect x="10" y="9" width="2" height="1" fill="#FFCC00"/></g>
+      <g class="fd"><rect x="3" y="12" width="4" height="2" fill="#FF006E"/><rect x="1" y="12" width="2" height="2" fill="#E8B888"/><rect x="15" y="12" width="4" height="2" fill="#FF006E"/><rect x="19" y="12" width="2" height="2" fill="#E8B888"/></g>
+      <g class="fe"><rect x="-1" y="12" width="5" height="2" fill="#FF006E"/><rect x="-3" y="12" width="2" height="2" fill="#E8B888"/><rect x="18" y="12" width="5" height="2" fill="#FF006E"/><rect x="23" y="12" width="2" height="2" fill="#E8B888"/></g>
+      <g class="ff"><rect x="6" y="11" width="10" height="3" fill="#FF006E"/><rect x="8" y="12" width="6" height="2" fill="#E8B888"/><rect x="2" y="11" width="1" height="1" fill="#FFCC00"/><rect x="19" y="11" width="1" height="1" fill="#FFCC00"/></g>
+    </g>
+
+  </symbol>
+</svg>
+
+<!-- ====================================================== -->
+<!-- PLACEHOLDER SCÈNE 2 - SERA REMPLACÉ                     -->
+<!-- ====================================================== -->
+<svg id="scene-2-template" style="display:none">
+  <symbol id="fiesta-scene-2" viewBox="0 0 320 160" shape-rendering="crispEdges">
+    <rect x="0" y="0" width="320" height="50" fill="#0A0A2E"/>
+    <rect x="0" y="50" width="320" height="20" fill="#1A1A4E"/>
+    <rect x="0" y="70" width="320" height="15" fill="#2A2A6E"/>
+    <rect x="0" y="85" width="320" height="15" fill="#3A2A5E" opacity="0.6"/>
+    <rect x="280" y="14" width="10" height="10" fill="#FDF6E8"/>
+    <rect x="278" y="16" width="2" height="6" fill="#FDF6E8"/>
+    <rect x="290" y="16" width="2" height="6" fill="#FDF6E8"/>
+    <rect x="282" y="12" width="6" height="2" fill="#FDF6E8"/>
+    <rect x="282" y="24" width="6" height="2" fill="#FDF6E8"/>
+    <rect x="283" y="18" width="2" height="2" fill="#C8C0B0"/>
+    <rect x="286" y="20" width="2" height="2" fill="#C8C0B0"/>
+    <rect class="star-blink-1" x="15" y="8" width="2" height="2" fill="#FFD60A"/>
+    <rect class="star-blink-2" x="38" y="12" width="2" height="2" fill="#FDF6E8"/>
+    <rect class="star-blink-3" x="58" y="6" width="2" height="2" fill="#FFD60A"/>
+    <rect class="star-blink-1" x="82" y="14" width="2" height="2" fill="#FDF6E8"/>
+    <rect class="star-blink-2" x="104" y="8" width="2" height="2" fill="#FFD60A"/>
+    <rect class="star-blink-3" x="128" y="12" width="2" height="2" fill="#FDF6E8"/>
+    <rect class="star-blink-1" x="150" y="6" width="2" height="2" fill="#FFD60A"/>
+    <rect class="star-blink-2" x="175" y="14" width="2" height="2" fill="#FDF6E8"/>
+    <rect class="star-blink-3" x="200" y="8" width="2" height="2" fill="#FFD60A"/>
+    <rect class="star-blink-1" x="225" y="12" width="2" height="2" fill="#FDF6E8"/>
+    <rect class="star-blink-2" x="248" y="6" width="2" height="2" fill="#FFD60A"/>
+    <rect class="star-blink-3" x="305" y="10" width="2" height="2" fill="#FDF6E8"/>
+    <rect class="star-blink-2" x="25" y="22" width="1" height="1" fill="#FDF6E8"/>
+    <rect class="star-blink-3" x="68" y="24" width="1" height="1" fill="#FFD60A"/>
+    <rect class="star-blink-1" x="115" y="22" width="1" height="1" fill="#FDF6E8"/>
+    <rect class="star-blink-2" x="162" y="24" width="1" height="1" fill="#FFD60A"/>
+    <rect class="star-blink-3" x="210" y="22" width="1" height="1" fill="#FDF6E8"/>
+    <rect class="star-blink-1" x="258" y="24" width="1" height="1" fill="#FFD60A"/>
+
+    <g class="firework-1" transform="translate(50 35)"><rect x="-1" y="-1" width="2" height="2" fill="#FFCC00"/><rect x="0" y="-9" width="1" height="4" fill="#C1121F"/><rect x="0" y="5" width="1" height="4" fill="#C1121F"/><rect x="-9" y="0" width="4" height="1" fill="#C1121F"/><rect x="5" y="0" width="4" height="1" fill="#C1121F"/><rect x="-7" y="-7" width="2" height="2" fill="#FF6B6B"/><rect x="5" y="-7" width="2" height="2" fill="#FF6B6B"/><rect x="-7" y="5" width="2" height="2" fill="#FF6B6B"/><rect x="5" y="5" width="2" height="2" fill="#FF6B6B"/></g>
+    <g class="rocket-1" transform="translate(50 50)"><rect x="0" y="0" width="1" height="3" fill="#FFCC00"/><rect x="0" y="3" width="1" height="2" fill="#FB5607" opacity="0.6"/></g>
+    <g class="firework-2" transform="translate(110 32)"><rect x="-1" y="-1" width="2" height="2" fill="#FDF6E8"/><rect x="0" y="-8" width="1" height="3" fill="#FFCC00"/><rect x="0" y="5" width="1" height="3" fill="#FFCC00"/><rect x="-8" y="0" width="3" height="1" fill="#FFCC00"/><rect x="5" y="0" width="3" height="1" fill="#FFCC00"/><rect x="-6" y="-5" width="1" height="2" fill="#06D6A0"/><rect x="5" y="-5" width="1" height="2" fill="#06D6A0"/><rect x="-6" y="4" width="1" height="2" fill="#06D6A0"/><rect x="5" y="4" width="1" height="2" fill="#06D6A0"/></g>
+    <g class="firework-3" transform="translate(225 38)"><rect x="-1" y="-1" width="2" height="2" fill="#FDF6E8"/><rect x="0" y="-8" width="1" height="3" fill="#06D6A0"/><rect x="0" y="5" width="1" height="3" fill="#06D6A0"/><rect x="-8" y="0" width="3" height="1" fill="#06D6A0"/><rect x="5" y="0" width="3" height="1" fill="#06D6A0"/><rect x="-5" y="-5" width="2" height="2" fill="#74C0FC"/><rect x="3" y="-5" width="2" height="2" fill="#74C0FC"/><rect x="-5" y="3" width="2" height="2" fill="#74C0FC"/><rect x="3" y="3" width="2" height="2" fill="#74C0FC"/></g>
+    <g class="firework-4" transform="translate(155 20)"><rect x="-1" y="-1" width="2" height="2" fill="#FFCC00"/><rect x="0" y="-7" width="1" height="3" fill="#FF006E"/><rect x="0" y="4" width="1" height="3" fill="#FF006E"/><rect x="-7" y="0" width="3" height="1" fill="#FF006E"/><rect x="4" y="0" width="3" height="1" fill="#FF006E"/><rect x="-5" y="-4" width="1" height="1" fill="#C77DFF"/><rect x="4" y="-4" width="1" height="1" fill="#C77DFF"/></g>
+    <g class="rocket-2" transform="translate(155 50)"><rect x="0" y="0" width="1" height="3" fill="#FF006E"/><rect x="0" y="3" width="1" height="2" fill="#C77DFF" opacity="0.6"/></g>
+    <g class="firework-5" transform="translate(85 22)"><rect x="-1" y="-1" width="2" height="2" fill="#FDF6E8"/><rect x="0" y="-6" width="1" height="2" fill="#FFCC00"/><rect x="0" y="4" width="1" height="2" fill="#FFCC00"/><rect x="-6" y="0" width="2" height="1" fill="#FFCC00"/><rect x="4" y="0" width="2" height="1" fill="#FFCC00"/></g>
+    <g class="firework-6" transform="translate(195 30)"><rect x="-1" y="-1" width="2" height="2" fill="#FDF6E8"/><rect x="0" y="-7" width="1" height="3" fill="#C77DFF"/><rect x="0" y="4" width="1" height="3" fill="#C77DFF"/><rect x="-6" y="0" width="2" height="1" fill="#C77DFF"/><rect x="4" y="0" width="2" height="1" fill="#C77DFF"/></g>
+    <g class="rocket-3" transform="translate(195 50)"><rect x="0" y="0" width="1" height="3" fill="#C77DFF"/><rect x="0" y="3" width="1" height="2" fill="#FF006E" opacity="0.6"/></g>
+
+    <g class="ferris-wheel" transform="translate(50 30)">
+      <rect x="36" y="-2" width="4" height="2" fill="#2A2A4E"/><rect x="48" y="2" width="2" height="2" fill="#2A2A4E"/><rect x="52" y="14" width="2" height="4" fill="#2A2A4E"/><rect x="48" y="28" width="2" height="2" fill="#2A2A4E"/><rect x="36" y="30" width="4" height="2" fill="#2A2A4E"/><rect x="24" y="28" width="2" height="2" fill="#2A2A4E"/><rect x="22" y="14" width="2" height="4" fill="#2A2A4E"/><rect x="24" y="2" width="2" height="2" fill="#2A2A4E"/>
+      <rect x="37" y="0" width="2" height="14" fill="#2A2A4E"/><rect x="37" y="18" width="2" height="14" fill="#2A2A4E"/><rect x="22" y="15" width="14" height="2" fill="#2A2A4E"/><rect x="40" y="15" width="14" height="2" fill="#2A2A4E"/>
+      <rect x="36" y="14" width="4" height="4" fill="#1F1410"/>
+      <rect x="34" y="-3" width="6" height="3" fill="#FFCC00" opacity="0.9"/><rect x="48" y="0" width="4" height="3" fill="#FF006E" opacity="0.9"/><rect x="50" y="14" width="4" height="4" fill="#06D6A0" opacity="0.9"/><rect x="48" y="28" width="4" height="3" fill="#FFCC00" opacity="0.9"/><rect x="34" y="30" width="6" height="3" fill="#FF006E" opacity="0.9"/><rect x="24" y="28" width="4" height="3" fill="#06D6A0" opacity="0.9"/><rect x="22" y="14" width="4" height="4" fill="#FFCC00" opacity="0.9"/><rect x="24" y="0" width="4" height="3" fill="#C77DFF" opacity="0.9"/>
+    </g>
+    <rect x="86" y="80" width="2" height="30" fill="#2A2A4E"/>
+    <rect x="92" y="80" width="2" height="30" fill="#2A2A4E"/>
+    <rect x="84" y="108" width="12" height="2" fill="#1F1410"/>
+
+    <rect x="135" y="78" width="50" height="40" fill="#0A0A2E"/>
+    <rect x="155" y="68" width="10" height="10" fill="#0A0A2E"/>
+    <rect x="157" y="63" width="6" height="5" fill="#0A0A2E"/>
+    <rect x="158" y="60" width="4" height="3" fill="#0A0A2E"/>
+    <rect x="159" y="58" width="2" height="2" fill="#0A0A2E"/>
+    <rect x="159" y="54" width="2" height="4" fill="#1F1410"/>
+    <rect x="157" y="55" width="6" height="1" fill="#1F1410"/>
+    <rect x="156" y="82" width="8" height="10" fill="#FFCC00" class="lantern-light"/>
+    <rect x="158" y="85" width="4" height="5" fill="#1F1410"/>
+    <rect x="140" y="90" width="4" height="6" fill="#FFCC00" opacity="0.7"/>
+    <rect x="176" y="90" width="4" height="6" fill="#FFCC00" opacity="0.7"/>
+    <rect x="140" y="100" width="4" height="6" fill="#FFCC00" opacity="0.5"/>
+    <rect x="176" y="100" width="4" height="6" fill="#FFCC00" opacity="0.7"/>
+    <rect x="156" y="74" width="8" height="8" fill="#FDF6E8" opacity="0.8"/>
+    <rect x="159" y="75" width="2" height="3" fill="#1F1410"/>
+    <rect x="159" y="78" width="3" height="1" fill="#1F1410"/>
+
+    <rect x="245" y="80" width="60" height="40" fill="#0A0A2E"/>
+    <rect x="245" y="77" width="60" height="3" fill="#1F1410"/>
+    <rect x="265" y="68" width="10" height="12" fill="#0A0A2E"/>
+    <rect x="265" y="65" width="10" height="3" fill="#1F1410"/>
+    <rect x="267" y="62" width="6" height="3" fill="#0A0A2E"/>
+    <rect x="269" y="74" width="2" height="3" fill="#FFCC00" class="lantern-light"/>
+    <rect x="253" y="88" width="6" height="6" fill="#FFCC00" opacity="0.7"/>
+    <rect x="265" y="88" width="6" height="6" fill="#FFCC00" class="lantern-light"/>
+    <rect x="277" y="88" width="6" height="6" fill="#FFCC00" opacity="0.5"/>
+    <rect x="291" y="88" width="6" height="6" fill="#FFCC00" opacity="0.7"/>
+    <rect x="253" y="100" width="6" height="6" fill="#FFCC00" class="lantern-light-2"/>
+    <rect x="265" y="100" width="6" height="6" fill="#FFCC00" opacity="0.7"/>
+    <rect x="277" y="100" width="6" height="6" fill="#FFCC00" opacity="0.6"/>
+    <rect x="291" y="100" width="6" height="6" fill="#FFCC00" class="lantern-light"/>
+
+    <rect x="0" y="42" width="320" height="1" fill="#4A3A2E" opacity="0.5"/>
+    <rect class="led-1" x="15" y="43" width="2" height="2" fill="#C1121F"/>
+    <rect class="led-2" x="35" y="44" width="2" height="2" fill="#FFCC00"/>
+    <rect class="led-3" x="65" y="43" width="2" height="2" fill="#06D6A0"/>
+    <rect class="led-4" x="95" y="44" width="2" height="2" fill="#C77DFF"/>
+    <rect class="led-1" x="125" y="43" width="2" height="2" fill="#FF006E"/>
+    <rect class="led-2" x="200" y="44" width="2" height="2" fill="#06D6A0"/>
+    <rect class="led-3" x="220" y="43" width="2" height="2" fill="#C77DFF"/>
+    <rect class="led-4" x="240" y="44" width="2" height="2" fill="#FF006E"/>
+    <rect class="led-1" x="260" y="43" width="2" height="2" fill="#C1121F"/>
+    <rect class="led-2" x="285" y="44" width="2" height="2" fill="#FFCC00"/>
+    <rect class="led-3" x="305" y="43" width="2" height="2" fill="#06D6A0"/>
+    <rect x="0" y="55" width="320" height="1" fill="#4A3A2E" opacity="0.4"/>
+    <rect class="led-2" x="8" y="56" width="2" height="2" fill="#FFCC00"/>
+    <rect class="led-3" x="24" y="57" width="2" height="2" fill="#C1121F"/>
+    <rect class="led-4" x="40" y="56" width="2" height="2" fill="#06D6A0"/>
+    <rect class="led-1" x="68" y="56" width="2" height="2" fill="#FF006E"/>
+    <rect class="led-2" x="84" y="57" width="2" height="2" fill="#FFCC00"/>
+    <rect class="led-3" x="100" y="56" width="2" height="2" fill="#C77DFF"/>
+    <rect class="led-1" x="208" y="56" width="2" height="2" fill="#FFCC00"/>
+    <rect class="led-2" x="224" y="57" width="2" height="2" fill="#06D6A0"/>
+    <rect class="led-3" x="244" y="56" width="2" height="2" fill="#C1121F"/>
+    <rect class="led-4" x="260" y="57" width="2" height="2" fill="#FF006E"/>
+    <rect class="led-1" x="280" y="56" width="2" height="2" fill="#FFCC00"/>
+    <rect class="led-2" x="300" y="57" width="2" height="2" fill="#C77DFF"/>
+
+    <rect x="40" y="60" width="1" height="6" fill="#4A3A2E"/>
+    <rect x="36" y="66" width="9" height="2" fill="#7A1F0E"/>
+    <rect x="37" y="68" width="7" height="6" fill="#FF006E" class="lantern-light"/>
+    <rect x="36" y="74" width="9" height="2" fill="#7A1F0E"/>
+    <rect x="39" y="76" width="3" height="2" fill="#7A1F0E"/>
+    <rect x="270" y="60" width="1" height="6" fill="#4A3A2E"/>
+    <rect x="266" y="66" width="9" height="2" fill="#7A1F0E"/>
+    <rect x="267" y="68" width="7" height="6" fill="#06D6A0" class="lantern-light-2"/>
+    <rect x="266" y="74" width="9" height="2" fill="#7A1F0E"/>
+    <rect x="269" y="76" width="3" height="2" fill="#7A1F0E"/>
+
+    <!-- BANNIÈRE ¡OLÉ! -->
+    <rect x="130" y="13" width="60" height="13" fill="#5A189A"/>
+    <rect x="130" y="13" width="60" height="2" fill="#3F0A6F"/>
+    <rect x="130" y="24" width="60" height="2" fill="#3F0A6F"/>
+    <rect x="125" y="13" width="5" height="2" fill="#4A3A2E"/>
+    <rect x="190" y="13" width="5" height="2" fill="#4A3A2E"/>
+    <rect x="135" y="16" width="2" height="2" fill="#FFCC00"/>
+    <rect x="135" y="19" width="2" height="4" fill="#FFCC00"/>
+    <rect x="141" y="16" width="6" height="7" fill="#FFCC00"/>
+    <rect x="143" y="18" width="2" height="3" fill="#5A189A"/>
+    <rect x="151" y="16" width="2" height="7" fill="#FFCC00"/>
+    <rect x="151" y="21" width="5" height="2" fill="#FFCC00"/>
+    <rect x="160" y="14" width="2" height="1" fill="#FFCC00"/>
+    <rect x="161" y="13" width="1" height="1" fill="#FFCC00"/>
+    <rect x="159" y="16" width="2" height="7" fill="#FFCC00"/>
+    <rect x="159" y="16" width="5" height="2" fill="#FFCC00"/>
+    <rect x="159" y="19" width="4" height="1" fill="#FFCC00"/>
+    <rect x="159" y="21" width="5" height="2" fill="#FFCC00"/>
+    <rect x="168" y="16" width="2" height="4" fill="#FFCC00"/>
+    <rect x="168" y="21" width="2" height="2" fill="#FFCC00"/>
+    <rect x="177" y="18" width="2" height="2" fill="#FFCC00"/>
+    <rect x="176" y="19" width="4" height="1" fill="#FFCC00"/>
+
+    <g class="pix-note-1" transform="translate(80 110)"><rect x="0" y="0" width="3" height="3" fill="#FFCC00"/><rect x="2" y="-7" width="1" height="7" fill="#FFCC00"/><rect x="2" y="-7" width="4" height="1" fill="#FFCC00"/></g>
+    <g class="pix-note-2" transform="translate(165 115)"><rect x="0" y="0" width="3" height="3" fill="#FF006E"/><rect x="2" y="-7" width="1" height="7" fill="#FF006E"/><rect x="2" y="-7" width="4" height="1" fill="#FF006E"/></g>
+    <g class="pix-note-3" transform="translate(250 110)"><rect x="0" y="0" width="3" height="3" fill="#06D6A0"/><rect x="2" y="-7" width="1" height="7" fill="#06D6A0"/><rect x="2" y="-7" width="4" height="1" fill="#06D6A0"/></g>
+
+    <rect x="0" y="135" width="320" height="25" fill="#2A1F1A"/>
+    <rect x="0" y="135" width="320" height="2" fill="#5A4A2E"/>
+    <rect x="20" y="138" width="6" height="1" fill="#FFCC00" opacity="0.3"/>
+    <rect x="60" y="138" width="6" height="1" fill="#FFCC00" opacity="0.3"/>
+    <rect x="120" y="138" width="6" height="1" fill="#FFCC00" opacity="0.3"/>
+    <rect x="180" y="138" width="6" height="1" fill="#FFCC00" opacity="0.3"/>
+    <rect x="230" y="138" width="6" height="1" fill="#FFCC00" opacity="0.3"/>
+    <rect x="280" y="138" width="6" height="1" fill="#FFCC00" opacity="0.3"/>
+    <rect x="15" y="148" width="18" height="1" fill="#1A0F0A"/>
+    <rect x="48" y="148" width="22" height="1" fill="#1A0F0A"/>
+    <rect x="85" y="148" width="18" height="1" fill="#1A0F0A"/>
+    <rect x="118" y="148" width="22" height="1" fill="#1A0F0A"/>
+    <rect x="155" y="148" width="18" height="1" fill="#1A0F0A"/>
+    <rect x="188" y="148" width="22" height="1" fill="#1A0F0A"/>
+    <rect x="225" y="148" width="18" height="1" fill="#1A0F0A"/>
+    <rect x="258" y="148" width="22" height="1" fill="#1A0F0A"/>
+    <rect x="295" y="148" width="18" height="1" fill="#1A0F0A"/>
+
+    <!-- SPRITE 1 : SALTAR (6 frames) -->
+    <g transform="translate(15 100)" class="sp-fast">
+      <g class="fa"><rect x="7" y="2" width="8" height="3" fill="#C8862E"/><rect x="6" y="3" width="1" height="3" fill="#C8862E"/><rect x="15" y="3" width="1" height="3" fill="#C8862E"/><rect x="7" y="5" width="8" height="5" fill="#E8B888"/><rect x="9" y="7" width="1" height="1" fill="#1F1410"/><rect x="12" y="7" width="1" height="1" fill="#1F1410"/><rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/><rect x="5" y="11" width="12" height="9" fill="#06D6A0"/><rect x="5" y="13" width="12" height="1" fill="#04A878"/><rect x="3" y="11" width="2" height="6" fill="#06D6A0"/><rect x="3" y="16" width="2" height="2" fill="#E8B888"/><rect x="17" y="11" width="2" height="6" fill="#06D6A0"/><rect x="17" y="16" width="2" height="2" fill="#E8B888"/><rect x="6" y="20" width="4" height="6" fill="#1F1410"/><rect x="12" y="20" width="4" height="6" fill="#1F1410"/><rect x="5" y="26" width="5" height="1" fill="#1F1410"/><rect x="12" y="26" width="5" height="1" fill="#1F1410"/></g>
+      <g class="fb"><rect x="7" y="6" width="8" height="3" fill="#C8862E"/><rect x="6" y="7" width="1" height="3" fill="#C8862E"/><rect x="15" y="7" width="1" height="3" fill="#C8862E"/><rect x="7" y="9" width="8" height="5" fill="#E8B888"/><rect x="9" y="11" width="1" height="1" fill="#1F1410"/><rect x="12" y="11" width="1" height="1" fill="#1F1410"/><rect x="10" y="13" width="2" height="1" fill="#7A1F0E"/><rect x="5" y="15" width="12" height="6" fill="#06D6A0"/><rect x="5" y="17" width="12" height="1" fill="#04A878"/><rect x="3" y="15" width="2" height="4" fill="#06D6A0"/><rect x="2" y="17" width="2" height="2" fill="#E8B888"/><rect x="17" y="15" width="2" height="4" fill="#06D6A0"/><rect x="19" y="17" width="2" height="2" fill="#E8B888"/><rect x="5" y="21" width="4" height="5" fill="#1F1410"/><rect x="13" y="21" width="4" height="5" fill="#1F1410"/><rect x="4" y="26" width="6" height="1" fill="#1F1410"/><rect x="13" y="26" width="6" height="1" fill="#1F1410"/></g>
+      <g class="fc"><rect x="7" y="2" width="8" height="3" fill="#C8862E"/><rect x="6" y="3" width="1" height="3" fill="#C8862E"/><rect x="15" y="3" width="1" height="3" fill="#C8862E"/><rect x="7" y="5" width="8" height="5" fill="#E8B888"/><rect x="9" y="7" width="1" height="1" fill="#1F1410"/><rect x="12" y="7" width="1" height="1" fill="#1F1410"/><rect x="9" y="9" width="4" height="1" fill="#7A1F0E"/><rect x="5" y="11" width="12" height="7" fill="#06D6A0"/><rect x="5" y="13" width="12" height="1" fill="#04A878"/><rect x="2" y="9" width="3" height="3" fill="#06D6A0"/><rect x="1" y="7" width="2" height="2" fill="#E8B888"/><rect x="15" y="9" width="3" height="3" fill="#06D6A0"/><rect x="18" y="7" width="2" height="2" fill="#E8B888"/><rect x="6" y="18" width="3" height="6" fill="#1F1410"/><rect x="13" y="18" width="3" height="6" fill="#1F1410"/><rect x="5" y="24" width="5" height="1" fill="#1F1410"/><rect x="13" y="24" width="5" height="1" fill="#1F1410"/><rect x="-2" y="20" width="2" height="1" fill="#FDF6E8" opacity="0.5"/><rect x="22" y="20" width="2" height="1" fill="#FDF6E8" opacity="0.5"/></g>
+      <g class="fd"><rect x="7" y="-8" width="8" height="3" fill="#C8862E"/><rect x="6" y="-7" width="1" height="3" fill="#C8862E"/><rect x="15" y="-7" width="1" height="3" fill="#C8862E"/><rect x="7" y="-5" width="8" height="5" fill="#E8B888"/><rect x="9" y="-3" width="1" height="1" fill="#1F1410"/><rect x="12" y="-3" width="1" height="1" fill="#1F1410"/><rect x="9" y="-1" width="4" height="1" fill="#7A1F0E"/><rect x="10" y="0" width="2" height="1" fill="#C1121F"/><rect x="5" y="1" width="12" height="9" fill="#06D6A0"/><rect x="5" y="3" width="12" height="1" fill="#04A878"/><rect x="3" y="-2" width="3" height="6" fill="#06D6A0"/><rect x="1" y="-7" width="3" height="4" fill="#E8B888"/><rect x="14" y="-2" width="3" height="6" fill="#06D6A0"/><rect x="16" y="-7" width="3" height="4" fill="#E8B888"/><rect x="6" y="10" width="4" height="3" fill="#1F1410"/><rect x="12" y="10" width="4" height="3" fill="#1F1410"/><rect x="4" y="13" width="4" height="2" fill="#1F1410"/><rect x="14" y="13" width="4" height="2" fill="#1F1410"/><ellipse cx="11" cy="28" rx="8" ry="1" fill="#000000" opacity="0.4"/><rect x="-2" y="-2" width="3" height="1" fill="#FDF6E8" opacity="0.6"/><rect x="22" y="-2" width="3" height="1" fill="#FDF6E8" opacity="0.6"/></g>
+      <g class="fe"><rect x="7" y="-2" width="8" height="3" fill="#C8862E"/><rect x="6" y="-1" width="1" height="3" fill="#C8862E"/><rect x="15" y="-1" width="1" height="3" fill="#C8862E"/><rect x="7" y="1" width="8" height="5" fill="#E8B888"/><rect x="9" y="3" width="1" height="1" fill="#1F1410"/><rect x="12" y="3" width="1" height="1" fill="#1F1410"/><rect x="10" y="5" width="2" height="1" fill="#7A1F0E"/><rect x="5" y="7" width="12" height="9" fill="#06D6A0"/><rect x="5" y="9" width="12" height="1" fill="#04A878"/><rect x="3" y="7" width="2" height="6" fill="#06D6A0"/><rect x="3" y="12" width="2" height="2" fill="#E8B888"/><rect x="17" y="7" width="2" height="6" fill="#06D6A0"/><rect x="17" y="12" width="2" height="2" fill="#E8B888"/><rect x="6" y="16" width="3" height="9" fill="#1F1410"/><rect x="13" y="16" width="3" height="9" fill="#1F1410"/><rect x="5" y="25" width="5" height="1" fill="#1F1410"/><rect x="13" y="25" width="5" height="1" fill="#1F1410"/></g>
+      <g class="ff"><rect x="7" y="6" width="8" height="3" fill="#C8862E"/><rect x="6" y="7" width="1" height="3" fill="#C8862E"/><rect x="15" y="7" width="1" height="3" fill="#C8862E"/><rect x="7" y="9" width="8" height="5" fill="#E8B888"/><rect x="9" y="11" width="1" height="1" fill="#1F1410"/><rect x="12" y="11" width="1" height="1" fill="#1F1410"/><rect x="10" y="13" width="2" height="1" fill="#7A1F0E"/><rect x="5" y="15" width="12" height="7" fill="#06D6A0"/><rect x="5" y="17" width="12" height="1" fill="#04A878"/><rect x="3" y="15" width="2" height="5" fill="#06D6A0"/><rect x="2" y="18" width="2" height="2" fill="#E8B888"/><rect x="17" y="15" width="2" height="5" fill="#06D6A0"/><rect x="19" y="18" width="2" height="2" fill="#E8B888"/><rect x="6" y="22" width="3" height="4" fill="#1F1410"/><rect x="13" y="22" width="3" height="4" fill="#1F1410"/><rect x="5" y="26" width="5" height="1" fill="#1F1410"/><rect x="13" y="26" width="5" height="1" fill="#1F1410"/><rect x="2" y="26" width="2" height="1" fill="#FDF6E8" opacity="0.6"/><rect x="18" y="26" width="2" height="1" fill="#FDF6E8" opacity="0.6"/></g>
+    </g>
+
+    <!-- SPRITE 2 : SACAR UNA FOTO (6 frames) -->
+    <g transform="translate(65 102)" class="sp-med delay-1">
+      <rect x="7" y="2" width="8" height="3" fill="#1F1410"/><rect x="6" y="3" width="1" height="3" fill="#1F1410"/><rect x="15" y="3" width="1" height="3" fill="#1F1410"/><rect x="7" y="5" width="8" height="5" fill="#E8B888"/><rect x="5" y="11" width="12" height="9" fill="#FF6B35"/><rect x="5" y="13" width="12" height="1" fill="#E04A1A"/><rect x="6" y="20" width="4" height="6" fill="#2D4A6B"/><rect x="12" y="20" width="4" height="6" fill="#2D4A6B"/><rect x="5" y="26" width="5" height="1" fill="#1F1410"/><rect x="12" y="26" width="5" height="1" fill="#1F1410"/><rect x="6" y="11" width="1" height="3" fill="#4A3A2E"/><rect x="15" y="11" width="1" height="3" fill="#4A3A2E"/>
+      <g class="fa"><rect x="9" y="7" width="1" height="1" fill="#1F1410"/><rect x="12" y="7" width="1" height="1" fill="#1F1410"/><rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/><rect x="6" y="15" width="10" height="5" fill="#1F1410"/><rect x="6" y="15" width="10" height="1" fill="#4A3A2E"/><rect x="7" y="16" width="8" height="3" fill="#2A2A2A"/><rect x="9" y="16" width="4" height="3" fill="#1F1410"/><rect x="10" y="17" width="2" height="1" fill="#7A1F0E"/><rect x="14" y="15" width="2" height="1" fill="#C1121F"/><rect x="4" y="16" width="2" height="3" fill="#E8B888"/><rect x="16" y="16" width="2" height="3" fill="#E8B888"/></g>
+      <g class="fb"><rect x="9" y="7" width="1" height="1" fill="#1F1410"/><rect x="12" y="7" width="1" height="1" fill="#1F1410"/><rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/><rect x="6" y="10" width="10" height="5" fill="#1F1410"/><rect x="6" y="10" width="10" height="1" fill="#4A3A2E"/><rect x="7" y="11" width="8" height="3" fill="#2A2A2A"/><rect x="9" y="11" width="4" height="3" fill="#1F1410"/><rect x="10" y="12" width="2" height="1" fill="#7A1F0E"/><rect x="14" y="10" width="2" height="2" fill="#C1121F"/><rect x="4" y="11" width="2" height="3" fill="#E8B888"/><rect x="16" y="11" width="2" height="3" fill="#E8B888"/></g>
+      <g class="fc"><rect x="9" y="7" width="1" height="1" fill="#1F1410"/><rect x="12" y="7" width="1" height="1" fill="#1F1410"/><rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/><rect x="6" y="3" width="10" height="6" fill="#1F1410"/><rect x="6" y="3" width="10" height="1" fill="#4A3A2E"/><rect x="7" y="4" width="8" height="4" fill="#2A2A2A"/><rect x="9" y="5" width="4" height="3" fill="#1F1410"/><rect x="10" y="6" width="2" height="1" fill="#7A1F0E"/><rect x="11" y="6" width="1" height="1" fill="#FDF6E8"/><rect x="14" y="3" width="2" height="2" fill="#C1121F"/><rect x="4" y="6" width="2" height="3" fill="#E8B888"/><rect x="16" y="6" width="2" height="3" fill="#E8B888"/></g>
+      <g class="fd"><rect x="9" y="7" width="1" height="1" fill="#1F1410"/><rect x="12" y="7" width="1" height="1" fill="#1F1410"/><rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/><rect x="6" y="3" width="10" height="6" fill="#1F1410"/><rect x="6" y="3" width="10" height="1" fill="#4A3A2E"/><rect x="7" y="4" width="8" height="4" fill="#2A2A2A"/><rect x="9" y="5" width="4" height="3" fill="#1F1410"/><rect x="10" y="6" width="2" height="1" fill="#FDF6E8"/><rect x="14" y="3" width="2" height="2" fill="#FFCC00"/><rect x="4" y="6" width="2" height="3" fill="#E8B888"/><rect x="16" y="6" width="2" height="3" fill="#E8B888"/><rect x="-6" y="0" width="3" height="3" fill="#FDF6E8"/><rect x="-4" y="4" width="2" height="2" fill="#FDF6E8"/><rect x="-5" y="7" width="3" height="2" fill="#FDF6E8"/><rect x="-3" y="11" width="2" height="2" fill="#FDF6E8"/><rect x="-9" y="3" width="3" height="1" fill="#FDF6E8" opacity="0.7"/><rect x="-11" y="6" width="2" height="1" fill="#FFCC00" opacity="0.5"/><rect x="-8" y="9" width="2" height="1" fill="#FDF6E8" opacity="0.6"/></g>
+      <g class="fe"><rect x="9" y="7" width="1" height="1" fill="#1F1410"/><rect x="12" y="7" width="1" height="1" fill="#1F1410"/><rect x="9" y="9" width="3" height="1" fill="#7A1F0E"/><rect x="6" y="10" width="10" height="5" fill="#1F1410"/><rect x="6" y="10" width="10" height="1" fill="#4A3A2E"/><rect x="7" y="11" width="8" height="3" fill="#2A2A2A"/><rect x="9" y="11" width="4" height="3" fill="#1F1410"/><rect x="10" y="12" width="2" height="1" fill="#7A1F0E"/><rect x="14" y="10" width="2" height="2" fill="#C1121F"/><rect x="4" y="11" width="2" height="3" fill="#E8B888"/><rect x="16" y="11" width="2" height="3" fill="#E8B888"/></g>
+      <g class="ff"><rect x="9" y="7" width="1" height="1" fill="#1F1410"/><rect x="12" y="7" width="1" height="1" fill="#1F1410"/><rect x="9" y="9" width="4" height="1" fill="#7A1F0E"/><rect x="10" y="10" width="2" height="1" fill="#C1121F"/><rect x="6" y="15" width="10" height="5" fill="#1F1410"/><rect x="6" y="15" width="10" height="1" fill="#4A3A2E"/><rect x="7" y="16" width="8" height="3" fill="#2A2A2A"/><rect x="9" y="16" width="4" height="3" fill="#1F1410"/><rect x="10" y="17" width="2" height="1" fill="#7A1F0E"/><rect x="14" y="15" width="2" height="1" fill="#C1121F"/><rect x="4" y="16" width="2" height="3" fill="#E8B888"/><rect x="16" y="16" width="2" height="3" fill="#E8B888"/><rect x="20" y="4" width="1" height="1" fill="#FFCC00"/><rect x="22" y="6" width="1" height="1" fill="#FFCC00"/></g>
+    </g>
+
+    <!-- SPRITE 3 : COMER UN HELADO (6 frames) - GLACE ICONIQUE 2 BOULES + CERISE -->
+    <g transform="translate(112 102)" class="sp-slow">
+      <rect x="7" y="2" width="8" height="3" fill="#4A3A2E"/><rect x="6" y="3" width="1" height="3" fill="#4A3A2E"/><rect x="15" y="3" width="1" height="3" fill="#4A3A2E"/><rect x="7" y="5" width="8" height="5" fill="#E8B888"/><rect x="9" y="7" width="1" height="1" fill="#1F1410"/><rect x="12" y="7" width="1" height="1" fill="#1F1410"/><rect x="5" y="11" width="12" height="9" fill="#FFCC00"/><rect x="5" y="13" width="12" height="1" fill="#E0AA00"/><rect x="6" y="20" width="4" height="6" fill="#1F1410"/><rect x="12" y="20" width="4" height="6" fill="#1F1410"/><rect x="5" y="26" width="5" height="1" fill="#1F1410"/><rect x="12" y="26" width="5" height="1" fill="#1F1410"/><rect x="3" y="11" width="2" height="6" fill="#FFCC00"/><rect x="3" y="16" width="2" height="2" fill="#E8B888"/>
+      <!-- FA : GRANDE GLACE tenue à droite -->
+      <g class="fa">
+        <rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/>
+        <!-- Bras qui tient -->
+        <rect x="17" y="13" width="2" height="4" fill="#E8B888"/>
+        <rect x="17" y="11" width="2" height="2" fill="#FFCC00"/>
+        <!-- CORNET (gaufrette) - triangle large en haut, pointu en bas -->
+        <rect x="17" y="10" width="6" height="2" fill="#D4A050"/>
+        <rect x="18" y="12" width="5" height="2" fill="#D4A050"/>
+        <rect x="19" y="14" width="3" height="2" fill="#D4A050"/>
+        <rect x="20" y="16" width="2" height="1" fill="#D4A050"/>
+        <!-- Quadrillage gaufrette (lignes croisées) -->
+        <rect x="18" y="11" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="20" y="11" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="22" y="11" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="19" y="13" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="21" y="13" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="20" y="15" width="1" height="1" fill="#8B6B2A"/>
+        <!-- BOULE 1 (rose fraise) en bas -->
+        <rect x="16" y="6" width="8" height="3" fill="#FF6B9D"/>
+        <rect x="17" y="5" width="6" height="1" fill="#FF6B9D"/>
+        <rect x="16" y="9" width="8" height="1" fill="#FF6B9D"/>
+        <rect x="17" y="6" width="2" height="1" fill="#FFB3CC"/>
+        <rect x="18" y="7" width="1" height="1" fill="#FFB3CC"/>
+        <!-- BOULE 2 (chocolat marron) au-dessus -->
+        <rect x="17" y="2" width="6" height="3" fill="#7A4A2A"/>
+        <rect x="18" y="1" width="4" height="1" fill="#7A4A2A"/>
+        <rect x="18" y="2" width="2" height="1" fill="#A06A3A"/>
+        <!-- Petite coulure de chocolat -->
+        <rect x="21" y="5" width="1" height="2" fill="#7A4A2A"/>
+        <!-- CERISE au sommet -->
+        <rect x="19" y="-1" width="2" height="2" fill="#C1121F"/>
+        <rect x="20" y="-1" width="1" height="1" fill="#E63946"/>
+        <!-- Tige verte -->
+        <rect x="20" y="-2" width="1" height="1" fill="#3F5A3A"/>
+        <rect x="21" y="-3" width="1" height="1" fill="#3F5A3A"/>
+      </g>
+      <!-- FB : glace approche, à mi-distance -->
+      <g class="fb">
+        <rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/>
+        <rect x="14" y="11" width="2" height="4" fill="#E8B888"/>
+        <rect x="14" y="10" width="2" height="2" fill="#FFCC00"/>
+        <!-- Cornet -->
+        <rect x="14" y="8" width="6" height="2" fill="#D4A050"/>
+        <rect x="15" y="10" width="5" height="2" fill="#D4A050"/>
+        <rect x="16" y="12" width="3" height="2" fill="#D4A050"/>
+        <rect x="17" y="14" width="2" height="1" fill="#D4A050"/>
+        <rect x="15" y="9" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="17" y="9" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="19" y="9" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="16" y="11" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="18" y="11" width="1" height="1" fill="#8B6B2A"/>
+        <!-- Boule fraise -->
+        <rect x="13" y="4" width="8" height="3" fill="#FF6B9D"/>
+        <rect x="14" y="3" width="6" height="1" fill="#FF6B9D"/>
+        <rect x="13" y="7" width="8" height="1" fill="#FF6B9D"/>
+        <rect x="14" y="4" width="2" height="1" fill="#FFB3CC"/>
+        <!-- Boule chocolat -->
+        <rect x="14" y="0" width="6" height="3" fill="#7A4A2A"/>
+        <rect x="15" y="-1" width="4" height="1" fill="#7A4A2A"/>
+        <rect x="15" y="0" width="2" height="1" fill="#A06A3A"/>
+        <rect x="18" y="3" width="1" height="2" fill="#7A4A2A"/>
+        <!-- Cerise -->
+        <rect x="16" y="-3" width="2" height="2" fill="#C1121F"/>
+        <rect x="17" y="-3" width="1" height="1" fill="#E63946"/>
+        <rect x="17" y="-4" width="1" height="1" fill="#3F5A3A"/>
+      </g>
+      <!-- FC : glace très proche du visage -->
+      <g class="fc">
+        <rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/>
+        <rect x="13" y="10" width="2" height="4" fill="#E8B888"/>
+        <rect x="13" y="9" width="2" height="2" fill="#FFCC00"/>
+        <rect x="13" y="6" width="6" height="2" fill="#D4A050"/>
+        <rect x="14" y="8" width="5" height="2" fill="#D4A050"/>
+        <rect x="15" y="10" width="3" height="2" fill="#D4A050"/>
+        <rect x="16" y="12" width="2" height="1" fill="#D4A050"/>
+        <rect x="14" y="7" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="16" y="7" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="18" y="7" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="15" y="9" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="17" y="9" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="12" y="2" width="8" height="3" fill="#FF6B9D"/>
+        <rect x="13" y="1" width="6" height="1" fill="#FF6B9D"/>
+        <rect x="12" y="5" width="8" height="1" fill="#FF6B9D"/>
+        <rect x="13" y="2" width="2" height="1" fill="#FFB3CC"/>
+        <rect x="13" y="-2" width="6" height="3" fill="#7A4A2A"/>
+        <rect x="14" y="-3" width="4" height="1" fill="#7A4A2A"/>
+        <rect x="14" y="-2" width="2" height="1" fill="#A06A3A"/>
+        <rect x="17" y="1" width="1" height="2" fill="#7A4A2A"/>
+        <rect x="15" y="-5" width="2" height="2" fill="#C1121F"/>
+        <rect x="16" y="-5" width="1" height="1" fill="#E63946"/>
+        <rect x="16" y="-6" width="1" height="1" fill="#3F5A3A"/>
+      </g>
+      <!-- FD : LÈCHE la glace, langue qui sort -->
+      <g class="fd">
+        <rect x="9" y="8" width="4" height="3" fill="#1F1410"/>
+        <!-- LANGUE ROSE qui sort vers la glace -->
+        <rect x="10" y="8" width="3" height="1" fill="#FF6B9D"/>
+        <rect x="11" y="6" width="3" height="2" fill="#FF6B9D"/>
+        <!-- Bras qui tient -->
+        <rect x="13" y="9" width="2" height="4" fill="#E8B888"/>
+        <rect x="13" y="9" width="2" height="1" fill="#FFCC00"/>
+        <!-- Cornet collé contre la bouche -->
+        <rect x="13" y="5" width="6" height="2" fill="#D4A050"/>
+        <rect x="14" y="7" width="5" height="2" fill="#D4A050"/>
+        <rect x="15" y="9" width="3" height="2" fill="#D4A050"/>
+        <rect x="16" y="11" width="2" height="1" fill="#D4A050"/>
+        <rect x="14" y="6" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="16" y="6" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="18" y="6" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="15" y="8" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="17" y="8" width="1" height="1" fill="#8B6B2A"/>
+        <!-- Boule fraise (entamée à gauche) -->
+        <rect x="14" y="1" width="7" height="3" fill="#FF6B9D"/>
+        <rect x="15" y="0" width="5" height="1" fill="#FF6B9D"/>
+        <rect x="14" y="4" width="7" height="1" fill="#FF6B9D"/>
+        <rect x="15" y="1" width="2" height="1" fill="#FFB3CC"/>
+        <!-- Boule chocolat (entamée) -->
+        <rect x="14" y="-3" width="5" height="3" fill="#7A4A2A"/>
+        <rect x="15" y="-4" width="3" height="1" fill="#7A4A2A"/>
+        <rect x="15" y="-3" width="2" height="1" fill="#A06A3A"/>
+        <!-- Cerise tombe presque -->
+        <rect x="15" y="-6" width="2" height="2" fill="#C1121F"/>
+        <rect x="16" y="-6" width="1" height="1" fill="#E63946"/>
+        <rect x="16" y="-7" width="1" height="1" fill="#3F5A3A"/>
+        <!-- Étoiles "miam" -->
+        <rect x="0" y="2" width="1" height="1" fill="#FFCC00"/>
+        <rect x="2" y="0" width="1" height="1" fill="#FFCC00"/>
+        <rect x="-1" y="-1" width="1" height="1" fill="#FFCC00"/>
+      </g>
+      <!-- FE : savoure, bouche fermée, glace tenue à côté avec coulure -->
+      <g class="fe">
+        <rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/>
+        <rect x="14" y="10" width="2" height="4" fill="#E8B888"/>
+        <rect x="14" y="9" width="2" height="2" fill="#FFCC00"/>
+        <rect x="14" y="7" width="6" height="2" fill="#D4A050"/>
+        <rect x="15" y="9" width="5" height="2" fill="#D4A050"/>
+        <rect x="16" y="11" width="3" height="2" fill="#D4A050"/>
+        <rect x="17" y="13" width="2" height="1" fill="#D4A050"/>
+        <rect x="15" y="8" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="17" y="8" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="19" y="8" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="16" y="10" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="18" y="10" width="1" height="1" fill="#8B6B2A"/>
+        <!-- Boule fraise plus petite (en train de fondre) -->
+        <rect x="14" y="3" width="7" height="3" fill="#FF6B9D"/>
+        <rect x="15" y="2" width="5" height="1" fill="#FF6B9D"/>
+        <rect x="14" y="6" width="7" height="1" fill="#FF6B9D"/>
+        <!-- Boule chocolat plus petite -->
+        <rect x="15" y="-1" width="5" height="3" fill="#7A4A2A"/>
+        <rect x="16" y="-2" width="3" height="1" fill="#7A4A2A"/>
+        <!-- COULURE rose sur le côté du cornet -->
+        <rect x="20" y="6" width="1" height="3" fill="#FF6B9D"/>
+        <rect x="20" y="9" width="1" height="1" fill="#FFB3CC"/>
+        <!-- Petite étoile satisfaction -->
+        <rect x="0" y="3" width="1" height="1" fill="#FFCC00"/>
+      </g>
+      <!-- FF : sourire de satisfaction + glace presque finie -->
+      <g class="ff">
+        <rect x="9" y="9" width="4" height="1" fill="#7A1F0E"/>
+        <rect x="10" y="10" width="2" height="1" fill="#C1121F"/>
+        <rect x="14" y="11" width="2" height="4" fill="#E8B888"/>
+        <rect x="14" y="10" width="2" height="2" fill="#FFCC00"/>
+        <rect x="14" y="8" width="6" height="2" fill="#D4A050"/>
+        <rect x="15" y="10" width="5" height="2" fill="#D4A050"/>
+        <rect x="16" y="12" width="3" height="2" fill="#D4A050"/>
+        <rect x="17" y="14" width="2" height="1" fill="#D4A050"/>
+        <rect x="15" y="9" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="17" y="9" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="19" y="9" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="16" y="11" width="1" height="1" fill="#8B6B2A"/>
+        <rect x="18" y="11" width="1" height="1" fill="#8B6B2A"/>
+        <!-- Toute petite boule restante (presque fini) -->
+        <rect x="15" y="4" width="5" height="3" fill="#FF6B9D"/>
+        <rect x="16" y="3" width="3" height="1" fill="#FF6B9D"/>
+        <!-- Coulure -->
+        <rect x="20" y="7" width="1" height="3" fill="#FF6B9D"/>
+        <rect x="14" y="7" width="1" height="2" fill="#FF6B9D"/>
+        <!-- Étoiles -->
+        <rect x="0" y="3" width="1" height="1" fill="#FFCC00"/>
+        <rect x="2" y="1" width="1" height="1" fill="#FFCC00"/>
+      </g>
+    </g>
+
+    <!-- SPRITE 4 : BEBER UN REFRESCO (6 frames) -->
+    <g transform="translate(160 102)" class="sp-med delay-2">
+      <rect x="7" y="2" width="8" height="3" fill="#1F1410"/><rect x="6" y="3" width="1" height="3" fill="#1F1410"/><rect x="15" y="3" width="1" height="3" fill="#1F1410"/><rect x="7" y="5" width="8" height="5" fill="#E8B888"/><rect x="9" y="7" width="1" height="1" fill="#1F1410"/><rect x="12" y="7" width="1" height="1" fill="#1F1410"/><rect x="5" y="11" width="12" height="9" fill="#C77DFF"/><rect x="5" y="13" width="12" height="1" fill="#A055D6"/><rect x="6" y="20" width="4" height="6" fill="#4A3A2E"/><rect x="12" y="20" width="4" height="6" fill="#4A3A2E"/><rect x="5" y="26" width="5" height="1" fill="#1F1410"/><rect x="12" y="26" width="5" height="1" fill="#1F1410"/><rect x="3" y="11" width="2" height="6" fill="#C77DFF"/><rect x="3" y="16" width="2" height="2" fill="#E8B888"/>
+      <g class="fa"><rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/><rect x="16" y="14" width="2" height="3" fill="#C77DFF"/><rect x="16" y="16" width="2" height="2" fill="#E8B888"/><rect x="15" y="17" width="7" height="9" fill="#C1121F"/><rect x="15" y="17" width="7" height="1" fill="#7A1F0E"/><rect x="16" y="26" width="5" height="1" fill="#7A1F0E"/><rect x="17" y="19" width="1" height="1" fill="#FDF6E8"/><rect x="19" y="21" width="1" height="1" fill="#FDF6E8"/><rect x="17" y="23" width="1" height="1" fill="#FDF6E8"/><rect x="19" y="12" width="1" height="6" fill="#FFCC00"/><rect x="18" y="11" width="2" height="1" fill="#FFCC00"/></g>
+      <g class="fb"><rect x="10" y="9" width="2" height="1" fill="#7A1F0E"/><rect x="15" y="11" width="2" height="2" fill="#C77DFF"/><rect x="15" y="12" width="2" height="2" fill="#E8B888"/><rect x="14" y="13" width="7" height="9" fill="#C1121F"/><rect x="14" y="13" width="7" height="1" fill="#7A1F0E"/><rect x="15" y="22" width="5" height="1" fill="#7A1F0E"/><rect x="16" y="15" width="1" height="1" fill="#FDF6E8"/><rect x="18" y="17" width="1" height="1" fill="#FDF6E8"/><rect x="14" y="9" width="1" height="4" fill="#FFCC00"/><rect x="13" y="9" width="2" height="1" fill="#FFCC00"/></g>
+      <g class="fc"><rect x="10" y="8" width="2" height="2" fill="#1F1410"/><rect x="12" y="9" width="2" height="3" fill="#C77DFF"/><rect x="12" y="10" width="2" height="2" fill="#E8B888"/><rect x="12" y="12" width="7" height="9" fill="#C1121F"/><rect x="12" y="12" width="7" height="1" fill="#7A1F0E"/><rect x="13" y="21" width="5" height="1" fill="#7A1F0E"/><rect x="14" y="14" width="1" height="1" fill="#FDF6E8"/><rect x="16" y="16" width="1" height="1" fill="#FDF6E8"/><rect x="13" y="9" width="1" height="3" fill="#FFCC00"/><rect x="12" y="8" width="2" height="1" fill="#FFCC00"/></g>
+      <g class="fd"><rect x="10" y="8" width="2" height="2" fill="#1F1410"/><rect x="11" y="6" width="1" height="2" fill="#FFCC00"/><rect x="11" y="9" width="7" height="9" fill="#C1121F"/><rect x="11" y="9" width="7" height="1" fill="#7A1F0E"/><rect x="12" y="18" width="5" height="1" fill="#7A1F0E"/><rect x="13" y="11" width="1" height="1" fill="#FDF6E8"/><rect x="15" y="13" width="1" height="1" fill="#FDF6E8"/><rect x="13" y="15" width="1" height="1" fill="#FDF6E8"/><rect x="11" y="8" width="1" height="2" fill="#FFCC00"/><rect x="10" y="11" width="2" height="3" fill="#E8B888"/><rect x="10" y="9" width="2" height="2" fill="#C77DFF"/><rect x="14" y="13" width="1" height="1" fill="#FDF6E8" opacity="0.6"/><rect x="16" y="15" width="1" height="1" fill="#FDF6E8" opacity="0.6"/></g>
+      <g class="fe"><rect x="10" y="8" width="2" height="2" fill="#1F1410"/><rect x="11" y="6" width="1" height="2" fill="#FFCC00"/><rect x="13" y="11" width="7" height="9" fill="#C1121F"/><rect x="13" y="11" width="7" height="1" fill="#7A1F0E"/><rect x="14" y="20" width="5" height="1" fill="#7A1F0E"/><rect x="15" y="13" width="1" height="1" fill="#FDF6E8"/><rect x="17" y="15" width="1" height="1" fill="#FDF6E8"/><rect x="13" y="9" width="1" height="2" fill="#FFCC00"/><rect x="12" y="8" width="2" height="1" fill="#FFCC00"/><rect x="12" y="11" width="2" height="3" fill="#E8B888"/><rect x="12" y="9" width="2" height="2" fill="#C77DFF"/></g>
+      <g class="ff"><rect x="9" y="9" width="4" height="1" fill="#7A1F0E"/><rect x="10" y="10" width="2" height="1" fill="#C1121F"/><rect x="15" y="14" width="2" height="3" fill="#C77DFF"/><rect x="15" y="16" width="2" height="2" fill="#E8B888"/><rect x="14" y="17" width="7" height="9" fill="#C1121F"/><rect x="14" y="17" width="7" height="1" fill="#7A1F0E"/><rect x="15" y="26" width="5" height="1" fill="#7A1F0E"/><rect x="16" y="19" width="1" height="1" fill="#FDF6E8"/><rect x="18" y="21" width="1" height="1" fill="#FDF6E8"/><rect x="18" y="12" width="1" height="5" fill="#FFCC00"/><rect x="17" y="11" width="2" height="1" fill="#FFCC00"/><rect x="11" y="11" width="1" height="2" fill="#C1121F"/><rect x="9" y="14" width="1" height="2" fill="#C1121F"/></g>
+    </g>
+
+    <!-- SPRITE 5 : LLEVAR UN SOMBRERO (6 frames cycle salutation) -->
+    <g transform="translate(210 100)" class="sp-slow delay-3">
+      <rect x="7" y="6" width="8" height="5" fill="#E8B888"/><rect x="9" y="8" width="1" height="1" fill="#1F1410"/><rect x="12" y="8" width="1" height="1" fill="#1F1410"/><rect x="9" y="10" width="4" height="1" fill="#1F1410"/><rect x="9" y="11" width="1" height="1" fill="#1F1410"/><rect x="12" y="11" width="1" height="1" fill="#1F1410"/><rect x="10" y="11" width="2" height="1" fill="#E8B888"/><rect x="10" y="12" width="2" height="1" fill="#7A1F0E"/><rect x="10" y="13" width="2" height="1" fill="#E8B888"/><rect x="5" y="14" width="12" height="9" fill="#7A1F0E"/><rect x="5" y="16" width="12" height="1" fill="#4A1F0E"/><rect x="9" y="14" width="4" height="2" fill="#FFCC00"/><rect x="10" y="15" width="2" height="1" fill="#C8862E"/><rect x="6" y="23" width="4" height="6" fill="#1F1410"/><rect x="12" y="23" width="4" height="6" fill="#1F1410"/><rect x="5" y="29" width="5" height="1" fill="#1F1410"/><rect x="12" y="29" width="5" height="1" fill="#1F1410"/><rect x="3" y="15" width="2" height="5" fill="#7A1F0E"/><rect x="3" y="20" width="2" height="2" fill="#E8B888"/>
+      <g class="fa"><rect x="17" y="15" width="2" height="5" fill="#7A1F0E"/><rect x="17" y="20" width="2" height="2" fill="#E8B888"/><rect x="-4" y="4" width="30" height="2" fill="#1F1410"/><rect x="-3" y="3" width="28" height="1" fill="#1F1410"/><rect x="-2" y="6" width="26" height="1" fill="#0A0A0A"/><rect x="6" y="0" width="10" height="3" fill="#1F1410"/><rect x="7" y="-2" width="8" height="2" fill="#1F1410"/><rect x="8" y="-3" width="6" height="1" fill="#1F1410"/><rect x="6" y="2" width="10" height="1" fill="#C1121F"/><rect x="7" y="3" width="8" height="1" fill="#FFCC00"/><rect x="-4" y="6" width="2" height="2" fill="#FFCC00"/><rect x="24" y="6" width="2" height="2" fill="#FFCC00"/><rect x="9" y="6" width="1" height="2" fill="#C1121F"/><rect x="14" y="6" width="1" height="2" fill="#C1121F"/></g>
+      <g class="fb"><rect x="17" y="11" width="2" height="4" fill="#7A1F0E"/><rect x="17" y="7" width="2" height="4" fill="#E8B888"/><rect x="-4" y="4" width="30" height="2" fill="#1F1410"/><rect x="-3" y="3" width="28" height="1" fill="#1F1410"/><rect x="-2" y="6" width="26" height="1" fill="#0A0A0A"/><rect x="6" y="0" width="10" height="3" fill="#1F1410"/><rect x="7" y="-2" width="8" height="2" fill="#1F1410"/><rect x="8" y="-3" width="6" height="1" fill="#1F1410"/><rect x="6" y="2" width="10" height="1" fill="#C1121F"/><rect x="7" y="3" width="8" height="1" fill="#FFCC00"/><rect x="-4" y="6" width="2" height="2" fill="#FFCC00"/><rect x="24" y="6" width="2" height="2" fill="#FFCC00"/><rect x="9" y="6" width="1" height="2" fill="#C1121F"/><rect x="14" y="6" width="1" height="2" fill="#C1121F"/></g>
+      <g class="fc"><rect x="17" y="5" width="2" height="6" fill="#7A1F0E"/><rect x="17" y="1" width="2" height="4" fill="#E8B888"/><rect x="-2" y="0" width="26" height="2" fill="#1F1410"/><rect x="-1" y="-1" width="24" height="1" fill="#1F1410"/><rect x="0" y="2" width="22" height="1" fill="#0A0A0A"/><rect x="8" y="-4" width="8" height="3" fill="#1F1410"/><rect x="9" y="-6" width="6" height="2" fill="#1F1410"/><rect x="10" y="-7" width="4" height="1" fill="#1F1410"/><rect x="8" y="-2" width="8" height="1" fill="#C1121F"/><rect x="9" y="-1" width="6" height="1" fill="#FFCC00"/><rect x="-2" y="2" width="2" height="2" fill="#FFCC00"/><rect x="22" y="2" width="2" height="2" fill="#FFCC00"/><rect x="11" y="2" width="1" height="2" fill="#C1121F"/><rect x="14" y="2" width="1" height="2" fill="#C1121F"/><rect x="7" y="4" width="8" height="2" fill="#4A3A2E"/></g>
+      <g class="fd"><rect x="17" y="2" width="2" height="6" fill="#7A1F0E"/><rect x="17" y="-2" width="2" height="4" fill="#E8B888"/><rect x="7" y="4" width="8" height="3" fill="#4A3A2E"/><rect x="6" y="5" width="1" height="2" fill="#4A3A2E"/><rect x="15" y="5" width="1" height="2" fill="#4A3A2E"/><rect x="-2" y="-6" width="26" height="2" fill="#1F1410"/><rect x="-1" y="-7" width="24" height="1" fill="#1F1410"/><rect x="0" y="-4" width="22" height="1" fill="#0A0A0A"/><rect x="8" y="-10" width="8" height="3" fill="#1F1410"/><rect x="9" y="-12" width="6" height="2" fill="#1F1410"/><rect x="10" y="-13" width="4" height="1" fill="#1F1410"/><rect x="8" y="-8" width="8" height="1" fill="#C1121F"/><rect x="9" y="-7" width="6" height="1" fill="#FFCC00"/><rect x="-2" y="-4" width="2" height="2" fill="#FFCC00"/><rect x="22" y="-4" width="2" height="2" fill="#FFCC00"/><rect x="10" y="-4" width="1" height="2" fill="#C1121F"/><rect x="13" y="-4" width="1" height="2" fill="#C1121F"/></g>
+      <g class="fe"><rect x="17" y="5" width="2" height="6" fill="#7A1F0E"/><rect x="17" y="1" width="2" height="4" fill="#E8B888"/><rect x="-2" y="0" width="26" height="2" fill="#1F1410"/><rect x="-1" y="-1" width="24" height="1" fill="#1F1410"/><rect x="0" y="2" width="22" height="1" fill="#0A0A0A"/><rect x="8" y="-4" width="8" height="3" fill="#1F1410"/><rect x="9" y="-6" width="6" height="2" fill="#1F1410"/><rect x="10" y="-7" width="4" height="1" fill="#1F1410"/><rect x="8" y="-2" width="8" height="1" fill="#C1121F"/><rect x="9" y="-1" width="6" height="1" fill="#FFCC00"/><rect x="-2" y="2" width="2" height="2" fill="#FFCC00"/><rect x="22" y="2" width="2" height="2" fill="#FFCC00"/><rect x="11" y="2" width="1" height="2" fill="#C1121F"/><rect x="14" y="2" width="1" height="2" fill="#C1121F"/><rect x="7" y="4" width="8" height="2" fill="#4A3A2E"/></g>
+      <g class="ff"><rect x="17" y="11" width="2" height="4" fill="#7A1F0E"/><rect x="17" y="7" width="2" height="4" fill="#E8B888"/><rect x="-4" y="4" width="30" height="2" fill="#1F1410"/><rect x="-3" y="3" width="28" height="1" fill="#1F1410"/><rect x="-2" y="6" width="26" height="1" fill="#0A0A0A"/><rect x="6" y="0" width="10" height="3" fill="#1F1410"/><rect x="7" y="-2" width="8" height="2" fill="#1F1410"/><rect x="8" y="-3" width="6" height="1" fill="#1F1410"/><rect x="6" y="2" width="10" height="1" fill="#C1121F"/><rect x="7" y="3" width="8" height="1" fill="#FFCC00"/><rect x="-4" y="6" width="2" height="2" fill="#FFCC00"/><rect x="24" y="6" width="2" height="2" fill="#FFCC00"/><rect x="9" y="6" width="1" height="2" fill="#C1121F"/><rect x="14" y="6" width="1" height="2" fill="#C1121F"/></g>
+    </g>
+
+    <!-- SPRITE 6 : MIRAR EL CIELO (6 frames suit les feux d'artifice) -->
+    <g transform="translate(265 102)" class="sp-med delay-4">
+      <rect x="5" y="11" width="12" height="9" fill="#06D6A0"/><rect x="5" y="13" width="12" height="1" fill="#04A878"/><rect x="6" y="20" width="4" height="6" fill="#1F1410"/><rect x="12" y="20" width="4" height="6" fill="#1F1410"/><rect x="5" y="26" width="5" height="1" fill="#1F1410"/><rect x="12" y="26" width="5" height="1" fill="#1F1410"/><rect x="17" y="5" width="2" height="6" fill="#06D6A0"/><rect x="17" y="1" width="2" height="4" fill="#E8B888"/><rect x="18" y="-1" width="1" height="2" fill="#E8B888"/><rect x="3" y="13" width="2" height="5" fill="#06D6A0"/><rect x="3" y="18" width="2" height="2" fill="#E8B888"/>
+      <g class="fa"><rect x="6" y="2" width="10" height="3" fill="#FF006E"/><rect x="5" y="3" width="1" height="3" fill="#FF006E"/><rect x="16" y="3" width="1" height="3" fill="#FF006E"/><rect x="6" y="5" width="8" height="5" fill="#E8B888"/><rect x="7" y="6" width="1" height="1" fill="#FDF6E8"/><rect x="10" y="6" width="1" height="1" fill="#1F1410"/><rect x="9" y="9" width="2" height="2" fill="#1F1410"/></g>
+      <g class="fb"><rect x="6" y="2" width="10" height="3" fill="#FF006E"/><rect x="5" y="3" width="1" height="3" fill="#FF006E"/><rect x="16" y="3" width="1" height="3" fill="#FF006E"/><rect x="6" y="5" width="9" height="5" fill="#E8B888"/><rect x="7" y="6" width="1" height="1" fill="#1F1410"/><rect x="11" y="6" width="1" height="1" fill="#1F1410"/><rect x="9" y="9" width="3" height="2" fill="#1F1410"/></g>
+      <g class="fc"><rect x="6" y="2" width="10" height="3" fill="#FF006E"/><rect x="5" y="3" width="1" height="3" fill="#FF006E"/><rect x="16" y="3" width="1" height="3" fill="#FF006E"/><rect x="7" y="5" width="8" height="5" fill="#E8B888"/><rect x="8" y="6" width="1" height="1" fill="#1F1410"/><rect x="12" y="6" width="1" height="1" fill="#1F1410"/><rect x="9" y="9" width="4" height="1" fill="#7A1F0E"/><rect x="10" y="10" width="2" height="1" fill="#C1121F"/><rect x="3" y="7" width="1" height="1" fill="#FFCC00"/></g>
+      <g class="fd"><rect x="6" y="2" width="10" height="3" fill="#FF006E"/><rect x="5" y="3" width="1" height="3" fill="#FF006E"/><rect x="16" y="3" width="1" height="3" fill="#FF006E"/><rect x="7" y="5" width="9" height="5" fill="#E8B888"/><rect x="9" y="6" width="1" height="1" fill="#1F1410"/><rect x="13" y="6" width="1" height="1" fill="#1F1410"/><rect x="13" y="6" width="1" height="1" fill="#FDF6E8"/><rect x="10" y="9" width="3" height="2" fill="#1F1410"/></g>
+      <g class="fe"><rect x="6" y="2" width="10" height="3" fill="#FF006E"/><rect x="5" y="3" width="1" height="3" fill="#FF006E"/><rect x="16" y="3" width="1" height="3" fill="#FF006E"/><rect x="8" y="5" width="8" height="5" fill="#E8B888"/><rect x="11" y="6" width="1" height="1" fill="#1F1410"/><rect x="14" y="6" width="1" height="1" fill="#1F1410"/><rect x="14" y="6" width="1" height="1" fill="#FDF6E8"/><rect x="11" y="9" width="2" height="2" fill="#1F1410"/></g>
+      <g class="ff"><rect x="6" y="2" width="10" height="3" fill="#FF006E"/><rect x="5" y="3" width="1" height="3" fill="#FF006E"/><rect x="16" y="3" width="1" height="3" fill="#FF006E"/><rect x="7" y="5" width="8" height="5" fill="#E8B888"/><rect x="8" y="6" width="1" height="1" fill="#1F1410"/><rect x="12" y="6" width="1" height="1" fill="#1F1410"/><rect x="9" y="9" width="4" height="1" fill="#7A1F0E"/><rect x="10" y="10" width="2" height="1" fill="#C1121F"/><rect x="3" y="7" width="1" height="1" fill="#FFCC00"/><rect x="20" y="7" width="1" height="1" fill="#FFCC00"/></g>
+    </g>
+
+  </symbol>
+</svg>
+
+<div class="slide-deck">
+
+  <section class="slide slide-title active" data-phase="Démarrage">
+    <div class="tag">¡Música a tope! · 4.º</div>
+    <h1 class="title-display">¿Qué <span class="accent">están</span><br>haciendo?</h1>
+    <p class="objective">Hoy vamos a aprender a decir <strong>lo que las personas están haciendo</strong> en este momento, en una fiesta hispana.</p>
+  </section>
+
+  <section class="slide slide-accroche" data-phase="Phase 2 · Accroche">
+    <div class="pixel-stage"><svg><use href="#fiesta-scene-1"/></svg></div>
+    <p class="accroche-question">¿Qué hacen <span class="accent">las personas</span>?</p>
+  </section>
+
+  <section class="slide slide-discovery" data-phase="Phase 3 · Découverte">
+    <h2>Construyamos juntos</h2>
+    <table class="learn-table">
+      <thead>
+        <tr>
+          <th>ACCIÓN<span class="sub">¿qué hacen?</span></th>
+          <th class="right"><span class="reveal" data-step="7">AHORA MISMO<span class="sub">en este momento</span></span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="reveal" data-step="1">bailar</span></td><td><span class="reveal" data-step="8">está <span class="gerund">bail<span class="ending">ando</span></span></span></td></tr>
+        <tr><td><span class="reveal" data-step="2">cantar</span></td><td><span class="reveal" data-step="9">está <span class="gerund">cant<span class="ending">ando</span></span></span></td></tr>
+        <tr><td><span class="reveal" data-step="3">tocar la guitarra</span></td><td><span class="reveal" data-step="10">está <span class="gerund">toc<span class="ending">ando</span></span> la guitarra</span></td></tr>
+        <tr><td><span class="reveal" data-step="4">comer</span></td><td><span class="reveal" data-step="11">está <span class="gerund">com<span class="ending">iendo</span></span></span></td></tr>
+        <tr><td><span class="reveal" data-step="5">beber</span></td><td><span class="reveal" data-step="12">está <span class="gerund">beb<span class="ending">iendo</span></span></span></td></tr>
+        <tr><td><span class="reveal" data-step="6">aplaudir</span></td><td><span class="reveal" data-step="13">está <span class="gerund">aplaud<span class="ending">iendo</span></span></span></td></tr>
+      </tbody>
+    </table>
+    <div class="discovery-rule" data-step="14">ESTAR + verbo · -AR → <span class="ending">-ANDO</span> · -ER / -IR → <span class="ending">-IENDO</span></div>
+  </section>
+
+  <section class="slide slide-trace" data-phase="Phase 4 · Lección">
+    <div class="trace-paper">
+      <h2>Decir lo que las personas están haciendo</h2>
+      <p class="objective">Para describir una acción <strong>en curso</strong>, en este momento.</p>
+      <div class="trace-rule" data-step="1">
+        <div class="formula"><span class="key">ESTAR</span> (conjugado) + verbo en <span class="ending">gerundio</span></div>
+        <div class="detail">Verbos en <strong>-AR</strong> → <strong>-ANDO</strong> (bailar → bailando) · Verbos en <strong>-ER / -IR</strong> → <strong>-IENDO</strong> (comer → comiendo)</div>
+      </div>
+      <div class="trace-examples">
+        <h3>Ejemplos</h3>
+        <div class="trace-example" data-step="2">Una mujer <span class="gerund">está cantando</span> en la calle.</div>
+        <div class="trace-example" data-step="3">Unos amigos <span class="gerund">están comiendo</span> tapas.</div>
+        <div class="trace-example" data-step="4">El músico <span class="gerund">está tocando</span> la guitarra.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide slide-production" data-phase="Phase 5 · Producción">
+    <div class="production-header">
+      <div class="left-block">
+        <span class="small-tag">Trabajo en parejas · 8 min</span>
+        <h2>Escribid <span class="key">4 frases</span> sobre lo que están haciendo las personas de la <span class="key">nueva</span> imagen.</h2>
+      </div>
+      <div class="timer"><span class="clock">⏱</span><span>8 min</span></div>
+    </div>
+    <div class="verb-bank">
+      <span class="label">Vocabulario</span>
+      <span class="verb-pill">saltar</span>
+      <span class="verb-pill">sacar una foto</span>
+      <span class="verb-pill">comer un helado</span>
+      <span class="verb-pill">beber un refresco</span>
+      <span class="verb-pill">llevar un sombrero</span>
+      <span class="verb-pill">mirar el cielo</span>
+    </div>
+    <div class="pixel-stage"><svg><use href="#fiesta-scene-2"/></svg></div>
+  </section>
+
+  <section class="slide slide-pingpong" data-phase="Phase 6 · Puesta en común">
+    <h2>Puesta en común</h2>
+    <p class="rules">Una frase por pareja · <strong>sin repetir</strong> lo que ya se ha dicho</p>
+    <div class="pixel-stage" style="margin-bottom: 0;"><svg><use href="#fiesta-scene-2"/></svg></div>
+  </section>
+
+  <section class="slide slide-bilan" data-phase="Phase 7 · Balance">
+    <div class="pre-tag">Para terminar</div>
+    <h2>¿Qué hemos <span class="accent">aprendido</span> hoy?</h2>
+    <div class="bilan-cards">
+      <div class="bilan-card"><div class="num">01</div><p>Una <strong>estructura</strong> nueva: ESTAR + gerundio.</p></div>
+      <div class="bilan-card"><div class="num">02</div><p>Una <strong>regla</strong> para formar el gerundio: -ando / -iendo.</p></div>
+      <div class="bilan-card"><div class="num">03</div><p>Algo de <strong>vocabulario</strong> de las fiestas hispanas.</p></div>
+    </div>
+    <div class="homework-banner" data-step="1">
+      <span class="icon">📓</span>
+      <span><strong>Para la próxima clase:</strong> escribid 4 frases sobre lo que estaban haciendo los miembros de vuestra familia ayer a las 8 de la tarde.</span>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const phaseEl = document.getElementById('phaseName');
+  const counterEl = document.getElementById('slideCounter');
+  let currentSlide = 0;
+  let currentStep = 0;
+
+  function maxStepOf(slide) {
+    const steps = slide.querySelectorAll('[data-step]');
+    if (!steps.length) return 0;
+    return Math.max(...Array.from(steps).map(s => +s.dataset.step));
+  }
+  function updateSteps() {
+    const slide = slides[currentSlide];
+    slide.querySelectorAll('[data-step]').forEach(el => {
+      const step = +el.dataset.step;
+      el.classList.toggle('visible', step <= currentStep);
+    });
+  }
+  function updateNav() {
+    const slide = slides[currentSlide];
+    phaseEl.textContent = slide.dataset.phase || '';
+    counterEl.textContent = (currentSlide + 1) + '/' + slides.length;
+  }
+  function showSlide(idx) {
+    slides.forEach((s, i) => s.classList.toggle('active', i === idx));
+    currentSlide = idx;
+    currentStep = 0;
+    updateSteps();
+    updateNav();
+  }
+  function next() {
+    const slide = slides[currentSlide];
+    const max = maxStepOf(slide);
+    if (currentStep < max) { currentStep++; updateSteps(); }
+    else if (currentSlide < slides.length - 1) { showSlide(currentSlide + 1); }
+  }
+  function prev() {
+    if (currentStep > 0) { currentStep--; updateSteps(); }
+    else if (currentSlide > 0) {
+      showSlide(currentSlide - 1);
+      currentStep = maxStepOf(slides[currentSlide]);
+      updateSteps();
+    }
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
+    else if (e.key === 'f' || e.key === 'F') {
+      e.preventDefault();
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+    else if (e.key === 'Home') showSlide(0);
+    else if (e.key === 'End') showSlide(slides.length - 1);
+  });
+  updateNav();
+  updateSteps();
+  setTimeout(() => {
+    const hint = document.getElementById('navHint');
+    if (hint) hint.style.opacity = '0';
+  }, 6000);
+</script>
+
+</body>
+</html>
