@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>¡Ayuda a tu jugador a anotar!</title>
+<title>Copa del Mundo 2026 – ¡Lleva a España a la final!</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Lexend:wght@400;600;800&display=swap" rel="stylesheet">
@@ -41,6 +41,7 @@ body{margin:0;color:var(--ink);background:var(--bg);
 h1{font-family:'Bebas Neue',Impact,'Arial Narrow Bold',sans-serif;font-weight:400;
   font-size:clamp(34px,9vw,60px);line-height:.92;letter-spacing:.01em;margin:4px 0 6px}
 h1 .nom{background:linear-gradient(90deg,var(--rojo),#ff6a3d);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ver{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:99px;background:var(--bg2);color:var(--muted);font-size:10px;letter-spacing:.04em;vertical-align:middle}
 .sub{margin:0;color:var(--muted);font-size:15px;line-height:1.45;max-width:48ch}
 .icon{flex:none;width:46px;height:46px;border-radius:14px;border:2px solid var(--line);background:var(--card);
   font-size:20px;cursor:pointer;color:var(--ink)}
@@ -63,10 +64,18 @@ h1 .nom{background:linear-gradient(90deg,var(--rojo),#ff6a3d);-webkit-background
 @keyframes flip{0%{transform:scale(1)}40%{transform:scale(1.9);color:var(--oro)}100%{transform:scale(1)}}
 .pts{background:rgba(6,10,28,.85);color:var(--oro);padding:.18em .6em .08em;border-radius:9px;box-shadow:0 6px 16px rgba(0,0,0,.45)}
 .cap{position:absolute;left:0;top:22%;pointer-events:none;opacity:0}
+.tierPop{position:fixed;inset:0;z-index:40;background:radial-gradient(circle at 50% 50%,rgba(10,14,40,.72),rgba(10,14,40,.45));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;pointer-events:none;z-index:6;opacity:0}
+.tierPop .rv-rayos{position:absolute;left:50%;top:50%;width:420px;height:420px;margin:-210px 0 0 -210px;opacity:.7}
+.tierPop .tpCard{position:relative;transform:scale(1.1);filter:drop-shadow(0 12px 24px rgba(0,0,0,.5))}
+.tierPop .tpTxt{position:relative;margin-top:6px;font-family:'Bebas Neue',Impact,sans-serif;font-size:34px;letter-spacing:.08em;color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.5),0 0 18px rgba(255,255,255,.5)}
+.tierPop.show{animation:tierIn 2.6s cubic-bezier(.2,.9,.3,1) forwards}
+@keyframes tierIn{0%{opacity:0;transform:scale(.4)}14%{opacity:1;transform:scale(1.05)}22%{transform:scale(1)}80%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.15)}}
 .cap span{display:inline-block;font-family:'Bebas Neue',Impact,sans-serif;font-size:clamp(30px,8vw,62px);letter-spacing:.05em;
   color:#fff;padding:.06em .7em 0;background:linear-gradient(90deg,#e4002b,#ff3d5e);transform:skewX(-12deg);
   border-left:9px solid var(--oro);box-shadow:8px 8px 0 rgba(0,0,0,.35)}
 .cap.ko span{background:linear-gradient(90deg,#111633,#2b3156);border-left-color:#e4002b}
+.cap.ok span{background:linear-gradient(90deg,#0f8a4a,#1fb866);border-left-color:#fff}
+.cap.def span{background:linear-gradient(90deg,#b35c00,#ff9f1a);border-left-color:#111633}
 .cap.show{animation:capIn 1.5s cubic-bezier(.2,.9,.3,1) forwards}
 @keyframes capIn{0%{opacity:0;transform:translateX(-110%)}18%{opacity:1;transform:translateX(18px)}
   26%{transform:translateX(10px)}80%{opacity:1;transform:translateX(20px)}100%{opacity:0;transform:translateX(60px)}}
@@ -131,6 +140,7 @@ h1 .nom{background:linear-gradient(90deg,var(--rojo),#ff6a3d);-webkit-background
 .gapin.err{color:var(--rojoT);border-color:var(--rojoT);background:var(--errbg);animation:halo 1s ease-out}
 @keyframes halo{0%{box-shadow:0 0 0 0 rgba(228,0,43,.7)}100%{box-shadow:0 0 0 14px rgba(228,0,43,0)}}
 .done{font-weight:800;color:var(--verde);background:var(--okbg);border-radius:8px;padding:.02em .35em}
+.done.err{color:var(--rojoT);background:var(--errbg);text-decoration:line-through}
 .fb{min-height:1.4em;margin:12px 0 0;font-weight:600;font-size:16px}
 .fb.ok{color:var(--verde)} .fb.ko{color:var(--rojoT)}
 .pista{margin-top:8px;padding:10px 14px;border-radius:12px;background:var(--errbg);font-size:16px;line-height:1.45;border-left:4px solid var(--rojoT)}
@@ -373,9 +383,10 @@ button:focus-visible{outline:3px solid var(--cian);outline-offset:3px}
 .fut.bronce{--fb:linear-gradient(160deg,#f0c39a,#b06f42 55%,#6b3a1f);--ft:#2e1405}
 .fut.plata{--fb:linear-gradient(160deg,#ffffff,#c3cad6 55%,#7d8796);--ft:#1d2433}
 .fut.oro{--fb:linear-gradient(160deg,#fff4b5,#f2c230 52%,#b8860b);--ft:#3a2600}
-.fut.especial{--fb:linear-gradient(160deg,#3a3a3a,#0d0d0d 60%,#3d2c00);--ft:#ffd24a}
+.fut.especial{--fb:linear-gradient(160deg,#f3d679 0%,#c99a2e 18%,#1a1a1a 42%,#111 60%,#8a6a1a 82%,#f0cf6a 100%);--ft:#ffe9a0}
 .fut.heroe{--fb:linear-gradient(160deg,#b98bff,#5b2bbf 55%,#250a63);--ft:#ffe680}
-.fut.icono{--fb:linear-gradient(160deg,#ffffff,#f6efd9 45%,#d6b85e);--ft:#5c4300}
+.fut.icono{--fb:linear-gradient(160deg,#fcfaf3,#efe6cc 50%,#cdb272);--ft:#4a3600}
+.fut.leyenda{--fb:linear-gradient(160deg,#ffe9a8,#ff6a3d 45%,#5e0a7a);--ft:#fff7d6}
 .fut.bronce::after,.fut.plata::after{animation:none;background:none}
 .fut-top{display:flex;align-items:flex-start}
 .fut-med{display:flex;flex-direction:column;align-items:center;line-height:1;margin-top:8px;min-width:46px}
@@ -401,7 +412,7 @@ button:focus-visible{outline:3px solid var(--cian);outline-offset:3px}
   font-family:'Bebas Neue',Impact,sans-serif;font-size:clamp(20px,5.4vw,34px);letter-spacing:.04em;padding:.15em .8em .05em;border-radius:12px;
   background:var(--fb,#f2c230);color:var(--ft,#3a2600);box-shadow:0 8px 20px rgba(0,0,0,.4)}
 .cartaUp.bronce{--fb:#b06f42;--ft:#fff}.cartaUp.plata{--fb:#c3cad6;--ft:#1d2433}.cartaUp.oro{--fb:#f2c230;--ft:#3a2600}
-.cartaUp.especial{--fb:#111;--ft:#ffd24a}.cartaUp.heroe{--fb:#5b2bbf;--ft:#ffe680}.cartaUp.icono{--fb:#f6efd9;--ft:#5c4300}
+.cartaUp.especial{--fb:#111;--ft:#ffd24a}.cartaUp.heroe{--fb:#5b2bbf;--ft:#ffe680}.cartaUp.icono{--fb:#f6efd9;--ft:#5c4300}.cartaUp.leyenda{--fb:#ff6a3d;--ft:#fff7d6}
 .cartaUp.show{animation:cartaUp 2.6s ease-out forwards}
 @keyframes cartaUp{0%{opacity:0;transform:translateX(-50%) scale(.5)}12%{opacity:1;transform:translateX(-50%) scale(1.1)}22%{transform:translateX(-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translateX(-50%) translateY(-20px)}}
 .headCard{flex:none}
@@ -457,6 +468,92 @@ button:focus-visible{outline:3px solid var(--cian);outline-offset:3px}
 .evo-at.activa{background:rgba(255,196,0,.25)}
 .evo-at.activa em,.evo-at.hecha em{opacity:1}
 .fut-stats span.brilla b{color:#2ecc71;text-shadow:0 0 10px rgba(46,204,113,.9)}
+.ayuda.ent{border-style:solid;border-color:var(--verde);color:var(--verde);cursor:default}
+.btn.ent,.btn.entBtn{background:linear-gradient(180deg,#3ee08a,#0f8a4a);color:#fff;box-shadow:0 5px 0 #075a2e,0 12px 22px rgba(15,138,74,.35)}
+.btn.entBtn{display:block;width:100%;margin:14px 0 0;font-size:22px}
+.btn.entBtn:disabled{filter:none;opacity:.85}
+.aviso.ent{background:var(--okbg);border-left-color:var(--verde)}
+.entWrap{width:min(520px,100%);max-width:calc(100vw - 24px);display:flex;flex-direction:column;gap:0}
+.vestuario{border-radius:20px 20px 0 0;overflow:hidden;background:#1b2650;box-shadow:0 0 0 3px #ffc400}
+.vestuario svg{display:block;width:100%;height:auto}
+.entCard{position:relative;width:100%;border-radius:0 0 24px 24px;animation:none}
+.flagbox{overflow:hidden;padding:0;background:#0d1433 !important;position:relative}
+.flagbox .flag{position:absolute;inset:0;width:100%;height:100%;display:block}
+.pre-escudo.flagbox{aspect-ratio:3/2;width:clamp(120px,32vw,210px);border-radius:16px}
+.flagbox .codTxt{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);font-size:.42em;background:rgba(0,0,0,.55);padding:.1em .5em 0;border-radius:6px}
+.bdg.flagbdg{padding:0;overflow:hidden;background:#0d1433;box-shadow:none;width:54px;height:38px;border-radius:8px;position:relative}
+.bdg.flagbdg .flag{position:absolute;inset:0;width:100%;height:100%;display:block}
+@media (max-width:430px){.bdg.flagbdg{width:46px;height:32px}}
+.enL{font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#ffc400;margin:12px 0 6px}
+.enErr{margin-top:6px}
+.enFrase{margin:0;padding:12px 14px;border-radius:14px;background:rgba(0,0,0,.25);font-size:18px;line-height:1.7}
+.enFrase s{color:#ff8a9a;background:rgba(255,0,40,.2);border-radius:6px;padding:0 .3em}
+.enFrase .inf{color:#cfd6ff;border-color:#cfd6ff}
+.enLec ul{margin:0;padding:0 0 0 18px;font-size:14.5px;line-height:1.55}
+.enLec li{margin-bottom:6px}
+.enPista{margin-top:8px;padding:9px 12px;border-radius:10px;background:rgba(255,196,0,.15);border-left:4px solid #ffc400;font-size:14.5px}
+.enQ{color:var(--ink);margin-top:0}
+.entCard .opciones .opt{background:#fff;color:#0d1433}
+.entCard .opciones .opt.bien{background:#dcf5e7;color:#0f8a4a;border-color:#0f8a4a;box-shadow:none}
+.entCard .opciones .opt.mal{background:#ffe3e8;color:#d1002a;border-color:#d1002a;text-decoration:line-through;box-shadow:none;opacity:.8}
+.entCard .enQ.bien{animation:none}.entCard .enQ.ko{animation:shake .45s}
+.entCard .fb{min-height:1.4em}
+.entCard .dos .btn{white-space:normal;font-size:21px;line-height:1.1}
+.enMedia{position:absolute;right:14px;top:12px;display:flex;flex-direction:column;align-items:center;min-width:58px;padding:4px 8px;border-radius:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#fff;line-height:1}
+.enMedia small{font-size:9px;letter-spacing:.1em;text-transform:uppercase;opacity:.8}.enMedia b{font-family:'Bebas Neue',Impact,sans-serif;font-size:26px;letter-spacing:.03em;margin:1px 0}.enMedia em{font-style:normal;font-size:9px;text-transform:uppercase;letter-spacing:.08em;opacity:.9}
+.enMedia.plata{background:rgba(201,208,219,.25)}.enMedia.oro,.enMedia.especial{background:rgba(242,194,48,.3);border-color:#f2c230}.enMedia.heroe{background:rgba(120,70,220,.4)}.enMedia.icono,.enMedia.leyenda{background:rgba(255,255,255,.3)}
+.enMedia.sube{animation:mediaSube .9s ease-out}
+@keyframes mediaSube{0%{transform:scale(1)}30%{transform:scale(1.25);box-shadow:0 0 0 6px rgba(255,196,0,.35)}100%{transform:scale(1)}}
+.enFinal{display:flex;align-items:center;justify-content:center;gap:18px;margin:6px 0 4px}
+.enFinal .enMini{zoom:.62}
+.enMediaBig{text-align:center;color:#fff}.enMediaBig small{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.8}
+.enMediaBig div{font-family:'Bebas Neue',Impact,sans-serif;font-size:34px;letter-spacing:.04em;line-height:1.1}.enMediaBig div span{opacity:.6}.enMediaBig b{color:#ffc400;display:inline-block}
+.enMediaBig b.salta{animation:mediaSube .8s ease-out}.enMediaBig .enTier{color:#ffc400;font-size:12px}
+.enLec.otraVez{outline:2px solid #ffc400;outline-offset:3px}
+.enH{font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;font-size:34px;letter-spacing:.03em;text-align:center;margin:8px 0 6px}
+.enPasos{margin:0;padding:0 0 0 22px;font-size:15.5px;line-height:1.6}
+.enPasos li{margin-bottom:6px}
+.enRes{font-family:'Bebas Neue',Impact,sans-serif;font-size:30px;text-align:center;margin-top:10px;letter-spacing:.04em}
+.enRes b{font-size:60px;color:#ffc400;display:block;line-height:1}
+/* ---------- Guía de la carta ---------- */
+.ficha.guia h3{font-family:'Bebas Neue',Impact,sans-serif;font-weight:400;font-size:21px;letter-spacing:.06em;color:#ffc400;margin:14px 0 6px;display:flex;align-items:center;gap:8px}
+.gu-top{display:flex;align-items:center;gap:12px;margin-top:8px}
+.gu-mini{zoom:.55;flex:none}
+.gu-intro p{margin:0 0 6px;font-size:15px;line-height:1.45}
+.gu-notas{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.gu-n{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:12px;background:rgba(0,0,0,.25)}
+.gu-n>b{font-family:'Bebas Neue',Impact,sans-serif;font-size:19px;letter-spacing:.04em;color:#ffc400;min-width:34px}
+.gu-n span{display:flex;flex-direction:column;line-height:1.2;min-width:0}
+.gu-n strong{font-size:13px}.gu-n em{font-style:italic;font-size:12px;opacity:.85}
+.gu-sube{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.4}
+.gu-sube li{display:flex;gap:9px;align-items:flex-start;padding:7px 10px;border-radius:12px;background:rgba(0,0,0,.25)}
+.gu-sube i{font-style:normal;font-size:18px;flex:none}
+.gu-tiers{display:flex;flex-wrap:wrap;gap:5px}
+.gu-t{display:flex;flex-direction:column;align-items:center;flex:1;min-width:64px;padding:5px 4px;border-radius:10px;background:var(--fb,#b06f42);color:var(--ft,#fff);line-height:1.1;border:2px solid transparent}
+.gu-t b{font-family:'Bebas Neue',Impact,sans-serif;font-size:14px;letter-spacing:.04em;font-weight:400}.gu-t small{font-size:10px;opacity:.9}
+.gu-t.act{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.35)}
+.gu-t.bronce{--fb:#b06f42;--ft:#fff}.gu-t.plata{--fb:#c3cad6;--ft:#1d2433}.gu-t.oro{--fb:#f2c230;--ft:#3a2600}.gu-t.especial{--fb:linear-gradient(160deg,#f3d679,#1a1a1a 50%,#c99a2e);--ft:#ffe9a0}
+.gu-t.heroe{--fb:#5b2bbf;--ft:#ffe680}.gu-t.icono{--fb:#efe6cc;--ft:#4a3600}.gu-t.leyenda{--fb:linear-gradient(160deg,#ffe9a8,#ff6a3d 50%,#5e0a7a);--ft:#fff7d6}
+.gu-btn{margin-left:auto;font-family:'Lexend',system-ui,sans-serif;font-size:12px;letter-spacing:0;padding:4px 10px;border-radius:99px;border:1.5px solid rgba(255,255,255,.5);background:rgba(255,255,255,.14);color:#fff;cursor:pointer}
+.pre-nota{display:inline-block;margin-top:6px;padding:4px 12px;border-radius:99px;background:rgba(255,196,0,.18);border:1px solid rgba(255,196,0,.5);color:#ffc400;font-weight:700;font-size:14px}
+/* ---------- Escena de la copa ---------- */
+.overlay.copaEsc{z-index:60;place-items:center;overflow:hidden;background:radial-gradient(120% 90% at 50% 100%,#3a1a7a 0%,#120a3a 45%,#04071a 100%);grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr auto auto;padding-top:calc(24px + env(safe-area-inset-top,0px))}
+.ce-fuegos i{position:absolute;width:6px;height:6px;border-radius:50%;opacity:0;animation:ceFuego 2.6s ease-out infinite;box-shadow:0 0 0 0 #fff}
+.ce-fuegos i:nth-child(1){left:15%;top:18%;--c:#ff3d5e;animation-delay:.2s}.ce-fuegos i:nth-child(2){left:78%;top:14%;--c:#ffc400;animation-delay:1.1s}
+.ce-fuegos i:nth-child(3){left:50%;top:9%;--c:#7dffa8;animation-delay:1.9s}.ce-fuegos i:nth-child(4){left:30%;top:30%;--c:#00c2d1;animation-delay:.7s}
+.ce-fuegos i:nth-child(5){left:68%;top:34%;--c:#fff;animation-delay:2.3s}.ce-fuegos i:nth-child(6){left:88%;top:40%;--c:#ff8a00;animation-delay:1.5s}
+@keyframes ceFuego{0%{opacity:0;transform:scale(.2);box-shadow:0 0 0 0 var(--c)}10%{opacity:1}55%{opacity:.9;transform:scale(1);box-shadow:0 0 0 0 var(--c),0 -34px 0 -2px var(--c),0 34px 0 -2px var(--c),34px 0 0 -2px var(--c),-34px 0 0 -2px var(--c),24px -24px 0 -2px var(--c),-24px -24px 0 -2px var(--c),24px 24px 0 -2px var(--c),-24px 24px 0 -2px var(--c)}100%{opacity:0;transform:scale(1.6)}}
+.ce-conf{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.ce-txt{position:relative;display:flex;flex-direction:column;align-items:center;font-family:'Bebas Neue',Impact,sans-serif;line-height:.9;letter-spacing:.06em;text-align:center}
+.ce-l1,.ce-l2{display:block;color:#fff;-webkit-text-stroke:2px #c8102e;text-shadow:0 0 26px rgba(255,196,0,.8),0 8px 0 #a3001c;font-size:clamp(44px,13vw,100px);opacity:0}
+.ce-l2{color:#ffc400;-webkit-text-stroke:2px #7a3a00}
+.copaEsc.anim .ce-l1{animation:ceIn .7s .3s cubic-bezier(.2,1.4,.4,1) forwards}
+.copaEsc.anim .ce-l2{animation:ceIn .7s .7s cubic-bezier(.2,1.4,.4,1) forwards}
+@keyframes ceIn{from{opacity:0;transform:scale(2.2) rotate(-6deg)}to{opacity:1;transform:none}}
+.ce-esc{position:relative;width:min(96vw,680px);align-self:center}
+.ce-esc>svg{display:block;width:100%;height:auto}
+.ce-nom{position:relative;font-family:'Bebas Neue',Impact,sans-serif;font-size:clamp(20px,5.6vw,34px);letter-spacing:.05em;color:#fff;text-align:center;padding:0 16px}
+.ce-btn{position:relative;margin:10px 0 calc(18px + env(safe-area-inset-bottom,0px));opacity:0;animation:preUp .5s 2.2s forwards}
 .slots{display:flex;flex-direction:column;gap:10px;margin-top:8px}
 .slot{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;padding:10px;border-radius:16px;background:rgba(0,0,0,.25);border:2px solid transparent}
 .slot.activo{border-color:#ffc400}
@@ -541,10 +638,12 @@ button:focus-visible{outline:3px solid var(--cian);outline-offset:3px}
 .futw.bronce{--fb:linear-gradient(160deg,#f3c9a1,#b5743f 50%,#6b3a1f);--ft:#2e1405;--fl:#6b3a1f}
 .futw.plata{--fb:linear-gradient(160deg,#ffffff,#c9d0db 50%,#7f8999);--ft:#1d2433;--fl:#5d6779}
 .futw.oro{--fb:linear-gradient(160deg,#fff6c2,#f2c230 48%,#b8860b);--ft:#3a2600;--fl:#8a6300;--glow:rgba(255,200,40,.35)}
-.futw.especial{--fb:linear-gradient(160deg,#3d3d3d,#0b0b0b 55%,#3d2c00);--ft:#ffd24a;--fl:#ffd24a;--glow:rgba(255,200,40,.6)}
+.futw.especial{--fb:linear-gradient(160deg,#f3d679 0%,#c99a2e 18%,#1a1a1a 42%,#111 60%,#8a6a1a 82%,#f0cf6a 100%);--ft:#ffe9a0;--fl:#f0cf6a;--glow:rgba(255,200,40,.45)}
 .futw.heroe{--fb:linear-gradient(160deg,#c49bff,#5b2bbf 50%,#200756);--ft:#ffe680;--fl:#ffe680;--glow:rgba(170,110,255,.6)}
-.futw.icono{--fb:linear-gradient(160deg,#ffffff,#f6efd9 45%,#d3b25a);--ft:#5c4300;--fl:#a8862a;--glow:rgba(255,235,160,.9)}
-.futw.especial,.futw.heroe,.futw.icono{animation:aura 2.4s ease-in-out infinite}
+.futw.icono{--fb:linear-gradient(160deg,#fcfaf3,#efe6cc 50%,#cdb272);--ft:#4a3600;--fl:#a8862a;--glow:rgba(255,255,255,.35)}
+.futw.icono .fut::after{background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.28) 48%,transparent 60%);background-size:250% 100%;animation-duration:4.5s}
+.futw.leyenda{--fb:linear-gradient(160deg,#ffe9a8 0%,#ff6a3d 45%,#5e0a7a 100%);--ft:#fff7d6;--fl:#ffd27a;--glow:rgba(255,120,60,.8)}
+.futw.especial,.futw.heroe,.futw.icono,.futw.leyenda{animation:aura 2.4s ease-in-out infinite}
 @keyframes aura{50%{filter:drop-shadow(0 10px 18px rgba(0,0,0,.4)) drop-shadow(0 0 22px var(--glow))}}
 .futw .fut::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.5) 45%,transparent 60%);
   background-size:250% 100%;animation:brillo 3.2s ease-in-out infinite;z-index:4}
@@ -587,7 +686,7 @@ button:focus-visible{outline:3px solid var(--cian);outline-offset:3px}
 .rv-rayos{position:absolute;left:50%;top:50%;width:1000px;height:1000px;margin:-500px 0 0 -500px;animation:spin 14s linear infinite;
   background:repeating-conic-gradient(var(--rc) 0 6deg,transparent 6deg 14deg);-webkit-mask:radial-gradient(circle,#000 8%,transparent 55%);mask:radial-gradient(circle,#000 8%,transparent 55%)}
 .rv-rayos.bronce{--rc:rgba(220,150,90,.35)}.rv-rayos.plata{--rc:rgba(220,230,245,.35)}.rv-rayos.oro{--rc:rgba(255,200,40,.4)}
-.rv-rayos.especial{--rc:rgba(255,210,74,.45)}.rv-rayos.heroe{--rc:rgba(180,130,255,.45)}.rv-rayos.icono{--rc:rgba(255,245,200,.55)}
+.rv-rayos.especial{--rc:rgba(255,210,74,.45)}.rv-rayos.heroe{--rc:rgba(180,130,255,.45)}.rv-rayos.icono{--rc:rgba(255,245,200,.55)}.rv-rayos.leyenda{--rc:rgba(255,140,80,.5)}
 .rv-txt{position:relative;font-family:'Bebas Neue',Impact,sans-serif;font-size:clamp(28px,8vw,46px);line-height:1;letter-spacing:.05em;color:#fff;text-align:center;
   transform:scale(0);animation:pop .5s cubic-bezier(.3,1.7,.5,1) 1.3s forwards}
 .rv-txt b{font-weight:400;color:#ffc400}
@@ -627,6 +726,17 @@ button:focus-visible{outline:3px solid var(--cian);outline-offset:3px}
 .futw .fut.dorso-c .dr-l{font-size:12px;gap:0 14px}
 .futw .fut.dorso-c .dr-l b{font-size:18px}
 .futw .fut.dorso-c .dr-h{font-size:10.5px;margin-top:4px;padding:0 26px;line-height:1.25}
+/* ---------- Modo ligero: sin efectos caros ---------- */
+.ligero .fut::after,.ligero .futw .fut::after{animation:none;background:none}
+.ligero .fut-holo{display:none}
+.ligero .overlay{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(4,7,22,.92)}
+.ligero .gol.show .rays{animation:fadeIn .3s forwards;opacity:.5}
+.ligero .golFlash{text-shadow:0 6px 0 #a3001c}
+.ligero .stage{box-shadow:none}
+.ligero .card,.ligero .pcard,.ligero .camino-head{box-shadow:none}
+.ligero .cnItem svg,.ligero .carta-top,.ligero .evo-carta{will-change:auto}
+.ligero .gol.show .big span{animation:pop .35s var(--d) forwards}
+.ligero .conf{animation-timing-function:linear}
 @media (prefers-reduced-motion: reduce){ .conf{display:none} .gol.show .rays{animation:fadeIn .3s forwards} }
 </style>
 </head>
@@ -634,13 +744,14 @@ button:focus-visible{outline:3px solid var(--cian);outline-offset:3px}
 <div class="wrap">
   <header class="top">
     <div>
-      <div class="eyebrow">Copa del Mundo 2026</div>
+      <div class="eyebrow">Copa del Mundo 2026 <span class="ver" title="Versión del juego">v35 · 19/10/2026</span></div>
       <h1 id="titulo"></h1>
       <p class="sub">Gana los 8 partidos de España hasta la final. Cada buena respuesta es una jugada: ¡regatea, defiende y marca!</p>
     </div>
     <div class="acciones-top">
       <button class="icon txt" id="verPartidas" type="button">👥 Partidas</button>
       <button class="icon txt" id="verCreador" type="button">Mi jugador</button>
+      <button class="icon" id="tgLigero" type="button" aria-pressed="false" aria-label="Modo ligero (menos efectos, más fluido)" title="Modo ligero">⚡</button>
       <button class="icon" id="tgSonido" type="button" aria-pressed="true" aria-label="Sonido">🔊</button>
     </div>
   </header>
@@ -648,6 +759,7 @@ button:focus-visible{outline:3px solid var(--cian);outline-offset:3px}
   <section id="camino" hidden>
     <div class="camino-head" id="caminoHead"></div>
     <ol class="ruta" id="ruta"></ol>
+    <button class="btn entBtn" id="entCamino" type="button" hidden></button>
     <button class="reset" id="resetTorneo" type="button">Reiniciar el torneo</button>
   </section>
 
@@ -694,12 +806,35 @@ button:focus-visible{outline:3px solid var(--cian);outline-offset:3px}
   </section>
 </div>
 
+<div class="overlay" id="guia" hidden role="dialog" aria-modal="true" aria-label="Cómo funciona mi carta">
+  <div class="ficha mia guia" id="guiaCard"></div>
+</div>
+
 <div class="overlay" id="carta" hidden role="dialog" aria-modal="true" aria-label="Mi carta">
   <div class="ficha mia" id="cartaCard"></div>
 </div>
 
 <div class="overlay" id="celeNueva" hidden role="dialog" aria-modal="true" aria-label="Nueva celebración">
   <div class="ficha mia" id="cnCard"></div>
+</div>
+
+<div class="tierPop" id="tierPop" aria-hidden="true" hidden></div>
+<div class="overlay copaEsc" id="copaEsc" hidden role="dialog" aria-modal="true" aria-label="Campeones del mundo">
+  <div class="ce-fuegos" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="ce-conf" id="ceConf"></div>
+  <div class="ce-txt"><span class="ce-l1">¡CAMPEONES</span><span class="ce-l2">DEL MUNDO!</span></div>
+  <div class="ce-esc"><svg id="ceSvg" viewBox="-330 -400 660 480" aria-hidden="true">
+    <defs><radialGradient id="ceLuz" cx=".5" cy=".4" r=".6"><stop offset="0" stop-color="#ffe9a8" stop-opacity=".5"/><stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/></radialGradient>
+      <pattern id="ceGrada" width="14" height="12" patternUnits="userSpaceOnUse"><circle cx="7" cy="6" r="3.2" fill="#e4002b"/><circle cx="0" cy="12" r="3.2" fill="#ffc400"/><circle cx="14" cy="0" r="3.2" fill="#fff"/></pattern></defs>
+    <rect x="-330" y="-400" width="660" height="290" fill="#141a3a"/><rect x="-330" y="-330" width="660" height="210" fill="url(#ceGrada)" opacity=".75"/>
+    <rect x="-330" y="-120" width="660" height="14" fill="#0b1030"/><rect x="-330" y="-106" width="660" height="186" fill="#2e9b4a"/>
+    ${Array.from({length:7},(_,i)=>`<rect x="${-330+i*95}" y="-106" width="47" height="186" fill="#35aa52"/>`).join("")}
+    <rect x="-330" y="-30" width="660" height="3" fill="#ffffff" opacity=".8"/><circle cx="0" cy="-28" r="70" fill="none" stroke="#fff" stroke-width="3" opacity=".8"/>
+    <ellipse cx="0" cy="-100" rx="330" ry="240" fill="url(#ceLuz)"/>
+    <g id="ceEq"></g><g id="ceAv"></g><g id="ceTrofeo"></g>
+  </svg></div>
+  <div class="ce-nom" id="ceNom"></div>
+  <button class="btn ce-btn" id="ceOk" type="button">Continuar ›</button>
 </div>
 
 <div class="overlay" id="copa" hidden role="dialog" aria-modal="true" aria-labelledby="copaTit">
@@ -755,6 +890,10 @@ button:focus-visible{outline:3px solid var(--cian);outline-offset:3px}
 <div class="overlay pre" id="preOv" hidden role="dialog" aria-modal="true" aria-label="Presentación del partido"><div class="pre-box" id="preBox"></div></div>
 <div class="overlay evo" id="evoOv" hidden role="dialog" aria-modal="true" aria-label="Evolución de tu carta"><div class="ficha mia evo-box" id="evoBox"></div></div>
 
+<div class="overlay" id="entrena" hidden role="dialog" aria-modal="true" aria-labelledby="enTit">
+  <div class="entWrap"><div class="vestuario" id="vestuario"></div><div class="ficha mia entCard" id="entCard"></div></div>
+</div>
+
 <div class="overlay" id="partidas" hidden role="dialog" aria-modal="true" aria-labelledby="ptTit">
   <div class="ficha mia" id="ptCard"></div>
 </div>
@@ -767,7 +906,7 @@ button:focus-visible{outline:3px solid var(--cian);outline-offset:3px}
    ============================================================ */
 let pActual=0;
 const KEYP="mundial2026-v2";
-const PROG0=()=>({res:{},xp:0,mvp:0,goles:0,cele:"salto",campeon:false,celeVistas:["salto","puno"],card:{PRO:50,PRE:50,GUS:50,SER:50,IRR:50,FUT:50}});
+const PROG0=()=>({res:{},xp:0,mvp:0,goles:0,cele:"salto",campeon:false,fallos:[],ent:0,celeVistas:["salto","puno"],card:{PRO:50,PRE:50,GUS:50,SER:50,IRR:50,FUT:50}});
 /* Partidas guardadas: 3 ranuras independientes (personaje + progreso) */
 const KEYS="mundial2026-partidas",NSLOTS=3;
 function progDesde(p){const d=PROG0();if(!p)return d;return{...d,...p,card:{...d.card,...(p.card||{})}};}
@@ -788,88 +927,103 @@ const conj=(antes,verbo,ok,despues,pista)=>({antes,verbo,ok:[ok],despues,pista})
 const elige=(antes,ops,ok,despues,etiqueta,pista)=>({antes,ops,ok:[ok],despues,etiqueta,pista});
 const escribe=(antes,etiqueta,ok,despues,pista)=>({antes,verbo:etiqueta,ok:[ok],despues,pista,esc:true});
 const cat=(it,c)=>({...it,cat:c});
+const FLAGS={
+  CPV:`<rect width="60" height="40" fill="#003893"/><rect y="24" width="60" height="4" fill="#fff"/><rect y="28" width="60" height="4" fill="#cf2027"/><rect y="32" width="60" height="4" fill="#fff"/>
+    ${Array.from({length:10},(_,i)=>{const a=i/10*Math.PI*2;return `<circle cx="${(22+Math.cos(a)*9).toFixed(1)}" cy="${(27+Math.sin(a)*9).toFixed(1)}" r="1.4" fill="#f7d116"/>`;}).join("")}`,
+  KSA:`<g transform="scale(.09375)"> <defs><clipPath id="@@sa-a"><path fill-opacity=".7" d="M-85.3 0h682.6v512H-85.3z"/></clipPath></defs><g fill-rule="evenodd" clip-path="url(#@@sa-a)" transform="translate(80)scale(.9375)"><path fill="#165d31" d="M-128 0h768v512h-768z"/><path fill="#fff" d="M65.5 145.1c-.8 12-2 33 8.3 35.2 12.3 1.2 5.5-20.8 10-24.8.8-2 2.3-2 2.4.5v18.7c0 6 4 7.8 7 9 3.2-.2 5.4 0 6.6 3l1.6 32.3s7.4 2.2 7.8-18.1c.3-12-2.4-21.9-.8-24.2 0-2.3 3-2.4 5-1.3 3.2 2.2 4.6 5 9.6 4 7.6-2.2 12.2-5.9 12.3-11.7a47 47 0 0 0-3.5-16.6c.4-1-1.4-3.7-1-4.7 1.3 2.2 3.4 2 3.8 0-1.3-4.2-3.3-8.3-6.5-10-2.7-2.4-6.7-2-8 3-.8 5.7 2 12.4 6.1 18 .9 2.1 2.1 5.7 1.6 8.9-2.2 1.3-4.4.7-6.3-1.2 0 0-6-4.5-6-5.6 1.6-10.2.3-11.4-.6-14.3-.6-3.9-2.5-5.2-4-7.8-1.5-1.6-3.5-1.6-4.5 0-2.7 4.6-1.4 14.5.5 19 1.4 4.1 3.5 6.7 2.5 6.7-.8 2.3-2.5 1.7-3.8-1a66.6 66.6 0 0 1-2.1-17.4c-.5-4.6-1.1-14.4-4.2-17-1.8-2.4-4.5-1.2-5.5 1a82.4 82.4 0 0 0 .3 13.4c2 7.4 2.7 14 3.7 21.5.3 10.1-5.8 4.4-5.5-.7a45 45 0 0 0-.3-19.4c-1-2.6-2.1-3.2-4.6-2.8-1.9 0-6.8 5.3-8.2 14.3 0 0-1.2 4.6-1.7 8.7-.7 4.6-3.7 8-5.9-.6-1.8-6.3-3-21.6-6-18z"/><path fill="#fff" d="m99 194.2-32 15.4c.3-7.3 15.1-20.4 25.3-20.5 6.5.1 4.9 2.5 6.6 5.1z"/><path fill="#fff" d="M93.3 204.2c-16.8 43.5 39.5 49.6 45.8 1.8.6-2 3-3.9 3.4-.7-1.3 43.3-43.6 46.2-50.8 32.6a41.9 41.9 0 0 1-2.5-14.6c-1-8.5-5.5-5.2-6.2 3.2-.7 4.7-.5 6-.5 10.5 2.2 34.2 56.7 19.5 65.6-8.7 4.7-15.6-.8-27.1 1.7-27.1 5.4 5.8 13 .8 14.7-1.2.7-1 2.5-1.7 3.7-.4 4.2 3 11.6 1.6 13.2-3.7.9-5.3 1.6-10.7 1.8-16.2-3.5 1-6 1.7-6.3 3.2l-.7 4.6c-.3 1.5-3.2 1.5-3.4-.4-1.3-6-6.7-6.7-10 2.5-2.1 1.8-6.1 2.2-6.5-.5.5-6.2-2-7-7-4.1l-4.8-36.2c2 0 4 1.5 5.9-.9-2-6.5-6.5-19.7-9-20.7-1.1-1.4-2.1-.5-3.7-.1-2.6.8-5 3-4.2 7.4 3 18.8 5 33.1 8.1 52 .5 2.1-1.3 5-3.7 4.7-4-2.7-5-8.2-12-8-5 0-10.6 5.5-11.3 10.7-.9 4.2-1.2 8.7 0 12.3 3.5 4.2 7.7 3.8 11.4 2.9 3-1.3 5.5-4.3 6.6-3.6.7.9.1 10.9-14.3 18.5-8.7 4-15.7 4.8-19.4-2.3-2.3-4.5.2-21.4-5.6-17.5"/><path fill="#fff" d="M165 160c3.3-1.2 19.3-19.6 19.3-19.6l-2.4-2c-.9-.7-.8-1.5 0-2.2 4-2.4 2.7-7.4.7-9.8a9.7 9.7 0 0 0-8.7.1c-2.8 2.7-3.4 7-1.2 9.6 2.1 1 4.2 3.2 2.8 4.4-6.6 7-24.5 19.1-22.4 19.5.4.6 11.5.6 11.8 0zm-97 65c-6 9.6-6.5 23.9-3.2 28.2 1.8 2 4.7 2.9 6.8 2.2 3.8-1.6 5.5-9.3 4.6-12-1.3-2-2.3-2.3-3.6-.7-2.6 5.4-3.7 1.7-4-1.3a70 70 0 0 1 .8-15.2c.7-4.2 0-3-1.4-1.2m257.1-15.3c-5.8-12.6-13.9-25-16.4-29.7a557.6 557.6 0 0 0-24.8-36c-6.2-7.4 10.2 3.1-2-11.7l-8.9-7.5c-2-1.4-6.8-4-7.6.2-.4 3.8-.2 5.8.4 8.9.5 2 3.5 5.5 5 7.5a565 565 0 0 1 53.8 86.5c2.6-1.3 2-16.1.5-18.2"/><path fill="#fff" d="M299.6 251.5c-1.2 1.3 2.8 6.8 8 6.8 8.6-1 16.2-5.8 23.2-18.6a33 33 0 0 0 5.3-14.2 317 317 0 0 0-5.8-72.4c-.3-2 0-4.4.2-5 .6-.7 2.5 0 3.5-1.7 1.5-1.5-4-14-7-18.7-1-2.2-1.5-3.6-3.3.2a27 27 0 0 0-3 13.6c4.1 28.5 5.4 53.4 8 81.9.3 2.8-.1 6.8-2 8.4a80.2 80.2 0 0 1-27.1 19.7m116.5-.1c-6.2 3.6-6.2 7.7-1.2 7.8 8.6-1 18.8-1.7 25.8-12.3a41 41 0 0 0 4.2-16 303 303 0 0 0-4.7-71.4c-.2-2-1.1-6.7-.8-7.3.6-1.4 3.4.1 4.4-1.5 1.4-1.5-7.3-12.7-10.4-17.5-1-2.2-1.4-3.6-3.3.2a22.3 22.3 0 0 0-1.8 13.6c4.6 31 8 54.2 8.7 81.6-.4 2.6-.5 4-1.7 7.3-2.7 3.4-5.7 7.8-8.5 9.9-2.8 2-8.8 4-10.7 5.6"/><path fill="#fff" d="M420.7 223.7c0-7.3.1-13.5-.1-19a34 34 0 0 0-3-13.5c-1.8-4.1-.7-7.4-1.6-11.8-.8-4.4-.6-11-1.8-16.1-.4-2-1.4-8.5-1.1-9.2.5-1.4 2.4 0 3.4-1.6 1.4-1.5-5-18-8.2-22.7-1.1-2.1-3.3-1.4-5.8 2-2.5 2.3-1.6 7.4-.6 12.3 6.1 32.3 10.8 61.6 9.8 92.3-.4 2.6 9-7.8 9-12.7m-45.7-40c-3.9-.2-12-7.7-14.4-12a8 8 0 0 1 .4-6.5c1.5-1 3.7-2 5.4-1 0 0 1.7 2.4 1.4 2.7 2 1 3 .5 3.2-.4.1-1.5-.6-2.4-.6-4 .9-4.6 6-5.3 8-2.4 1.4 1.8 2 5.5 2.1 8 0 1.3-2-.2-3.3 0-1.1.4-1.4 1.8-1.5 3-.2 3.3-.6 8.6-.7 12.5zm-71.8 48c1-9.8-.4-27.3-.5-33.1A477 477 0 0 0 299 154c-1.2-8.4 3.4.9 2.8-4-1.5-8.3-6.1-14-11.6-21.5-1.7-2.5-1.7-3-4.4.6-3 6.7-.4 11.4.4 16.7 3.9 17.2 6.2 33 7.3 48.7a393.4 393.4 0 0 1 .4 49c3 .1 7.6-4.7 9.3-11.8"/><path fill="#fff" d="M434 216c-6.9-11.6-17.2-24-20-28.7a658 658 0 0 0-29.2-37.8c-8.5-9 4-1.5-1.6-8.5-4.7-5.1-6-6.8-10.1-9.9-2-1.3-3.2-3.8-4 .5a83 83 0 0 0-.2 11.2c0 1.7 1.8 5 3.4 7 20.7 25.5 43.4 51.5 61.6 84.2 2.6-1.3 1.7-16 0-18z"/><path fill="#165d31" d="M122.6 194.7c-.5.9-1.6 2-1.2 3.1.7 1 1.4 1.3 2.6 1.3 1.1 0 2.7.3 3-.3.6-.7 1-2 .6-3.3-1.2-3-4.4-1.8-5-.8"/><path fill="#fff" d="M354.2 362.5c9.2.4 15.2.5 23.3 1.4l9.6-1c10.6-1 11 15.1 11 15.1 0 9.5-3.7 10-8.4 11-2.7.4-4-1.6-5.5-3.6a14 14 0 0 1-7 .4c-3.9-.2-7.7-.2-11.5-.5-4-.3-6.2.5-10.3.1-.8 1.3-2 3.1-4.4 2.6-2-.3-4.5-6-3.8-10.5 1.5-3.2 1-2.1 1-3.5-37.6-1-75.5-2.7-112.3-2.2-28.8.1-57.2 1.3-85.7 2.5-15.2-.2-26.8-2.6-34.8-14.3.8 0 38.8 2.1 49.9 1.4 20.5-.2 39.3-1.9 60.2-2.5 41.2.7 82.1.7 123.3 3.6-4-2.7-4-9 2-10.6.5-.4.8 3.1 1.7 3 4.9-.3 2.7 6.3 1.7 7.6M188.6 135.3c-6.2 17.8 3.6 37.4 10.4 35.5 5 2 8-7.4 10-17.6 1.5-2.9 2.5-3.2 3.2-1.7-.2 13.6 1 16.7 4.5 20.8 7.8 6 14.3.8 14.8.3l6-6.1c1.4-1.5 3.2-1.5 5.1-.3 1.9 1.7 1.6 4.6 5.6 6.6 3.4 1.4 10.5.4 12.2-2.5 2.2-3.9 2.8-5.2 3.8-6.6 1.6-2.1 4.3-1.2 4.3-.5-.3 1.2-1.9 2.3-.8 4.5 2 1.4 2.4.5 3.5.2 4-2 7-10.6 7-10.6.1-3.2-1.7-3-2.9-2.2l-3.1 2.1c-2 .3-5.7 1.6-7.6-1.3-1.9-3.4-1.9-8.3-3.3-11.8 0-.2-2.6-5.5-.2-5.8 1.2.2 3.7.9 4.1-1.2 1.2-2.1-2.6-8-5.3-11-2.3-2.5-5.5-2.8-8.6-.2-2.2 2-1.9 4.2-2.3 6.3a9.8 9.8 0 0 0 2 8.7c2.2 4.2 6.1 9.7 4.8 17.5 0 0-2.3 3.6-6.3 3.1-1.7-.3-4.4-1-5.8-11.8-1.1-8 .2-19.4-3.2-24.7-1.3-3.3-2.2-6.4-5.2-.9-.8 2.2-4.3 5.5-1.8 12.2a36 36 0 0 1 2 19c-1.5 2.2-1.8 2.9-3.7 5-2.6 3-5.5 2.2-7.7 1.1-2-1.3-3.6-2-4.6-6.5.2-7 .6-18.5-.7-20.9-1.9-3.8-5-2.4-6.3-1.2a47.7 47.7 0 0 0-11.5 23.5c-1.8 5.8-3.7 4.1-5 1.8-3.2-3-3.5-26.7-7.4-22.8"/><path fill="#fff" d="M207.4 174.1c2.9-2 1.6-3.4 5.8.8a72 72 0 0 1 9.2 31.3c-.2 2.6 1.6 4.2 2.5 3.6.4-6 15.1-14.4 28.6-15.6 2-.5 1-4.4 1.3-6.4-.8-7.5 4.2-14.3 11.2-14.8 9.6 1.4 12.8 6.5 13 14.2-1.1 15-16.7 17.5-25.4 18.7-1.3.5-1.9 1.1 0 1.8l36.6.2 1.9 1c.2 1-.6.2-2 2.6a29.5 29.5 0 0 0-3.7 11.5c-10.9 3.6-22.2 5-33.6 6.5-4 2-6 4.7-5.2 7.7 1.4 3.3 10.2 6.7 10.2 6.8 1.7 1 3.6 3.5-.5 8.6-17.8-.8-31.7-8.4-36.5-19.1-1.4-1.1-3 0-4 1.4-7 9-13.8 17-25.7 21.4-7 1.8-14.3-1.1-17.7-5.7-2.3-2.7-2.2-5.6-3-6.2-3.9 1.7-36.9 15.7-32.7 9.1 8-8.5 22-14.9 34.2-23.3.9-2.9 2.5-12.5 7.3-15.6.3 0-.7 5.6-.6 8 0 2-.2 2.7.2 2.2.9-.5 15.7-12.2 17-15.8 1.4-2 .3-7.2.3-7.4-2.8-7.2-6.7-7.8-8.1-11.4-1.3-4.7-.7-10.1 2-11.7 2.4-2.1 5.2-1.9 7.9.5 3 2.7 5.6 8 6.4 11.9-.5 1.5-4-1-5-.3a16 16 0 0 1 3.7 7.8c2 8.2 1.4 11.4-.6 16.7-6.6 13.9-15 18-22.4 23.2-.2 0-.3 3.5 2.4 5.4 1 1 4.9 1.5 9.4 0a54.5 54.5 0 0 0 22.3-23.3 51 51 0 0 0-2.4-22.2c-2.9-6.7-6.3-16.2-6.3-16.4-.1-4.2.2-5.6 2-7.7m-95.8-38.6c4.2 2 12.2 1.1 11.8-5.7l-.2-3.1c-.8-2-3.2-1.5-3.7.5-.2.7.3 1.8-.3 2.1-.4.4-1.7.2-1.7-1.7 0-.6-.4-1.2-.7-1.6-.2-.2-.4-.2-.9-.2-.6 0-.6.1-.9.6-.1.5-.3 1-.3 1.6 0 .7-.4.9-.8 1-.6 0-.5 0-1-.2-.2-.3-.5-.4-.5-1l-.3-1.6c-.2-.3-.6-.5-1-.6-2.3 0-2.5 2.7-2.3 3.7-.2.2-.3 4.9 2.8 6.2"/><path fill="#fff" d="M235.1 187.7c4.2 2 14.3.9 11.8-5.6l-.2-3.2c-.9-2-3.2-1.5-3.7.6-.2.6.3 1.7-.4 2-.3.4-1.7.2-1.6-1.6 0-.6-.4-1.3-.7-1.7-.3-.1-.4-.2-1-.2-.5 0-.5.2-.8.7-.2.5-.3 1-.3 1.6-.1.6-.4.8-.9 1-.5 0-.4 0-.8-.3-.3-.3-.6-.4-.6-.9l-.3-1.6c-.2-.3-.6-.5-1-.6-2.3 0-2.5 2.6-2.4 3.6-.1.2-.2 5 3 6.2zm72-21.6c4.2 2 12.1 1.1 11.8-5.6l-.2-3.2c-.9-2-3.2-1.5-3.7.5-.2.7.3 1.8-.4 2.2-.3.3-1.7.1-1.6-1.8 0-.6-.4-1.2-.7-1.6-.3-.2-.4-.2-1-.2-.5 0-.5.2-.8.7l-.3 1.5c-.1.7-.4 1-.9 1s-.4 0-.8-.2c-.3-.3-.6-.4-.6-.9s-.1-1.3-.3-1.7c-.2-.3-.6-.4-1-.5-2.3 0-2.5 2.6-2.4 3.6-.1.2-.2 4.9 3 6.2zm37.3 54.3c-7.3 8.3-4.1 22-2.4 25 2.4 4.8 4.3 7.9 9 10.3 4.3 3.1 7.7 1.2 9.5-1 4.3-4.5 4.4-16 6.4-18.2 1.4-4.2 5-3.5 6.7-1.6a16.5 16.5 0 0 0 6.2 5.3c4 3.5 8.8 4.2 13.6 1 3.2-1.9 5.3-4.2 7.2-8.9 2-5.6 1-31.6.5-47l-4.2-21.5c0-.2-.5-10.2-1-12.5 0-1-.3-1.3.7-1.2 1.1 1 1.2 1 2 1.3 1 .2 2-1.7 1.3-3.3l-10-18.6c-.8-.8-1.9-1.6-3.2.2a7.3 7.3 0 0 0-2.4 5.5c.3 4.4 1 8.9 1.3 13.3l4 22.6c1.3 16 1.6 29.2 2.9 45.3-.2 6.8-2.3 12.7-4.3 13.6 0 0-3 1.7-5-.2-1.5-.6-7.4-9.9-7.4-9.9-3-2.7-5-2-7.1 0-6 5.8-8.6 16.4-12.7 23.8-1 1.7-4 3-7.2-.1-8.2-11.3-3.4-27.3-4.4-23.2M309 126.7c3.8 1.5 6.4 9.2 5.6 13-.8 4.5-2.8 9.5-4.2 8.9-1.6-.6 1-4.6-.5-8.8-.8-2.8-6-7.8-5.4-9.2-1-3.1 2.2-4.5 4.5-4z"/><path fill="#fff" d="M356.6 225c.7-9.2-.6-14.8-.8-20.2s-6.1-46.6-7.3-50.6c-1.5-7.8 5.7-1 4.9-5.6-2.5-5.6-8.6-13.9-10.5-18.8-1.2-2-.7-4-3.3-.5a42.3 42.3 0 0 0-2.3 19.2c6.2 32.3 12.5 59.1 11.5 89.8 3 0 6.3-6.7 7.8-13.3m64.4-85.3c3.5 1.7 5.5 11.3 5.1 14-.7 5-2.5 10.4-3.8 9.7-1.5-.6.3-7.4-.4-9.5-.8-3-5.5-8.4-5-10-1-3.4 2-4.8 4.1-4.2m-255.7 67.9c3.3 1.3 5.3 8.3 5 10.3-.8 3.7-2.5 7.7-3.8 7.1-1.3-.4.3-5.4-.3-7-.3-3.7-4.9-5.7-4.8-7.3-.8-3 2-3.5 4-3.1z"/><path fill="#165d31" d="M244.9 218.2c4.2.2 6.3 3.6 2.4 5-4 1.3-7.7 2.4-7.8 8 1.5 8-2 5.2-4 4.2-2.4-1.8-9.2-6-10.2-15-.1-2.1 1.6-4 4.3-4 4 1.1 10 1.2 15.3 1.8"/><path fill="#fff" d="M77.4 124.4c4.8 1.4 5.1 8.6 4.8 10.7-.7 3.8-2.4 7.9-3.6 7.4-1.4-.5 0-5.7-.7-7.3-.7-2.2-4.8-6.4-4.4-7.6-.9-2.5 2-3.7 3.9-3.2m95.9 33.6c-3.8 2-5.2 8-2.9 11.6 2.2 3 5.6 1.9 6 1.9 3.7.4 5.9-6.9 5.9-6.9s.1-2-4.2 1.9c-1.9.3-2-.4-2.5-1.4a9 9 0 0 1 .5-5.7c.7-1.8-.7-2.6-2.8-1.4m28-36.4c-2 1.3-5.7 5.2-5.8 9.6-.1 2.5-.6 2.5 1 4 1.3 1.8 2.4 1.7 4.8.4a5.1 5.1 0 0 0 2.3-3.4c.6-2.8-3 1.4-3.4-1.8-.8-3 1.5-4.2 3.7-7 0-2 0-3.3-2.7-1.8zm22.4 4a59.5 59.5 0 0 0-1.6 11.1c-.6 2.8 3 4 4.5.4 2.4-6.5 2.4-9.3 2.6-12-.7-4.3-3.6-4.2-5.5.5m142 72.3c.4-.5 20-14.4 20-14.4 2-.7 1.5 7.2.6 7.1a77.8 77.8 0 0 1-20.7 14.3c-1 .7-1.9-5.3 0-7zm17.7-.2c3.5 1.7 4.9 11.8 4.5 14.5 0 5.4-3.3 9.6-4.7 9-1.4-.7.2-6.7-.5-8.8-.8-3-3.7-8.5-3.2-10.1-1-3.4 1.8-5.2 4-4.6zm-116 43.4a26 26 0 0 1 5.6-4.9c2-1 3.8.8 3.7.7.3 2-1.2 3.7-.7 6.3.4 1 .7 2.2 2.6 1.8 3.1-2.5 6-2.7 9-2.8 2.5.1 2.6 4.2 1 4.2-5.7 1.2-8.2 2.8-12.3 4.3-2 1.2-3.6-.3-3.6-.4s-1.1-1.1-.4-3.7c.2-2-.6-3.2-2.4-3-1.2.8-2.4 1.2-3-.3-.3-1-.4-1.6.5-2.2m136.6 5.4c.8 1 1.4 2-.1 3.8l-3.7 3.2c-.6 1-1 2.8 1 3.3 3.6 1 12-4.5 12-4.6 1.4-1 1-3 .8-3-.8-.9-2.6-.3-3.8-.5-.6 0-2.5-.2-1.6-2a11.4 11.4 0 0 0 1.6-2.9c.5-1.2 0-2-2-2.7-2.1-.4-3-.2-5.3 0-1.2.2-1.6.8-1.9 2.3.1 2.3 1.5 2.2 3 3z"/><path fill="#165d31" d="M268.1 189.7c-.5 1-2.3 1-4 0s-2.7-2.6-2.1-3.5 2.3-.9 4 0 2.6 2.6 2.1 3.5m-89-53.6c-1 .3-2.4-.6-3-2s-.3-2.6.7-2.9 2.3.7 3 2 .3 2.7-.8 3zM355.2 375c9.4.4 18.2 0 27.5.5 1.7 1.5.5 5-.6 4.8l-7.8-.3c-.1-3-7.7-2.5-7.5.1-4.1.5-7.8-.1-12-.3-1.2-1.5-1-4.2.4-4.8"/></g> </g>`,
+  URU:`<rect width="60" height="40" fill="#fff"/>${[1,3,5,7].map(i=>`<rect y="${i*40/9}" width="60" height="${40/9}" fill="#0038a8"/>`).join("")}<rect width="24" height="22.2" fill="#fff"/>
+    <circle cx="12" cy="11" r="5" fill="#fcd116"/>${Array.from({length:8},(_,i)=>{const a=i/8*Math.PI*2;return `<path d="M12,11 L${(12+Math.cos(a-.2)*6).toFixed(1)},${(11+Math.sin(a-.2)*6).toFixed(1)} L${(12+Math.cos(a)*9).toFixed(1)},${(11+Math.sin(a)*9).toFixed(1)} L${(12+Math.cos(a+.2)*6).toFixed(1)},${(11+Math.sin(a+.2)*6).toFixed(1)} Z" fill="#fcd116"/>`;}).join("")}`,
+  AUT:`<rect width="60" height="40" fill="#ed2939"/><rect y="13.3" width="60" height="13.4" fill="#fff"/>`,
+  POR:`<g transform="scale(.09375)"> <path fill="red" d="M256 0h384v480H256z"/><path fill="#060" d="M0 0h256v480H0z"/><g fill="#ff0" fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width=".6"><path d="M339.5 306.2c-32.3-1-180-93.2-181-108l8.1-13.5c14.7 21.3 165.7 111 180.6 107.8z"/><path d="M164.9 182.8c-2.9 7.8 38.6 33.4 88.4 63.8 49.9 30.3 92.9 49 96 46.4l1.5-2.8c-.6 1-2 1.3-4.3.6-13.5-3.9-48.6-20-92.1-46.4-43.6-26.4-81.4-50.7-87.3-61a6.3 6.3 0 0 1-.6-3.1h-.2l-1.2 2.2zm175.3 123.8c-.5 1-1.6 1-3.5.8-12-1.3-48.6-19.1-91.9-45-50.4-30.2-92-57.6-87.4-64.8l1.2-2.2.2.1c-4 12.2 82.1 61.4 87.2 64.6 49.8 30.8 91.8 48.9 95.5 44.2z"/><path d="M256.2 207.2c32.2-.3 72-4.4 95-13.6l-5-8c-13.5 7.5-53.5 12.5-90.3 13.2-43.4-.4-74.1-4.5-89.5-14.8l-4.6 8.6c28.2 12 57.2 14.5 94.4 14.6"/><path d="M352.5 193.8c-.8 1.3-15.8 6.4-37.8 10.2a381.2 381.2 0 0 1-58.6 4.3 416.1 416.1 0 0 1-56.2-3.6c-23.1-3.6-35-8.6-39.5-10.4l1.1-2.2c12.7 5 24.7 8 38.7 10.2A411.5 411.5 0 0 0 256 206a391.8 391.8 0 0 0 58.3-4.3c22.5-3.7 34.8-8.4 36.6-10.5zm-4.4-8.1c-2.4 2-14.6 6.3-36 9.7a388.2 388.2 0 0 1-55.8 4c-22 0-40.1-1.6-53.8-3.6-21.8-2.8-33.4-8-37.6-9.4l1.3-2.2c3.3 1.7 14.4 6.2 36.5 9.3a385 385 0 0 0 53.6 3.4 384 384 0 0 0 55.4-4c21.5-3 33.1-8.4 34.9-9.8zM150.3 246c19.8 10.7 63.9 16 105.6 16.4 38 .1 87.4-5.8 105.9-15.6l-.5-10.7c-5.8 9-58.8 17.7-105.8 17.4-47-.4-90.7-7.6-105.3-17v9.5"/><path d="M362.8 244.5v2.5c-2.8 3.4-20.2 8.4-42 12a434 434 0 0 1-65.4 4.4 400 400 0 0 1-62-4.3 155 155 0 0 1-44.4-12v-2.9c9.7 6.4 35.9 11.2 44.7 12.6 15.8 2.4 36.1 4.2 61.7 4.2 26.9 0 48.4-1.9 65-4.4 15.7-2.3 38-8.2 42.4-12.1m0-9v2.5c-2.8 3.3-20.2 8.3-42 11.9a434 434 0 0 1-65.4 4.5 414 414 0 0 1-62-4.3 155 155 0 0 1-44.4-12v-3c9.7 6.5 36 11.2 44.7 12.6a408 408 0 0 0 61.7 4.3c26.9 0 48.5-2 65-4.5 15.7-2.2 38-8.1 42.4-12m-107 68.8c-45.6-.2-84.7-12.4-93-14.4l6 9.4a249.8 249.8 0 0 0 87.4 14.3c34.7-1 65-3.7 86.3-14.1l6.2-9.8c-14.5 6.9-64 14.6-93 14.6"/><path d="M344.9 297.3a143 143 0 0 1-2.8 4c-10 3.6-26 7.4-32.6 8.4a295.5 295.5 0 0 1-53.7 5c-40.4-.6-73.5-8.5-89-15.3l-1.3-2.1.2-.4 2.1.9a286.5 286.5 0 0 0 88.2 14.5c18.8 0 37.5-2.1 52.6-4.8 23.2-4.7 32.6-8.2 35.5-9.8l.7-.4zm5.3-8.8a287.2 287.2 0 0 1-2 3.5c-5.4 2-20 6.2-41.3 9.2-14 1.9-22.7 3.8-50.6 4.3a347.4 347.4 0 0 1-94.2-14L161 289a390 390 0 0 0 95.4 14c25.5-.5 36.4-2.4 50.3-4.3 24.8-3.8 37.3-8 41-9.1a2.9 2.9 0 0 0 0-.2l2.6-1z"/><path d="M350.8 237.6c.1 30-15.3 57-27.6 68.8a99.3 99.3 0 0 1-67.8 28.2c-30.3.5-58.8-19.2-66.5-27.9a101 101 0 0 1-27.5-67.4c1.8-32.8 14.7-55.6 33.3-71.3a99.6 99.6 0 0 1 64.2-22.7 98.2 98.2 0 0 1 71 35.6c12.5 15.2 18 31.7 20.9 56.7M255.6 135a106 106 0 0 1 106 105.2 105.6 105.6 0 1 1-211.4 0c-.1-58 47.3-105.2 105.4-105.2"/><path d="M255.9 134.5c58.2 0 105.6 47.4 105.6 105.6S314.1 345.7 256 345.7s-105.6-47.4-105.6-105.6c0-58.2 47.4-105.6 105.6-105.6zM152.6 240c0 56.8 46.7 103.3 103.3 103.3 56.6 0 103.3-46.5 103.3-103.3s-46.7-103.3-103.3-103.3S152.6 183.2 152.6 240"/><path d="M256 143.3a97 97 0 0 1 96.7 96.7 97.1 97.1 0 0 1-96.7 96.8c-53 0-96.7-43.6-96.7-96.8a97.1 97.1 0 0 1 96.7-96.7M161.6 240c0 52 42.6 94.4 94.4 94.4s94.4-42.5 94.4-94.4c0-52-42.6-94.4-94.4-94.4a94.8 94.8 0 0 0-94.4 94.4"/><path d="M260.3 134h-9.1v212.3h9z"/><path d="M259.3 132.8h2.3v214.7h-2.2V132.8zm-9 0h2.4v214.7h-2.3z"/><path d="M361.6 244.2v-7.8l-6.4-6-36.3-9.6-52.2-5.3-63 3.2-44.8 10.6-9 6.7v7.9l22.9-10.3 54.4-8.5h52.3l38.4 4.2 26.6 6.4z"/><path d="M256 223.8c24.9 0 49 2.3 68.3 6 19.8 4 33.7 9 38.5 14.5v2.8c-5.8-7-24.5-12-39-15-19-3.6-43-6-67.9-6-26.1 0-50.5 2.6-69.3 6.2-15 3-35.1 9-37.6 14.8v-2.9c1.3-4 16.3-10 37.3-14.3 18.9-3.7 43.3-6.1 69.6-6.1zm0-9.1a383 383 0 0 1 68.3 6c19.8 4 33.7 9 38.5 14.6v2.7c-5.8-6.9-24.5-12-39-14.9-19-3.7-43-6-67.9-6a376 376 0 0 0-69.2 6.2c-14.5 2.7-35.4 8.9-37.7 14.7v-2.8c1.4-4 16.6-10.3 37.3-14.3 19-3.7 43.3-6.2 69.7-6.2m-.6-46.2c39.3-.2 73.6 5.5 89.3 13.5l5.7 10c-13.6-7.4-50.6-15-94.9-14-36.1.3-74.7 4-94 14.4l6.8-11.4c15.9-8.3 53.3-12.5 87.1-12.5"/><path d="M256 176.7a354 354 0 0 1 61.3 4.3c16 3 31.3 7.4 33.5 9.8l1.7 3c-5.3-3.4-18.6-7.3-35.6-10.5s-38.7-4.3-61-4.2c-25.3-.1-45 1.2-61.8 4.2a108.9 108.9 0 0 0-33.3 10.3l1.7-3.1c6-3 15.3-6.7 31.1-9.6 17.5-3.2 37.4-4.1 62.4-4.2m0-9c21.4-.2 42.6 1 59.1 4a96 96 0 0 1 30.6 10l2.5 4c-4.2-4.7-20-9.2-34.1-11.6-16.4-2.9-36.7-4-58.1-4.2a361 361 0 0 0-59.5 4.4 97.3 97.3 0 0 0-29.6 9.1l2.2-3.3c5.8-3 15.2-5.8 27-8.1a357 357 0 0 1 59.9-4.4zM308.4 284a276.4 276.4 0 0 0-52.5-4c-65.5.8-86.6 13.5-89.2 17.3l-5-8c16.8-12 52.4-18.8 94.6-18.2 21.9.4 40.8 1.9 56.6 5l-4.5 8"/><path d="M255.6 278.9c18.2.3 36 1 53.3 4.2l-1.2 2.2c-16-3-33.2-4-52-4-24.3-.2-48.7 2.1-70 8.2-6.7 1.9-17.8 6.2-19 9.8l-1.2-2c.4-2.2 7-6.6 19.6-10 24.4-7 47.2-8.3 70.5-8.4m.8-9.2a327 327 0 0 1 57.3 5l-1.3 2.3a299 299 0 0 0-56-4.9c-24.2 0-49.9 1.8-73.3 8.6-7.5 2.2-20.6 7-21 10.7l-1.2-2.2c.2-3.4 11.5-7.9 21.7-10.8 23.5-6.9 49.3-8.6 73.8-8.7"/><path d="m349.4 290.5-7.8 12.3-22.7-20.1-58.6-39.5-66.2-36.3-34.3-11.7 7.3-13.6 2.5-1.3 21.3 5.3 70.4 36.3 40.6 25.6L336 272l13.9 16z"/><path d="M158.6 195.5c6-4 50.2 15.6 96.6 43.6 46.1 28 90.3 59.6 86.3 65.5l-1.3 2.1-.6.5c.1-.1.8-1 0-3.1-2-6.5-33.4-31.5-85.3-62.9-50.7-30.1-92.9-48.3-97-43.1zM351 290.4c3.8-7.6-37.2-38.5-88.1-68.6-52-29.5-89.6-46.9-96.5-41.7L165 183c0 .1 0-.2.4-.5 1.2-1 3.3-1 4.2-1 11.8.2 45.5 15.7 92.8 42.8 20.8 12 87.6 55 87.3 67 0 1 .1 1.2-.3 1.8l1.7-2.6z"/></g><g transform="translate(0 26.7)scale(1.06667)"><path fill="#fff" stroke="#000" stroke-width=".7" d="M180.6 211a58.7 58.7 0 0 0 17.5 41.7 59 59 0 0 0 41.8 17.6 59.4 59.4 0 0 0 42-17.4 59 59 0 0 0 17.4-41.8v-79.2l-118.7-.2z"/><path fill="red" stroke="#000" stroke-width=".5" d="M183 211.1a56.4 56.4 0 0 0 16.8 40 57 57 0 0 0 40.2 16.8 56.9 56.9 0 0 0 40.2-16.6 56.4 56.4 0 0 0 16.7-40v-77H183v76.8m91-53.7v48.9l-.1 5.1a33.2 33.2 0 0 1-10 24 34 34 0 0 1-24 10c-9.4 0-17.7-4-23.9-10.2a34 34 0 0 1-10-24v-54z"/><g id="@@pt-e"><g id="@@pt-d" fill="#ff0" stroke="#000" stroke-width=".5"><path stroke="none" d="M190.2 154.4c.1-5.5 4-6.8 4-6.8.1 0 4.3 1.4 4.3 6.9z"/><path d="m186.8 147.7-.7 6.3h4.2c0-5.2 4-6 4-6 .1 0 4 1.1 4.1 6h4.2l-.8-6.4zm-1 6.4h17c.3 0 .6.3.6.7 0 .5-.3.8-.6.8h-17c-.3 0-.6-.3-.6-.8 0-.4.3-.7.7-.7z"/><path d="M192 154c0-3.3 2.3-4.2 2.3-4.2s2.3 1 2.3 4.2H192m-5.8-9h16.3c.3 0 .6.4.6.8 0 .3-.3.6-.6.6h-16.3c-.3 0-.6-.3-.6-.7 0-.3.3-.6.6-.6zm.4 1.5H202c.3 0 .6.3.6.7 0 .4-.3.7-.6.7h-15.5c-.4 0-.6-.3-.6-.7 0-.4.2-.7.6-.7zm5-10.6h1.2v.8h.9v-.8h1.3v.9h.9v-1h1.2v2c0 .4-.2.6-.5.6h-4.4c-.3 0-.6-.2-.6-.5zm4.6 2.7.3 6.4h-4.3l.3-6.5h3.7"/><path id="@@pt-a" d="M191 141.6v3.4h-4v-3.4z"/><use xlink:href="#@@pt-a" width="100%" height="100%" x="10.6"/><path id="@@pt-b" d="M186.3 139h1.2v1h.9v-1h1.2v1h.9v-1h1.2v2c0 .4-.2.6-.5.6h-4.3a.6.6 0 0 1-.6-.6z"/><use xlink:href="#@@pt-b" width="100%" height="100%" x="10.6"/><path fill="#000001" stroke="none" d="M193.9 140.6c0-.6.9-.6.9 0v1.6h-.9z"/><path id="@@pt-c" fill="#000001" stroke="none" d="M188.6 142.8c0-.6.8-.6.8 0v1.2h-.8z"/><use xlink:href="#@@pt-c" width="100%" height="100%" x="10.6"/></g><use xlink:href="#@@pt-d" width="100%" height="100%" y="46.3"/><use xlink:href="#@@pt-d" width="100%" height="100%" transform="rotate(-45.2 312.8 180)"/></g><use xlink:href="#@@pt-d" width="100%" height="100%" x="45.7"/><use xlink:href="#@@pt-e" width="100%" height="100%" transform="matrix(-1 0 0 1 479.8 0)"/><g id="@@pt-f" fill="#fff"><path fill="#039" d="M232.6 202.4a8.3 8.3 0 0 0 2.2 5.7 7.2 7.2 0 0 0 5.3 2.4c2.1 0 4-1 5.3-2.4a8.3 8.3 0 0 0 2.2-5.7v-10.8h-15z"/><circle cx="236.1" cy="195.7" r="1.5"/><circle cx="244.4" cy="195.7" r="1.5"/><circle cx="240.2" cy="199.7" r="1.5"/><circle cx="236.1" cy="203.9" r="1.5"/><circle cx="244.4" cy="203.9" r="1.5"/></g><use xlink:href="#@@pt-f" width="100%" height="100%" y="-26"/><use xlink:href="#@@pt-f" width="100%" height="100%" x="-20.8"/><use xlink:href="#@@pt-f" width="100%" height="100%" x="20.8"/><use xlink:href="#@@pt-f" width="100%" height="100%" y="25.8"/></g> </g>`,
+  BEL:`<rect width="20" height="40" fill="#000"/><rect x="20" width="20" height="40" fill="#fae042"/><rect x="40" width="20" height="40" fill="#ed2939"/>`,
+  FRA:`<rect width="20" height="40" fill="#0055a4"/><rect x="20" width="20" height="40" fill="#fff"/><rect x="40" width="20" height="40" fill="#ef4135"/>`,
+  ARG:`<g transform="scale(.09375)"> <path fill="#74acdf" d="M0 0h640v480H0z"/><path fill="#fff" d="M0 160h640v160H0z"/><g id="@@ar-c" transform="translate(-64)scale(.96)"><path id="@@ar-a" fill="#f6b40e" stroke="#85340a" stroke-width="1.1" d="m396.8 251.3 28.5 62s.5 1.2 1.3.9c.8-.4.3-1.6.3-1.6l-23.7-64m-.7 24.2c-.4 9.4 5.4 14.6 4.7 23-.8 8.5 3.8 13.2 5 16.5 1 3.3-1.2 5.2-.3 5.7 1 .5 3-2.1 2.4-6.8-.7-4.6-4.2-6-3.4-16.3.8-10.3-4.2-12.7-3-22"/><use xlink:href="#@@ar-a" width="100%" height="100%" transform="rotate(22.5 400 250)"/><use xlink:href="#@@ar-a" width="100%" height="100%" transform="rotate(45 400 250)"/><use xlink:href="#@@ar-a" width="100%" height="100%" transform="rotate(67.5 400 250)"/><path id="@@ar-b" fill="#85340a" d="M404.3 274.4c.5 9 5.6 13 4.6 21.3 2.2-6.5-3.1-11.6-2.8-21.2m-7.7-23.8 19.5 42.6-16.3-43.9"/><use xlink:href="#@@ar-b" width="100%" height="100%" transform="rotate(22.5 400 250)"/><use xlink:href="#@@ar-b" width="100%" height="100%" transform="rotate(45 400 250)"/><use xlink:href="#@@ar-b" width="100%" height="100%" transform="rotate(67.5 400 250)"/></g><use xlink:href="#@@ar-c" width="100%" height="100%" transform="rotate(90 320 240)"/><use xlink:href="#@@ar-c" width="100%" height="100%" transform="rotate(180 320 240)"/><use xlink:href="#@@ar-c" width="100%" height="100%" transform="rotate(-90 320 240)"/><circle cx="320" cy="240" r="26.7" fill="#f6b40e" stroke="#85340a" stroke-width="1.4"/><path id="@@ar-h" fill="#843511" stroke-width="1" d="M329 234.3c-1.7 0-3.5.8-4.5 2.4 2 1.9 6.6 2 9.7-.2a7 7 0 0 0-5.1-2.2zm0 .4c1.8 0 3.5.8 3.7 1.6-2 2.3-5.3 2-7.4.4 1-1.4 2.4-2 3.8-2z"/><use xlink:href="#@@ar-d" width="100%" height="100%" transform="matrix(-1 0 0 1 640.2 0)"/><use xlink:href="#@@ar-e" width="100%" height="100%" transform="matrix(-1 0 0 1 640.2 0)"/><use xlink:href="#@@ar-f" width="100%" height="100%" transform="translate(18.1)"/><use xlink:href="#@@ar-g" width="100%" height="100%" transform="matrix(-1 0 0 1 640.2 0)"/><path fill="#85340a" d="M316 243.7a1.8 1.8 0 1 0 1.8 2.9 4 4 0 0 0 2.2.6h.2c.6 0 1.6-.1 2.3-.6.3.5.9.7 1.5.7a1.8 1.8 0 0 0 .3-3.6c.5.2.8.6.8 1.2a1.2 1.2 0 0 1-2.4 0 3 3 0 0 1-2.6 1.7 3 3 0 0 1-2.5-1.7c0 .7-.6 1.2-1.3 1.2-.6 0-1.2-.6-1.2-1.2s.3-1 .8-1.2zm2 5.4c-2.1 0-3 2-4.8 3.1 1-.4 1.8-1.2 3.3-2 1.4-.8 2.6.2 3.5.2.8 0 2-1 3.5-.2 1.4.8 2.3 1.6 3.3 2-1.9-1.2-2.7-3-4.8-3-.4 0-1.2.2-2 .6z"/><path fill="#85340a" d="M317.2 251.6c-.8 0-1.8.2-3.4.6 3.7-.8 4.5.5 6.2.5 1.6 0 2.5-1.3 6.1-.5-4-1.2-4.9-.4-6.1-.4-.8 0-1.4-.3-2.8-.2"/><path fill="#85340a" d="M314 252.2h-.8c4.3.5 2.3 3 6.8 3s2.5-2.5 6.8-3c-4.5-.4-3.1 2.3-6.8 2.3-3.5 0-2.4-2.3-6-2.3"/><path fill="#85340a" d="M323.7 258.9a3.7 3.7 0 0 0-7.4 0 3.8 3.8 0 0 1 7.4 0"/><path id="@@ar-e" fill="#85340a" stroke-width="1" d="M303.4 234.3c4.7-4.1 10.7-4.8 14-1.7a8 8 0 0 1 1.5 3.4c.4 2.4-.3 4.9-2.1 7.5l.8.4c1.6-3.1 2.2-6.3 1.6-9.4l-.6-2.3c-4.5-3.7-10.7-4-15.2 2z"/><path id="@@ar-d" fill="#85340a" stroke-width="1" d="M310.8 233c2.7 0 3.3.6 4.5 1.7 1.2 1 1.9.8 2 1 .3.2 0 .8-.3.6-.5-.2-1.3-.6-2.5-1.6s-2.5-1-3.7-1c-3.7 0-5.7 3-6.1 2.8-.5-.2 2-3.5 6.1-3.5"/><use xlink:href="#@@ar-h" width="100%" height="100%" transform="translate(-18.4)"/><circle id="@@ar-f" cx="310.9" cy="236.3" r="1.8" fill="#85340a" stroke-width="1"/><path id="@@ar-g" fill="#85340a" stroke-width="1" d="M305.9 237.5c3.5 2.7 7 2.5 9 1.3 2-1.3 2-1.7 1.6-1.7-.4 0-.8.4-2.4 1.3-1.7.8-4.1.8-8.2-.9"/> </g>`,
+  ESP:`<rect width="60" height="40" fill="#aa151b"/><rect y="10" width="60" height="20" fill="#f1bf00"/>`
+};
+let flagN=0;
+const bandera=(cod,cls)=>`<svg class="${cls||"flag"}" viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${(FLAGS[cod]||`<rect width="60" height="40" fill="#555"/>`).replace(/@@/g,"f"+(++flagN)+"_")}<rect width="60" height="40" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1"/></svg>`;
 const PARTIDOS=[
  {fase:"Fase de grupos – Jornada 1",rival:"Cabo Verde",cod:"CPV",real:"0 – 0",nota:"Debut difícil: España empata y no marca.",
   tema:"Presentarse: pronombres personales, ser, llamarse, tener",cat:"PRO",evitar:["azul"],peloDef:"rapado",piel:"#7a4a2a",
   kit:{camiseta:"#1f4fb4",pantalon:"#1f4fb4",medias:"#1f4fb4",detalle:"#ffffff"},por:{camiseta:"#ffd23f",pantalon:"#1d2233",medias:"#ffd23f",detalle:"#1d2233"},
   frases:()=>[
-   conj("— ¡Hola! ¿Cómo te llamas? —","llamarse","me llamo",`${NOM()}.`,"Verbo pronominal: el pronombre va delante del verbo. Con «yo»: me llamo."),
-   elige("",["Vosotros","Nosotros","Ellos","Tú","Yo","Él"],"Vosotros","jugáis muy bien.","pronombre sujeto","Mira la terminación del verbo: -áis → vosotros."),
-   escribe(`Ana y yo somos ${G("amigos","amigas")}:`,"pronombre sujeto",G("nosotros","nosotras"),`nos entrenamos ${G("juntos","juntas")}.`,"«Ana y yo» = 1.ª persona del plural. Con un chico en el grupo: nosotros; solo chicas: nosotras."),
-   elige("— Señor seleccionador, ¿cómo se llama",["usted","tú","él","vosotros"],"usted","? — Me llamo Luis.","pronombre sujeto","Hablas con respeto a un adulto: usted (con el verbo en 3.ª persona)."),
-   conj("Luis y Marta","ser","son","mis compañeros de equipo.","«Ser» con «ellos»: son."),
-   escribe("¿Y Marta? —","pronombre sujeto","ella","juega de portera.","Marta es una chica → ella.")]},
+   conj("— ¡Hola! ¿Cómo te llamas? —","llamarse","me llamo",`${NOM()}.`,"Verbo pronominal: escribe el pronombre delante del verbo. ¿Quién habla? Yo."),
+   elige("",["Vosotros","Nosotros","Ellos","Tú","Yo","Él"],"Vosotros","jugáis muy bien.","pronombre sujeto","Fíjate en la terminación del verbo (-áis): ¿a qué persona corresponde?"),
+   escribe(`Ana y yo somos ${G("amigos","amigas")}:`,"pronombre sujeto",G("nosotros","nosotras"),`nos entrenamos ${G("juntos","juntas")}.`,"«Ana y yo» = yo + otra persona → 1.ª persona del plural. Ojo al género del grupo."),
+   elige("— Señor seleccionador, ¿cómo se llama",["usted","tú","él","vosotros"],"usted","? — Me llamo Luis.","pronombre sujeto","Hablas con respeto a un adulto. Fíjate: el verbo está en 3.ª persona («se llama»)."),
+   conj("Luis y Marta","ser","son","mis compañeros de equipo.","«Luis y Marta» = ellos. Conjuga «ser» en 3.ª persona del plural."),
+   escribe("¿Y Marta? —","pronombre sujeto","ella","juega de portera.","Marta es una chica: ¿qué pronombre la sustituye?")]},
  {fase:"Fase de grupos – Jornada 2",rival:"Arabia Saudí",cod:"KSA",real:"4 – 0",nota:"¡Primera gran victoria de España en el Mundial!",
   tema:"El presente regular y las preguntas (¿qué?, ¿dónde?…)",cat:"PRE",evitar:[],peloDef:"corto",piel:"#a4693f",
   kit:{camiseta:"#0b7a3e",pantalon:"#ffffff",medias:"#0b7a3e",detalle:"#ffffff"},por:{camiseta:"#ffd23f",pantalon:"#1d2233",medias:"#ffd23f",detalle:"#1d2233"},
   frases:()=>[
-   conj(`Cada día, ${NOM()}`,"entrenarse","se entrena","con la selección.","Verbo pronominal en -ar con «él / ella»: se entrena (el pronombre va delante)."),
-   elige("— ¿",["Dónde","Cuándo","Qué"],"Dónde","vives? — En Madrid.","interrogativo","Preguntas por un lugar → ¿dónde?"),
-   conj("Nosotros","comer","comemos","pasta antes del partido.","Verbo en -er con «nosotros»: termina en -emos."),
-   elige("— ¿",["Cuántos","Cómo","Quién"],"Cuántos","años tienes? — Doce.","interrogativo","Preguntas por un número → ¿cuántos?"),
-   conj("Los jugadores","vivir","viven","en un hotel cerca del estadio.","Verbo en -ir con «ellos»: termina en -en."),
-   elige("— ¿",["Quién","Qué","Dónde"],"Quién","es tu jugador favorito? — Mi capitán.","interrogativo","Preguntas por una persona → ¿quién?")]},
+   conj(`Cada día, ${NOM()}`,"entrenarse","se entrena","con la selección.","Verbo pronominal en -ar: pronombre delante + terminación de 3.ª persona del singular."),
+   elige("— ¿",["Dónde","Cuándo","Qué"],"Dónde","vives? — En Madrid.","interrogativo","La respuesta es un lugar («En Madrid»)."),
+   conj("Nosotros","comer","comemos","pasta antes del partido.","Verbo en -er: terminación de la 1.ª persona del plural."),
+   elige("— ¿",["Cuántos","Cómo","Quién"],"Cuántos","años tienes? — Doce.","interrogativo","La respuesta es un número («Doce»)."),
+   conj("Los jugadores","vivir","viven","en un hotel cerca del estadio.","Verbo en -ir: terminación de la 3.ª persona del plural."),
+   elige("— ¿",["Quién","Qué","Dónde"],"Quién","es tu jugador favorito? — Mi capitán.","interrogativo","La respuesta es una persona («Mi capitán»).")]},
  {fase:"Fase de grupos – Jornada 3",rival:"Uruguay",cod:"URU",real:"1 – 0",nota:"España termina primera de su grupo, sin recibir ningún gol.",
   tema:"Los gustos: gustar y los pronombres me, te, le, nos, os, les",cat:"GUS",evitar:[],peloDef:"tupe",piel:"#e6ad84",
   kit:{camiseta:"#6cb4ee",pantalon:"#111827",medias:"#111827",detalle:"#111827"},por:{camiseta:"#ff8a00",pantalon:"#1d2233",medias:"#ff8a00",detalle:"#1d2233"},
   frases:()=>[
-   elige("A mis padres",["les","le","nos","os","me","te"],"les","encanta el fútbol.","pronombre","A ellos (mis padres) → les."),
-   conj("A los aficionados","encantar","les encantan","los goles de España.","Escribe el pronombre y el verbo: a ellos → les; «los goles» es plural → encantan."),
-   elige("A mi hermano y a mí",["nos","os","les","me","le","te"],"nos","apasiona el Mundial.","pronombre","«A mi hermano y a mí» = a nosotros → nos."),
-   elige("¿A ti y a tu hermano",["os","les","nos","te","le","me"],"os","gusta jugar al fútbol?","pronombre","«A ti y a…» = a vosotros → os."),
-   conj(`A ${NOM()} le`,"gustar","gustan","los videojuegos y la música.","«Los videojuegos y la música» es plural → gustan."),
-   elige("— ¡Me encanta ganar! — ¡A mí",["también","tampoco"],"también","!","también / tampoco","Respondes a una frase afirmativa → también.")]},
+   elige("A mis padres",["les","le","nos","os","me","te"],"les","encanta el fútbol.","pronombre","«A mis padres» = a ellos: pronombre de 3.ª persona del plural."),
+   conj("A los aficionados","encantar","les encantan","los goles de España.","Escribe el pronombre (a ellos) y el verbo. Fíjate: «los goles» es plural."),
+   elige("A mi hermano y a mí",["nos","os","les","me","le","te"],"nos","apasiona el Mundial.","pronombre","«A mi hermano y a mí» = a nosotros: 1.ª persona del plural."),
+   elige("¿A ti y a tu hermano",["os","les","nos","te","le","me"],"os","gusta jugar al fútbol?","pronombre","«A ti y a tu hermano» = a vosotros: 2.ª persona del plural."),
+   conj(`A ${NOM()} le`,"gustar","gustan","los videojuegos y la música.","¿Qué es lo que gusta? Son dos cosas: el verbo va en plural."),
+   elige("— ¡Me encanta ganar! — ¡A mí",["también","tampoco"],"también","!","también / tampoco","La primera frase es afirmativa («Me encanta»). ¿Con qué palabra se está de acuerdo?")]},
  {fase:"Dieciseisavos de final",rival:"Austria",cod:"AUT",real:"3 – 0",nota:"España gana sin problemas y pasa a octavos.",
   tema:"Ser, estar y hay",cat:"SER",evitar:["roja"],peloDef:"corto",piel:"#f1c9a5",
   kit:{camiseta:"#d81e2c",pantalon:"#ffffff",medias:"#d81e2c",detalle:"#ffffff"},por:{camiseta:"#2ecc71",pantalon:"#1d2233",medias:"#2ecc71",detalle:"#1d2233"},
   frases:()=>[
-   elige("El estadio",["es","está","hay"],"es","enorme y moderno.","¿ser, estar o hay?","Una característica → ser."),
-   elige(`Hoy ${NOM()}`,["está","es","hay"],"está",`muy ${G("nervioso","nerviosa")}.`,"¿ser, estar o hay?","Un estado pasajero (hoy) → estar."),
-   elige("En las gradas",["hay","están","son"],"hay","miles de aficionados.","¿ser, estar o hay?","«Il y a» + una cantidad → hay."),
-   elige("Viena",["está","es","hay"],"está","en Austria.","¿ser, estar o hay?","Para localizar → estar."),
-   conj("Antes del partido, nosotros","estar","estamos","en el vestuario.","Para localizar, con «nosotros» → estamos."),
-   conj("Los aficionados españoles","ser","son","muy simpáticos.","El carácter → ser. Con «ellos»: son.")]},
+   elige("El estadio",["es","está","hay"],"es","enorme y moderno.","¿ser, estar o hay?","Describimos cómo es el estadio: una característica permanente."),
+   elige(`Hoy ${NOM()}`,["está","es","hay"],"está",`muy ${G("nervioso","nerviosa")}.`,"¿ser, estar o hay?","Es un estado pasajero: hoy sí, mañana quizá no."),
+   elige("En las gradas",["hay","están","son"],"hay","miles de aficionados.","¿ser, estar o hay?","Hablamos de la existencia de algo: «il y a» + una cantidad."),
+   elige("Viena",["está","es","hay"],"está","en Austria.","¿ser, estar o hay?","Localizamos una ciudad en el mapa."),
+   conj("Antes del partido, nosotros","estar","estamos","en el vestuario.","Localizamos dónde está el equipo. Conjuga con «nosotros»."),
+   conj("Los aficionados españoles","ser","son","muy simpáticos.","Describimos el carácter de los aficionados. Conjuga con «ellos».")]},
  {fase:"Octavos de final",rival:"Portugal",cod:"POR",real:"1 – 0",nota:"¡El gran derbi ibérico es para España!",
   tema:"Diptongos, irregulares y posesivos (mi, tu, su…)",cat:"IRR",evitar:["roja"],peloDef:"afro",piel:"#c98b5e",
   kit:{camiseta:"#b0122a",pantalon:"#0f6b3a",medias:"#b0122a",detalle:"#0f6b3a"},por:{camiseta:"#ffd23f",pantalon:"#1d2233",medias:"#ffd23f",detalle:"#1d2233"},
   frases:()=>[
-   conj(NOM(),"querer","quiere","ganar el partido.","Querer: la «e» se convierte en «ie» → quiere."),
-   conj("Yo","jugar","juego","con la selección española.","Jugar: la «u» se convierte en «ue» → juego."),
-   elige("¡Cantamos",["nuestro","nuestra","nuestros","vuestro"],"nuestro","himno!","posesivo","Es de nosotros y «himno» es masculino singular → nuestro."),
-   conj("Nosotros","poder","podemos","marcar un gol.","Con «nosotros» no hay diptongo: podemos."),
-   elige("Los jugadores hablan con",["su","sus","suyo","vuestro"],"su","entrenador.","posesivo","Es de ellos, pero «entrenador» es singular → su."),
-   elige(`${NOM()} lleva`,["sus","su","tus","mis"],"sus","botas nuevas.","posesivo","Es de él / de ella y «botas» es plural → sus.")]},
+   conj(NOM(),"querer","quiere","ganar el partido.","Verbo con diptongo e → ie. Conjuga en 3.ª persona del singular."),
+   conj("Yo","jugar","juego","con la selección española.","Verbo con diptongo u → ue. Conjuga con «yo»."),
+   elige("¡Cantamos",["nuestro","nuestra","nuestros","vuestro"],"nuestro","himno!","posesivo","Es de nosotros. Concuerda con «himno» (masculino singular)."),
+   conj("Nosotros","poder","podemos","marcar un gol.","Con «nosotros» y «vosotros» el diptongo desaparece."),
+   elige("Los jugadores hablan con",["su","sus","suyo","vuestro"],"su","entrenador.","posesivo","Es de ellos, pero fíjate: «entrenador» es singular."),
+   elige(`${NOM()} lleva`,["sus","su","tus","mis"],"sus","botas nuevas.","posesivo","Es de él / de ella. Concuerda con «botas» (plural).")]},
  {fase:"Cuartos de final",rival:"Bélgica",cod:"BEL",real:"2 – 1",nota:"Es el único gol que recibe España en todo el Mundial.",
   tema:"La rutina: verbos pronominales y la hora",cat:"IRR",evitar:["roja"],peloDef:"rapado",piel:"#7a4a2a",
   kit:{camiseta:"#c8102e",pantalon:"#c8102e",medias:"#c8102e",detalle:"#111111"},por:{camiseta:"#2ecc71",pantalon:"#1d2233",medias:"#2ecc71",detalle:"#1d2233"},
   frases:()=>[
-   conj("Yo","levantarse","me levanto","a las siete.","Verbo pronominal con «yo»: me levanto."),
-   elige("— ¿Qué hora es? —",["Son","Es","Está"],"Son","las ocho.","la hora","Para las 2, las 3, las 8…: son las…"),
-   conj(NOM(),"ducharse","se ducha","después del entrenamiento.","Verbo pronominal con «él / ella»: se ducha."),
-   elige("— ¿Y ahora? —",["Es","Son","Está"],"Es","la una.","la hora","Para la una: es la una."),
-   conj("Nosotros","acostarse","nos acostamos","temprano antes del partido.","Verbo pronominal con «nosotros»: nos acostamos (sin diptongo)."),
-   elige("El partido empieza a",["las","la","los"],"las","nueve de la noche.","la hora","A + las + hora: a las nueve.")]},
+   conj("Yo","levantarse","me levanto","a las siete.","Verbo pronominal: pronombre de 1.ª persona + verbo conjugado con «yo»."),
+   elige("— ¿Qué hora es? —",["Son","Es","Está"],"Son","las ocho.","la hora","La hora es plural (las ocho): ¿singular o plural?"),
+   conj(NOM(),"ducharse","se ducha","después del entrenamiento.","Verbo pronominal: pronombre de 3.ª persona + verbo conjugado con «él / ella»."),
+   elige("— ¿Y ahora? —",["Es","Son","Está"],"Es","la una.","la hora","La una es singular: ¿singular o plural?"),
+   conj("Nosotros","acostarse","nos acostamos","temprano antes del partido.","Verbo pronominal con «nosotros»: sin diptongo."),
+   elige("El partido empieza a",["las","la","los"],"las","nueve de la noche.","la hora","Para decir a qué hora: a + artículo + hora. «Nueve» es plural.")]},
  {fase:"Semifinal",rival:"Francia",cod:"FRA",real:"2 – 0",nota:"España se clasifica para la final del Mundial.",
   tema:"Planes y obligaciones: ir a / tener que / hay que",cat:"FUT",evitar:["azul"],peloDef:"afro",piel:"#4f2f1c",
   kit:{camiseta:"#1b2a6b",pantalon:"#ffffff",medias:"#c8102e",detalle:"#ffffff"},por:{camiseta:"#ffd23f",pantalon:"#1d2233",medias:"#ffd23f",detalle:"#1d2233"},
   frases:()=>[
-   conj(`Hoy ${NOM()}`,"ir","va","a jugar la semifinal.","Ir a + infinitivo. Con «él / ella»: va."),
-   conj("Nosotros","tener","tenemos","que defender bien.","Tener que + infinitivo. Con «nosotros»: tenemos."),
-   conj("Yo","ir","voy","a marcar un gol.","Ir a + infinitivo. Con «yo»: voy."),
-   elige("Para ganar,",["hay","tiene","es"],"hay","que correr mucho.","obligación","Obligación general, para todos: hay que."),
-   conj("Y vosotros, ¿","ir","vais","a ver la final en la tele?","Con «vosotros»: vais."),
-   elige("Los franceses juegan",["muy","mucho"],"muy","bien.","muy / mucho","Delante de un adjetivo o de «bien» → muy.")]},
+   conj(`Hoy ${NOM()}`,"ir","va","a jugar la semifinal.","Futuro próximo: ir a + infinitivo. Conjuga «ir» con «él / ella»."),
+   conj("Nosotros","tener","tenemos","que defender bien.","Obligación: tener que + infinitivo. Conjuga «tener» con «nosotros»."),
+   conj("Yo","ir","voy","a marcar un gol.","Futuro próximo: ir a + infinitivo. Conjuga «ir» con «yo»."),
+   elige("Para ganar,",["hay","tiene","es"],"hay","que correr mucho.","obligación","Obligación general, válida para todos (no para una persona concreta)."),
+   conj("Y vosotros, ¿","ir","vais","a ver la final en la tele?","Conjuga «ir» con «vosotros»."),
+   elige("Los franceses juegan",["muy","mucho"],"muy","bien.","muy / mucho","Va delante de «bien» (un adverbio).")]},
  {fase:"Final",rival:"Argentina",cod:"ARG",real:"1 – 0",nota:"Gol en la prórroga: ¡España es campeona del mundo por segunda vez!",
   tema:"Repaso: todas las nociones",cat:"PRE",evitar:["blanca"],peloDef:"tupe",piel:"#e6ad84",
   badge:"background:repeating-linear-gradient(90deg,#7cc0ec 0 7px,#ffffff 7px 14px);color:#0d1433;text-shadow:none",
   kit:{camiseta:"#7cc0ec",rayas:"#ffffff",rayasW:3.6,pantalon:"#111827",medias:"#ffffff",detalle:"#111827"},por:{camiseta:"#ff8a00",pantalon:"#1d2233",medias:"#ff8a00",detalle:"#1d2233"},
   frases:()=>[
-   cat(conj("","llamarse","me llamo",`${NOM()} y juego la final del Mundial.`,"Repaso: verbo pronominal con «yo» → me llamo."),"PRO"),
-   cat(elige("Hoy nosotros",["estamos","somos","hay"],"estamos","muy contentos.","¿ser, estar o hay?","Repaso: un estado pasajero → estar."),"SER"),
-   cat(elige("A mis compañeros",["les","le","nos","os"],"les","encantan los grandes partidos.","pronombre","Repaso: a ellos → les."),"GUS"),
-   cat(conj(`Esta mañana, ${NOM()}`,"levantarse","se levanta","muy temprano.","Repaso: verbo pronominal con «él / ella» → se levanta."),"IRR"),
-   cat(elige("— ¿",["Dónde","Cuándo","Quién"],"Dónde","está la copa? — ¡En nuestras manos!","interrogativo","Repaso: un lugar → ¿dónde?"),"PRE"),
-   cat(conj("¡Y ahora yo","ir","voy","a marcar el gol de la victoria!","Repaso: ir a + infinitivo → voy."),"FUT")]}
+   cat(conj("","llamarse","me llamo",`${NOM()} y juego la final del Mundial.`,"Repaso: verbo pronominal, pronombre delante, persona «yo»."),"PRO"),
+   cat(elige("Hoy nosotros",["estamos","somos","hay"],"estamos","muy contentos.","¿ser, estar o hay?","Repaso: un estado pasajero (hoy)."),"SER"),
+   cat(elige("A mis compañeros",["les","le","nos","os"],"les","encantan los grandes partidos.","pronombre","Repaso: «a mis compañeros» = a ellos."),"GUS"),
+   cat(conj(`Esta mañana, ${NOM()}`,"levantarse","se levanta","muy temprano.","Repaso: verbo pronominal, 3.ª persona del singular."),"IRR"),
+   cat(elige("— ¿",["Dónde","Cuándo","Quién"],"Dónde","está la copa? — ¡En nuestras manos!","interrogativo","Repaso: la respuesta es un lugar."),"PRE"),
+   cat(conj("¡Y ahora yo","ir","voy","a marcar el gol de la victoria!","Repaso: futuro próximo, conjuga «ir» con «yo»."),"FUT")]}
 ];
 const JUGADOR={get frases(){return PARTIDOS[pActual].frases();}};
 const REGATES=["caño","sombrero","bicicleta","ruleta"];
@@ -878,6 +1032,12 @@ const TXT_REGATE={"caño":"¡Caño!",sombrero:"¡Sombrero!",bicicleta:"¡Bicicle
 /* ============================================================
    PERSONAJES (vectoriales, articulados: cadera, rodilla, hombro, codo)
    ============================================================ */
+/* Modo ligero: automático en teléfonos, o si el aparato no sigue el ritmo; se puede forzar con el botón ⚡ */
+let ligero=(()=>{try{const v=localStorage.getItem("mundial-ligero");if(v==="1")return true;if(v==="0")return false;}catch(e){}
+  const movil=matchMedia("(pointer:coarse)").matches&&Math.min(screen.width,screen.height)<=600;
+  return movil||(navigator.hardwareConcurrency||8)<=4;})();
+if(ligero)document.documentElement.classList.add("ligero");
+const FILL=(grad,flat)=>ligero?flat:grad;
 const OUT="#0d1433", NS="http://www.w3.org/2000/svg", GY=410, PX=230;
 const C_DEF={camiseta:"#5cc4f5",pantalon:"#f4f5f8",medias:"#5cc4f5",botas:"#15182a",detalle:"#0d4f8a",piel:"#b97a52",pelo:"#121212"};
 const C_POR={camiseta:"#ff8a00",pantalon:"#1d2233",medias:"#ff8a00",botas:"#15182a",detalle:"#1d2233",piel:"#f0c39b",pelo:"#6b3b1f",
@@ -974,11 +1134,11 @@ function figura(id,c,o={}){
     ${pierna(c,"legB",true)}
     ${brazo(c,"armB",true)}
     ${pierna(c,"legF",false)}
-    <path d="M-18,-109 L19,-109 Q23,-93 21,-79 L3.5,-77 L1,-87 L-2,-77 L-17,-79 Q-22,-93 -18,-109 Z" fill="url(#${S})" stroke="${OUT}" stroke-width="1.4"/>
+    <path d="M-18,-109 L19,-109 Q23,-93 21,-79 L3.5,-77 L1,-87 L-2,-77 L-17,-79 Q-22,-93 -18,-109 Z" fill="${FILL(`url(#${S})`,c.pantalon)}" stroke="${OUT}" stroke-width="1.4"/>
     <path d="M17,-107 L18.5,-81" stroke="${c.detalle}" stroke-width="2.6"/>
     ${o.dorsal?`<text x="-10" y="-83" text-anchor="middle" font-family="Bebas Neue, Impact, sans-serif" font-size="12" fill="${c.numCol||"#fff"}">${o.dorsal}</text>`:""}
     <path d="M-4,-162 L8,-162 L8.5,-146 L-4.5,-146 Z" fill="${sh(c.piel,-.18)}" stroke="${OUT}" stroke-width="1.2"/>
-    <path d="M-20,-147 Q2,-155 22,-147 Q26,-124 20,-101 Q1,-95 -18,-101 Q-24,-124 -20,-147 Z" fill="url(#${J})" stroke="${OUT}" stroke-width="1.4"/>
+    <path d="M-20,-147 Q2,-155 22,-147 Q26,-124 20,-101 Q1,-95 -18,-101 Q-24,-124 -20,-147 Z" fill="${FILL(`url(#${J})`,c.camiseta)}" stroke="${OUT}" stroke-width="1.4"/>
     <path d="M-12,-140 Q-10,-120 -12,-104" stroke="rgba(0,0,0,.14)" stroke-width="5" fill="none"/>
     ${c.rayas?`<path d="M-10,-148 L-10,-98 M-3,-150 L-3,-96 M4,-150 L4,-96 M11,-149 L11,-97 M17,-146 L17,-100" stroke="${c.rayas}" stroke-width="${c.rayasW||.9}" opacity="${c.rayasW?1:.75}"/>`:""}
     <path d="M-16,-139 Q-19,-120 -15.5,-102" stroke="${c.detalle}" stroke-width="3" fill="none" opacity=".9"/>
@@ -986,7 +1146,7 @@ function figura(id,c,o={}){
     <g transform="translate(3,-172) scale(.84) translate(-3,156)">
     ${p.atras}
     ${p.flow?`<g class="flow" data-px="${p.px}" data-py="${p.py}" data-amp="${p.amp}">${p.flow}</g>`:""}
-    <ellipse cx="3" cy="-156" rx="17" ry="18.5" fill="url(#${K})" stroke="${OUT}" stroke-width="1.5"/>
+    <ellipse cx="3" cy="-156" rx="17" ry="18.5" fill="${FILL(`url(#${K})`,c.piel)}" stroke="${OUT}" stroke-width="1.5"/>
     <path d="M19.5,-159 Q25,-154 19.5,-150" fill="${c.piel}" stroke="${OUT}" stroke-width="1.2"/>
     <ellipse cx="-4" cy="-155" rx="3.6" ry="5.2" fill="${sh(c.piel,-.1)}" stroke="${OUT}" stroke-width="1.2"/>
     <ellipse cx="12" cy="-158" rx="2.8" ry="3.1" fill="#fff"/>
@@ -1078,9 +1238,9 @@ function frente(id,c,o={}){
     <g transform="translate(0,-170) scale(.74) translate(0,152)">${hp.capa==="atras"?flow:""}${hp.atras}</g>
     <g transform="scale(${an.toFixed(3)},1)">
       ${pierna(-13,-1)}${pierna(13,1)}
-      <path d="M-28,-84 L28,-84 L31,-52 L3,-52 L0,-62 L-3,-52 L-31,-52 Z" fill="url(#${G2})" ${OS}/>
+      <path d="M-28,-84 L28,-84 L31,-52 L3,-52 L0,-62 L-3,-52 L-31,-52 Z" fill="${FILL(`url(#${G2})`,c.pantalon)}" ${OS}/>
       <path d="M-27.5,-82 L-30,-54 M27.5,-82 L30,-54" stroke="${c.detalle}" stroke-width="2.4"/>
-      <path d="M-27,-140 Q0,-146 27,-140 Q32,-112 28,-80 Q0,-75 -28,-80 Q-32,-112 -27,-140 Z" fill="url(#${G1})" ${OS}/>
+      <path d="M-27,-140 Q0,-146 27,-140 Q32,-112 28,-80 Q0,-75 -28,-80 Q-32,-112 -27,-140 Z" fill="${FILL(`url(#${G1})`,c.camiseta)}" ${OS}/>
       <path d="M-14,-134 Q-12,-110 -14,-84 M14,-134 Q12,-110 14,-84" stroke="rgba(0,0,0,.12)" stroke-width="6" fill="none"/>
       ${c.rayas?`<path d="M-20,-140 L-20,-80 M-13,-142 L-13,-78 M-6,-143 L-6,-77 M6,-143 L6,-77 M13,-142 L13,-78 M20,-140 L20,-80" stroke="${c.rayas}" stroke-width="1.1" opacity=".75"/>`:""}
       <path d="M-24,-136 Q-28,-110 -25,-84 M24,-136 Q28,-110 25,-84" stroke="${c.detalle}" stroke-width="3" fill="none" opacity=".9"/>
@@ -1092,7 +1252,7 @@ function frente(id,c,o={}){
     <path d="M-7,-152 L7,-152 L7.5,-136 L-7.5,-136 Z" fill="${sh(piel,-.18)}" ${OS}/>
     <g transform="translate(0,-170) scale(.74) translate(0,152)">
     <ellipse cx="-30" cy="-150" rx="6" ry="8.5" fill="${sh(piel,-.06)}" ${OS}/><ellipse cx="30" cy="-150" rx="6" ry="8.5" fill="${sh(piel,-.06)}" ${OS}/>
-    <path d="M-30,-154 Q-30,-122 0,-119 Q30,-122 30,-154 Q30,-184 0,-184 Q-30,-184 -30,-154 Z" fill="url(#${G3})" ${OS}/>
+    <path d="M-30,-154 Q-30,-122 0,-119 Q30,-122 30,-154 Q30,-184 0,-184 Q-30,-184 -30,-154 Z" fill="${FILL(`url(#${G3})`,piel)}" ${OS}/>
     <g class="ojos">${ojo(-11)}${ojo(11)}</g>
     ${o.genero==="f"?`<path d="M-17.5,-157 l-4,-3 M-18.6,-153 l-4.6,-1 M17.5,-157 l4,-3 M18.6,-153 l4.6,-1" stroke="${OUT}" stroke-width="1.8" stroke-linecap="round"/>`:""}
     <path d="M-18,-166 Q-11,-170 -4,-167 M4,-167 Q11,-170 18,-166" stroke="${sh(c.pelo,-.1)}" stroke-width="2.6" fill="none" stroke-linecap="round"/>
@@ -1240,7 +1400,7 @@ function mkFig(id){const g=$(id),q=s=>g.querySelector(s);
          flow:q(".flow"),rz:[...g.querySelectorAll(".rz")],seed:Math.random()*6};}
 let P=null,PV=null,PR=null,C=null,M1=null,M2=null,D=mkFig("defensa"),K=mkFig("portero");
 let ESC={an:1,al:1};
-function animarPelo(f,now,corre,ph,cel){
+function animarPelo(f,now,corre,ph,cel){if(ligero&&!cel&&!corre)return;
   if(f.flow){const d=f.flow.dataset,amp=+d.amp;
     const r=(Math.sin(now*0.005+f.seed)*3+(corre?12+Math.sin(ph*2)*6:0)+(cel?Math.sin(now*0.02)*10:0))*amp;
     setA(f.flow,"transform",`rotate(${r.toFixed(1)} ${d.px} ${d.py})`);}
@@ -1267,20 +1427,13 @@ function run(ph){const s=Math.sin(ph);
 
 /* Celebraciones de gol: cada una devuelve una postura en función del tiempo */
 const CEL_POSE={
-  salto:t=>{const j=Math.abs(Math.sin(t*0.011));return{py:-j*34,leg:[-22*j,15+50*j,18,25+35*j],arm:[-165,-15,165,15]};},
-  puno:t=>{const q=Math.sin(t*0.02);return{py:-Math.abs(Math.sin(t*0.01))*8,leg:[q*12,15,-q*12,15],arm:[-160+q*18,-70,20,-40]};},
-  avion:t=>{const q=Math.sin(t*0.02);return{py:-Math.abs(Math.sin(t*0.01))*6,leg:[q*30,15+20*Math.max(0,q),-q*30,15+20*Math.max(0,-q)],arm:[-92,0,92,0],rot:6};},
-  oreja:t=>({py:0,leg:[-6,10,10,14],arm:[-150,-125,25,-30],rot:-8+Math.sin(t*0.006)*2}),
-  baile:t=>{const q=Math.sin(t*0.014);return{py:-Math.abs(q)*10,leg:[q*22,12,-q*22,12],arm:[-130+q*45,-40,130+q*45,40]};},
-  corazon:t=>({py:-Math.abs(Math.sin(t*0.008))*6,leg:[-6,10,8,12],arm:[-155,-70,155,70]}),
-  rodillas:t=>({py:12,leg:[-80,100,-70,105],arm:[-165,-15,165,15],bob:Math.sin(t*0.02)*1.5}),
-  robot:t=>{const s=Math.sin(t*0.008)>0?1:-1;return{py:0,leg:[s*12,0,-s*12,0],arm:[-90,s>0?-90:0,90,s>0?0:90]};},
-  voltereta:t=>{const u=(t%1300)/1300;return{py:-Math.sin(Math.PI*u)*80,rot:-360*u,rc:-90,leg:[-60,110,-60,110],arm:[-150,-20,150,20]};},
-  patinazo:t=>({py:-4,rot:78,rc:0,leg:[30,20,20,20],arm:[-175,-10,-175,-10],bob:Math.sin(t*0.03)}),
-  saludo:t=>({py:0,leg:[0,4,0,4],arm:[-150,-145,6,-8],bob:Math.sin(t*0.004)}),
-  siesta:t=>({py:-6,rot:-88,leg:[-20,45,-5,20],arm:[-170,-150,-165,-150],bob:Math.sin(t*0.004)*1.5}),
-  giro:t=>{const u=(t%950)/950;return{py:-Math.sin(Math.PI*u)*48,sx:Math.cos(2*Math.PI*u),leg:[-20,40,15,30],arm:[-95,0,95,0]};},
-  arquero:t=>({py:0,leg:[-25,10,25,10],arm:[-95,0,-95,150],rot:Math.sin(t*0.005)*2})
+  salto:t=>{const j=Math.abs(Math.sin(t*0.011));return{py:-j*40,leg:[-26*j,20+55*j,20,30+40*j],arm:[-160-10*j,-10,160+10*j,10],bob:0};},
+  puno:t=>{const q=Math.sin(t*0.018),h=Math.max(0,q);return{py:-h*14,leg:[-10,12+14*h,12,14+10*h],arm:[-150-15*q,-95+30*q,30,-30],rot:-6*h};},
+  avion:t=>{const r=run(t*0.016);return{py:0,leg:r.leg,arm:[-95,0,95,0],rot:12,bob:r.bob};},
+  corazon:t=>{const b=Math.abs(Math.sin(t*0.007));return{py:-b*5,leg:[-8,10,10,12],arm:[-140-8*b,-95,140+8*b,95],bob:0};},
+  baile:t=>{const q=Math.sin(t*0.013),w=Math.sin(t*0.026);return{py:-Math.abs(w)*5,leg:[q*26,14+Math.abs(q)*12,-q*26,14+Math.abs(q)*12],arm:[-120+q*50,-60,120+q*50,60],rot:q*5};},
+  rodillas:t=>({py:14,leg:[-85,105,-70,110],arm:[-150,-25,150,25],rot:-14,bob:Math.sin(t*0.02)*1.5}),
+  voltereta:t=>{const u=(t%1300)/1300;return{py:-Math.sin(Math.PI*u)*80,rot:-360*u,rc:-90,leg:[-60,110,-60,110],arm:[-150,-20,150,20]};}
 };
 /* ============================================================
    ESTADO + BUCLE
@@ -1308,6 +1461,7 @@ function frame(now){
   if(P){pose(P,{x:PX+S.pdx,y:GY+py,rot:S.prot+rotC+inclin,rc:rcC||S.prc,sx:S.psx*ESC.an*sxC,sy:ESC.al,...pp});animarPelo(P,now,S.running,S.ph,S.celebra);}
   if(PV&&!crEl.hidden){animFrente(PV,now);if(nFrame%3===0)posPills();}
   if(PR&&!presEl.hidden)animFrente(PR,now);
+  animarVestuario(now);animCopa(now);
   if(CN.length)CN.forEach(o=>{const c=CEL_POSE[o.k](now);pose(o.f,{x:0,y:c.py||0,rot:c.rot||0,rc:c.rc||0,sx:(c.sx===undefined?1:c.sx)*ESC.an,sy:ESC.al,leg:c.leg,arm:c.arm,bob:c.bob||0});animarPelo(o.f,now,false,0,true);});
 
   let dp=S.defRun?run(S.defPh):idle(now,1.3);
@@ -1334,13 +1488,13 @@ function frame(now){
   const h=Math.max(0,GY-11-by);
   setA(el.sombra,"cx",bx.toFixed(1));
   setA(el.sombra,"rx",(11*Math.max(.35,1-h/180)).toFixed(1));
-  if(S.ballMode==="free"){trail.unshift([bx,by]);if(trail.length>7)trail.pop();}else trail.length=0;
+  if(S.ballMode==="free"&&!ligero){trail.unshift([bx,by]);if(trail.length>7)trail.pop();}else trail.length=0;
   el.trail.forEach((c,i)=>{const t=trail[(i+1)*2];
     if(t&&Math.hypot(t[0]-bx,t[1]-by)>6){setA(c,"cx",t[0].toFixed(1));setA(c,"cy",t[1].toFixed(1));setA(c,"opacity",(.3-i*.09).toFixed(2));}
     else setA(c,"opacity","0");});
 
   const v=(S.world-prevWorld)/dt;prevWorld=S.world;
-  setA(el.vel,"opacity",(Math.min(1,Math.max(0,(v-0.15)*1.3))*0.45).toFixed(2));
+  setA(el.vel,"opacity",ligero?"0":(Math.min(1,Math.max(0,(v-0.15)*1.3))*0.45).toFixed(2));
   el.velLines.forEach((l,i)=>{const x=((i*173-S.world*1.8)%950+950)%950-90;setA(l,"x",x.toFixed(0));});
 
   setA(el.cesped,"transform",`translate(${(-(S.world%180)).toFixed(1)},0)`);
@@ -1351,7 +1505,7 @@ function frame(now){
     setA(el.gradaA,"transform",`translate(0,${sA.toFixed(1)})`);setA(el.gradaB,"transform",`translate(0,${sB.toFixed(1)})`);}
   else{setA(el.gradaA,"transform","translate(0,0)");setA(el.gradaB,"transform","translate(0,0)");}
   if(S.celebra||nFrame%6===0)el.banderas.forEach((b,i)=>{const x=+b.dataset.x,a=S.celebra?Math.sin(now*0.016+i)*26:Math.sin(now*0.0035+i*.9)*7;setA(b,"transform",`rotate(${a.toFixed(0)} ${x} 128)`);});
-  if(S.celebra)el.flashes.forEach(c=>{let o=+c.getAttribute("opacity");o=Math.random()<0.04?1:o*0.8;setA(c,"opacity",o.toFixed(2));});
+  if(S.celebra&&!ligero)el.flashes.forEach(c=>{let o=+c.getAttribute("opacity");o=Math.random()<0.04?1:o*0.8;setA(c,"opacity",o.toFixed(2));});
   setA(el.pA,"transform",`translate(${S.goalX.toFixed(1)},${GY})`);
   setA(el.pD,"transform",`translate(${S.goalX.toFixed(1)},${GY})`);
   setA(el.red,"transform",`translate(${(S.netB*12).toFixed(1)},${(-S.netB*3).toFixed(1)})`);
@@ -1360,16 +1514,28 @@ function frame(now){
   setA(el.flag,"transform",`translate(${S.flagX.toFixed(1)},${GY+34}) scale(1.15)`);
   setA(el.redP,"transform",`translate(${(S.netP*12).toFixed(1)},${(-S.netP*3).toFixed(1)})`);
 
-  const shx=S.shake?(Math.random()-.5)*S.shake:0,shy=S.shake?(Math.random()-.5)*S.shake:0;
+  const shx=S.shake&&!ligero?(Math.random()-.5)*S.shake:0,shy=S.shake&&!ligero?(Math.random()-.5)*S.shake:0;
   const camT=`translate(${S.camX.toFixed(1)},${S.camY.toFixed(1)}) scale(${S.camZ.toFixed(3)}) translate(${(-S.camX+shx).toFixed(1)},${(-S.camY+shy).toFixed(1)})`;
   setA(el.cam,"transform",camT);setA(el.camF,"transform",camT);
 }
-let lastFrame=0,medioRitmo=false,acum=0,cont=0,saltarImg=false;
+let lastFrame=0,medioRitmo=false,acum=0,cont=0,saltarImg=false,nLoop=0,lentos=0;
+const hayAccion=()=>activos>0||S.running||S.celebra||S.defRun||S.cRun||S.kpDive||S.shake>0||CN.length>0||(typeof $==="function"&&(!$("creador").hidden||!$("presenta").hidden));
 function loop(){
-  const n=performance.now(),gap=n-lastFrame;lastFrame=n;
-  if(gap<200){acum+=gap;cont++;if(cont>=40){medioRitmo=(acum/cont)>24;acum=0;cont=0;}}
-  if(medioRitmo){saltarImg=!saltarImg;if(saltarImg){requestAnimationFrame(loop);return;}}
+  const n=performance.now(),gap=n-lastFrame;lastFrame=n;nLoop++;
+  if(gap<200){acum+=gap;cont++;if(cont>=40){const med=acum/cont;medioRitmo=med>24;acum=0;cont=0;
+    if(!ligero&&med>30&&++lentos>=4)activarLigero(true,true);}}
+  /* En reposo (nadie corre, ningún tween) basta con unas pocas imágenes por segundo para la respiración */
+  const reposo=!hayAccion();
+  if(reposo&&nLoop%(ligero?6:3)!==0){requestAnimationFrame(loop);return;}
+  if(!reposo&&(ligero||medioRitmo)){saltarImg=!saltarImg;if(saltarImg){requestAnimationFrame(loop);return;}}
   frame(n);requestAnimationFrame(loop);
+}
+function activarLigero(on,auto){
+  ligero=on;document.documentElement.classList.toggle("ligero",on);
+  try{localStorage.setItem("mundial-ligero",on?"1":"0");}catch(e){}
+  const b=$("tgLigero");if(b){b.setAttribute("aria-pressed",on);b.title=on?"Modo ligero activado":"Modo ligero desactivado";}
+  if(typeof actualizarAvatar==="function"){actualizarAvatar();if(typeof PARTIDOS!=="undefined")aplicarRival(PARTIDOS[pActual]);}
+  if(auto&&on)caption("⚡ Modo ligero activado");
 }
 requestAnimationFrame(loop);
 setInterval(()=>{const n=performance.now();if(n-lastFrame>150){frame(n);lastFrame=n-100;}},60);
@@ -1380,15 +1546,16 @@ function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 /* Reloj del partido: permite la cámara lenta en los remates (reloj.esc < 1) */
 const reloj={t:performance.now(),esc:1};
 const ahora=()=>reloj.t;
-function tween(d,fn,ease=E.io){return new Promise(res=>{const s0=ahora();let done=false;
-  const end=()=>{if(done)return;done=true;fn(ease(1),1);res();};
+let activos=0;
+function tween(d,fn,ease=E.io){return new Promise(res=>{const s0=ahora();let done=false;activos++;
+  const end=()=>{if(done)return;done=true;activos--;fn(ease(1),1);res();};
   function f(){if(done)return;const t=Math.min(1,(ahora()-s0)/d);fn(ease(t),t);if(t<1)requestAnimationFrame(f);else end();}
   requestAnimationFrame(f);
   (function poll(){if(done)return;const t=(ahora()-s0)/d;if(t>=1){end();return;}fn(ease(t),t);setTimeout(poll,40);})();});}
 async function lento(fn,esc=.42){reloj.esc=esc;try{await fn();}finally{reloj.esc=1;}}
 function camara(z,x,y,dur=500){const z0=S.camZ,x0=S.camX,y0=S.camY;return tween(dur,u=>{S.camZ=z0+(z-z0)*u;S.camX=x0+(x-x0)*u;S.camY=y0+(y-y0)*u;});}
 const camNormal=(dur=500)=>camara(1,400,225,dur);
-function fuegos(n=3,desde=0){
+function fuegos(n=3,desde=0){if(ligero)n=Math.min(n,1);
   const cols=["#ff3d5e","#ffc400","#ffffff","#00c2d1","#7dffa8"];
   for(let b=0;b<n;b++){setTimeout(()=>{const x=90+Math.random()*620,y=40+Math.random()*110,col=cols[b%cols.length];
     tone(180,.12,{type:"triangle",v:.05,to:900});
@@ -1398,7 +1565,7 @@ function fuegos(n=3,desde=0){
   },desde+b*420);}
 }
 function golFlash(txt){const g=$("golFlash");g.textContent=txt||"¡GOL!";g.classList.remove("show");void g.offsetWidth;g.classList.add("show");}
-function polvo(x,y,n=10,col="#d8f5c8"){
+function polvo(x,y,n=10,col="#d8f5c8"){if(ligero){if(n<4)return;n=Math.ceil(n/3);}
   for(let i=0;i<n;i++){const c=document.createElementNS(NS,"circle");c.setAttribute("r",(2+Math.random()*3.5).toFixed(1));
     c.setAttribute("fill",col);el.fx.appendChild(c);
     const vx=(Math.random()-.5)*80,vy=-12-Math.random()*34;
@@ -1488,14 +1655,14 @@ async function verPorteria(txt){
 }
 async function acercarPorteria(){S.running=true;const w0=S.world,g0=S.goalX;await tween(500,u=>{S.world=w0+90*u;S.goalX=g0-90*u;});S.running=false;}
 function porteroVuela(){setTimeout(()=>{S.kpDive=true;tween(450,u=>{S.kpRot=-74*u;S.kpX=-28*u;S.kpY=-Math.sin(Math.PI*u)*28;},E.out);},120);}
-function porteroAtrapa(){tween(450,u=>{S.kpY=-22*Math.sin(Math.PI*u);});}
+function porteroAtrapa(){if(S.fuera){tween(500,u=>{S.kpY=-30*Math.sin(Math.PI*u);S.kpX=10*u;});return;}tween(420,u=>{S.kpY=-18*Math.sin(Math.PI*u);S.kpX=-90*u;},E.out);}
 async function golpeo(){S.bSq=1;
   await tween(200,u=>{S.pLeg=[42*u,85*u,-8,16];},E.out);
   sndKick();S.ballMode="free";S.bx=pX()+30;S.by=GY-11;
   tween(170,u=>{S.pLeg=[42-112*u,85-80*u,-8,16];},E.out).then(()=>tween(380,u=>{S.pLeg=[-70*(1-u),5,-8,16];})).then(()=>{S.pLeg=null;});
 }
 async function vuelo(x0,y0,tx,ty,dur,arco){await tween(dur,u=>{S.bx=x0+(tx-x0)*u;S.by=y0+(ty-y0)*u-Math.sin(Math.PI*u)*arco;S.spin+=14;},E.lin);}
-const destino=gol=>gol?[S.goalX+108,GY-118]:[S.goalX+64,GY-100];
+const destino=gol=>{if(gol)return[S.goalX+108,GY-118];S.fuera=Math.random()<.45;return S.fuera?[S.goalX+40,-90]:[S.goalX-26,GY-100];};
 function flip(id,n){const g=$(id);g.textContent=n;g.classList.remove("flip");void g.offsetWidth;g.classList.add("flip");}
 async function celebrarGol(asist){
   marcador.esp++;flip("golE",marcador.esp);
@@ -1509,7 +1676,10 @@ const pX=()=>PX+S.pdx;
 async function terminarRemate(gol,tx,ty,asist){
   if(gol){S.shake=8;tween(600,u=>{S.shake=8*(1-u);},E.lin);tween(420,u=>{S.netB=Math.sin(Math.PI*u);},E.lin);
     tween(440,u=>{S.by=ty+(GY-14-ty)*u;},E.in);await tween(260,u=>{S.bx=tx+12*u;},E.out);await celebrarGol(asist);}
-  else{caption("¡Parada del portero!",true);S.bx=S.goalX+62+S.kpX;S.by=GY-100+S.kpY;sndKo();await sleep(1200);}
+  else if(S.fuera){caption("¡Fuera! Por encima del larguero",true);sndKo();await sleep(1100);S.fuera=false;}
+  else{S.bx=S.goalX+62+S.kpX;S.by=GY-100+S.kpY;polvo(S.bx,S.by,10,"#ffffff");caption("¡Parada del portero!",true);sndKo();
+    await tween(500,u=>{S.kpY=-14*Math.sin(Math.PI*u);S.bx=S.goalX+62+S.kpX;S.by=GY-100+S.kpY;});await sleep(350);
+    sndKick();await vuelo(S.bx,S.by,S.goalX-520,-80,620,60);}
 }
 async function tiro(gol,txt){
   caption(txt||"¡Chuta!");await acercarPorteria();camara(1.18,S.goalX-40,GY-95,450);await golpeo();
@@ -1644,72 +1814,72 @@ async function sacaCompanero(x,sx){Object.assign(S,{cOp:1,cX:x,cY:0,cSx:sx,cRun:
 function saltoCabeza(dur,alto,ini){tween(dur,u=>{const t=clamp((u-ini)/(1-ini));S.py=-Math.sin(Math.PI*t)*alto;S.pArm=[-70*t,-20,70*t,-20];});}
 const meta=(alto)=>[S.propX-80,alto];
 const SIT_D={
-  entrada:{t:"Entrada",run:async ok=>{caption("¡Ataca el rival!");await rivalEntra(430);
+  entrada:{t:"Entrada",run:async ok=>{caption("¡Ataca el rival!","def");await rivalEntra(430);
     if(ok){const b0=S.bx;await tween(380,u=>{S.pLeg=[-55*u,5,15*u,10];S.prot=-10*u;S.bx=b0+(pX()+30-b0)*u;},E.out);polvo(pX()+40,GY,10);
-      tween(500,u=>{S.defRot=-80*u;S.defOp=1-u*.9;},E.in);caption("¡Entrada limpia!");await tween(320,u=>{S.pLeg=[-55*(1-u),5,15*(1-u),10];S.prot=-10*(1-u);});S.pLeg=null;S.ballMode="feet";}
+      tween(500,u=>{S.defRot=-80*u;S.defOp=1-u*.9;},E.in);caption("¡Entrada limpia!","ok");await tween(320,u=>{S.pLeg=[-55*(1-u),5,15*(1-u),10];S.prot=-10*(1-u);});S.pLeg=null;S.ballMode="feet";}
     else{tween(520,u=>{const q=Math.sin(Math.PI*u);S.pLeg=[-45*q,5,10,10];S.prot=-14*q;});await tween(700,u=>{S.defX=430-220*u;S.bx=S.defX-32;S.spin-=10;},E.in);
       S.pLeg=null;S.prot=0;await rivalPatea();await lento(()=>vuelo(S.bx,GY-11,...meta(GY-90),450,25));}}},
-  presion:{t:"Presión",run:async ok=>{caption("¡Presiona!");await rivalEntra(330);
-    if(ok){const b0=S.bx;await tween(320,u=>{S.pLeg=[-35*u,5,10,10];S.bx=b0+(pX()+30-b0)*u;});S.pLeg=null;S.ballMode="feet";tween(400,u=>{S.defRot=25*u;S.defOp=1-u;});caption("¡Balón robado!");await sleep(500);}
+  presion:{t:"Presión",run:async ok=>{caption("¡Presiona!","def");await rivalEntra(330);
+    if(ok){const b0=S.bx;await tween(320,u=>{S.pLeg=[-35*u,5,10,10];S.bx=b0+(pX()+30-b0)*u;});S.pLeg=null;S.ballMode="feet";tween(400,u=>{S.defRot=25*u;S.defOp=1-u;});caption("¡Balón robado!","ok");await sleep(500);}
     else{await tween(700,u=>{S.defX=330-130*u;S.bx=S.defX-32;S.defY=-Math.sin(Math.PI*u)*20;S.spin-=10;});await rivalPatea();await lento(()=>vuelo(S.bx,GY-11,...meta(GY-100),420,20));}}},
-  intercepcion:{t:"Intercepción",run:async ok=>{caption("¡Pase del rival!");await rivalEntra(520);await rivalPatea();const x0=S.bx;
+  intercepcion:{t:"Intercepción",run:async ok=>{caption("¡Pase del rival!","def");await rivalEntra(520);await rivalPatea();const x0=S.bx;
     if(ok){tween(600,u=>{const t=clamp((u-.4)/.6);S.py=-Math.sin(Math.PI*t)*40;S.pArm=[-60*t,-20,60*t,-20];});
-      await vuelo(x0,GY-11,pX()+10,GY-150*ESC.al,600,60);caption("¡Interceptado!");await vuelo(pX()+10,GY-150*ESC.al,pX()+30,GY-11,300,0);
+      await vuelo(x0,GY-11,pX()+10,GY-150*ESC.al,600,60);caption("¡Interceptado!","ok");await vuelo(pX()+10,GY-150*ESC.al,pX()+30,GY-11,300,0);
       S.py=0;S.pArm=null;S.ballMode="feet";tween(400,u=>{S.defOp=1-u;});}
     else{tween(600,u=>{const t=clamp((u-.5)/.5);S.py=-Math.sin(Math.PI*t)*22;});await vuelo(x0,GY-11,S.propX+30,GY-60,800,110);S.py=0;await lento(()=>vuelo(S.propX+30,GY-60,...meta(GY-90),260,0));}}},
   despeje:{t:"Despeje de cabeza",run:async ok=>{Object.assign(S,{m1X:330,m1Op:1,m1Y:0});await centroRival();const x0=S.bx,hx=pX()+10,hy=GY-188*ESC.al;
     tween(760,u=>{const t=clamp((u-.45)/.55),q=Math.sin(Math.PI*t);S.py=-q*(ok?44:16);S.pArm=[-70*t,-20,70*t,-20];S.m1Y=-q*(ok?18:40);});
-    if(ok){await vuelo(x0,GY-11,hx,hy,760,120);sndKick();caption("¡Despeje de cabeza!");await vuelo(hx,hy,900,-40,600,40);S.py=0;S.pArm=null;S.ballMode="feet";}
-    else{await vuelo(x0,GY-11,S.m1X+10,GY-190,760,120);caption("¡Remata el 9 rival!");sndKick();await lento(()=>vuelo(S.m1X+10,GY-190,...meta(GY-110),420,5));S.py=0;S.pArm=null;}
+    if(ok){await vuelo(x0,GY-11,hx,hy,760,120);sndKick();caption("¡Despeje de cabeza!","ok");await vuelo(hx,hy,900,-40,600,40);S.py=0;S.pArm=null;S.ballMode="feet";}
+    else{await vuelo(x0,GY-11,S.m1X+10,GY-190,760,120);caption("¡Remata el 9 rival!","def");sndKick();await lento(()=>vuelo(S.m1X+10,GY-190,...meta(GY-110),420,5));S.py=0;S.pArm=null;}
     tween(400,u=>{S.m1Op=1-u;});}},
-  bloqueo:{t:"Bloqueo",run:async ok=>{caption("¡Disparo del rival!");await rivalEntra(470);await rivalPatea();const x0=S.bx;
-    if(ok){tween(250,u=>{S.pLeg=[-30*u,5,30*u,5];S.pArm=[-60,-10,60,-10];});await vuelo(x0,GY-11,pX()+22,GY-60,350,10);polvo(pX()+25,GY-50,8,"#ffffff");caption("¡Bloqueado!");
+  bloqueo:{t:"Bloqueo",run:async ok=>{caption("¡Disparo del rival!","def");await rivalEntra(470);await rivalPatea();const x0=S.bx;
+    if(ok){tween(250,u=>{S.pLeg=[-30*u,5,30*u,5];S.pArm=[-60,-10,60,-10];});await vuelo(x0,GY-11,pX()+22,GY-60,350,10);polvo(pX()+25,GY-50,8,"#ffffff");caption("¡Bloqueado!","ok");
       await vuelo(pX()+22,GY-60,pX()+120,GY-11,400,40);await vuelo(pX()+120,GY-11,pX()+30,GY-11,300,0);S.pLeg=null;S.pArm=null;S.ballMode="feet";tween(400,u=>{S.defOp=1-u;});}
     else{tween(300,u=>{S.pLeg=[-30*u,5,30*u,5];});await lento(()=>vuelo(x0,GY-11,...meta(GY-40),600,20));S.pLeg=null;}}},
-  paradaAbajo:{t:"Tiro raso",run:async ok=>{caption("¡Tiro raso!");await rivalEntra(480);await rivalPatea();const x0=S.bx;
-    if(ok){tween(380,u=>{S.prot=70*u;S.pArm=[-100,-10,-100,-10];});await vuelo(x0,GY-11,pX()+75,GY-25,450,5);caption("¡Paradón abajo!");await sleep(500);
-      await tween(300,u=>{S.prot=70*(1-u);});S.pArm=null;S.ballMode="feet";}
+  paradaAbajo:{t:"Tiro raso",run:async ok=>{caption("¡Tiro raso!","def");await rivalEntra(480);await rivalPatea();const x0=S.bx;
+    if(ok){tween(380,u=>{S.prot=70*u;S.pArm=[-100,-10,-100,-10];});await vuelo(x0,GY-11,pX()+75,GY-25,450,5);await agarre(pX()+75,GY-25,"¡Paradón abajo!");
+      await tween(300,u=>{S.prot=70*(1-u);});S.pArm=null;await sacaPortero(pX()+75,GY-25);}
     else{tween(520,u=>{S.prot=40*Math.sin(Math.PI*u);});await lento(()=>vuelo(x0,GY-11,...meta(GY-25),520,5));S.prot=0;}}},
-  paradaArriba:{t:"Tiro alto",run:async ok=>{caption("¡Tiro alto!");await rivalEntra(470);await rivalPatea();const x0=S.bx;
+  paradaArriba:{t:"Tiro alto",run:async ok=>{caption("¡Tiro alto!","def");await rivalEntra(470);await rivalPatea();const x0=S.bx;
     tween(520,u=>{S.py=-Math.sin(Math.PI*u)*(ok?44:18);S.pArm=[-170,-10,-170,-10];});
-    if(ok){await vuelo(x0,GY-11,pX()+15,GY-205*ESC.al,480,30);caption("¡Paradón arriba!");await sleep(450);S.pArm=null;S.py=0;S.ballMode="feet";}
+    if(ok){await vuelo(x0,GY-11,pX()+15,GY-205*ESC.al,480,30);await agarre(pX()+15,GY-205*ESC.al,"¡Paradón arriba!");S.pArm=null;S.py=0;await sacaPortero(pX()+15,GY-205*ESC.al);}
     else{await lento(()=>vuelo(x0,GY-11,...meta(GY-140),560,40));S.pArm=null;S.py=0;}}},
-  salida:{t:"Mano a mano",run:async ok=>{caption("¡Mano a mano!");await rivalEntra(430);S.running=true;
+  salida:{t:"Mano a mano",run:async ok=>{caption("¡Mano a mano!","def");await rivalEntra(430);S.running=true;
     tween(500,u=>{S.pdx=-70+110*u;});await tween(500,u=>{S.defX=430-90*u;S.bx=S.defX-32;S.spin-=8;});S.running=false;
-    if(ok){const b0=S.bx;await tween(300,u=>{S.prot=70*u;S.pArm=[-100,-10,-100,-10];S.bx=b0+((pX()+60)-b0)*u;S.by=GY-14;});caption("¡Gran salida!");polvo(pX()+60,GY,10);
-      tween(400,u=>{S.defRot=-60*u;S.defOp=1-u;});await sleep(500);await tween(300,u=>{S.prot=70*(1-u);});S.pArm=null;S.ballMode="feet";}
+    if(ok){const b0=S.bx;await tween(300,u=>{S.prot=70*u;S.pArm=[-100,-10,-100,-10];S.bx=b0+((pX()+60)-b0)*u;S.by=GY-14;});polvo(pX()+60,GY,10);await agarre(pX()+60,GY-14,"¡Gran salida!");
+      tween(400,u=>{S.defRot=-60*u;S.defOp=1-u;});await tween(300,u=>{S.prot=70*(1-u);});S.pArm=null;await sacaPortero(pX()+60,GY-14);}
     else{tween(300,u=>{S.prot=60*u;});await tween(600,u=>{S.defX=340-240*u;S.defY=-Math.sin(Math.PI*u)*18;S.bx=S.defX-32;});await lento(()=>vuelo(S.bx,GY-11,...meta(GY-20),350,0));S.prot=0;}}},
   punos:{t:"Despeje de puños",run:async ok=>{Object.assign(S,{m1X:300,m1Op:1,m1Y:0});await centroRival();const x0=S.bx,hx=pX()+15,hy=GY-200*ESC.al;
     tween(760,u=>{const t=clamp((u-.4)/.6),q=Math.sin(Math.PI*t);S.py=-q*(ok?42:14);S.pArm=[-170*t,-10,-60,-10];S.m1Y=-q*(ok?16:38);});
-    if(ok){await vuelo(x0,GY-11,hx,hy,760,120);sndKick();caption("¡Despeje de puños!");await vuelo(hx,hy,880,40,550,30);S.py=0;S.pArm=null;S.ballMode="feet";}
-    else{await vuelo(x0,GY-11,S.m1X+10,GY-190,760,120);caption("¡Cabezazo del 9 rival!");sndKick();await lento(()=>vuelo(S.m1X+10,GY-190,...meta(GY-110),400,5));S.py=0;S.pArm=null;}
+    if(ok){await vuelo(x0,GY-11,hx,hy,760,120);sndKick();caption("¡Despeje de puños!","ok");await vuelo(hx,hy,880,40,550,30);S.py=0;S.pArm=null;S.ballMode="feet";}
+    else{await vuelo(x0,GY-11,S.m1X+10,GY-190,760,120);caption("¡Cabezazo del 9 rival!","def");sndKick();await lento(()=>vuelo(S.m1X+10,GY-190,...meta(GY-110),400,5));S.py=0;S.pArm=null;}
     tween(400,u=>{S.m1Op=1-u;});}},
-  barrida:{t:"Barrida",run:async ok=>{caption("¡Conduce el medio rival!");await rivalEntra(470);
+  barrida:{t:"Barrida",run:async ok=>{caption("¡Conduce el medio rival!","def");await rivalEntra(470);
     if(ok){S.running=true;await tween(300,u=>{S.pdx=60*u;});S.running=false;const b0=S.bx;
       await tween(420,u=>{S.pdx=60+70*u;S.pLeg=[-70*u,0,25*u,15];S.prot=-14*u;S.bx=b0+(PX+S.pdx+40-b0)*u;},E.out);polvo(pX()+40,GY,14);
-      caption("¡Barrida perfecta!");tween(500,u=>{S.defY=-Math.sin(Math.PI*u)*30;S.defRot=-70*u;S.defOp=1-u*.9;});
+      caption("¡Barrida perfecta!","ok");tween(500,u=>{S.defY=-Math.sin(Math.PI*u)*30;S.defRot=-70*u;S.defOp=1-u*.9;});
       await tween(350,u=>{S.pLeg=[-70*(1-u),0,25*(1-u),15];S.prot=-14*(1-u);});S.pLeg=null;S.ballMode="feet";}
     else{S.running=true;tween(300,u=>{S.pdx=60*u;}).then(()=>{S.running=false;tween(400,u=>{S.pLeg=[-70*u,0,25*u,15];S.prot=-14*u;});});
       await tween(800,u=>{const h=Math.sin(Math.PI*clamp((u-.3)/.4));S.defX=470-300*u;S.defY=-h*34;S.bx=S.defX-32;S.by=GY-11-h*30;S.spin-=10;});
       S.by=GY-11;S.pLeg=null;S.prot=0;await rivalPatea();await lento(()=>vuelo(S.bx,GY-11,...meta(GY-60),420,20));}}},
-  cobertura:{t:"Carrera de cobertura",run:async ok=>{caption("¡El delantero rival se escapa!");Object.assign(S,{defX:560,defOp:1,defRun:true,defRot:0,defY:0,ballMode:"free"});S.bx=528;S.by=GY-11;
+  cobertura:{t:"Carrera de cobertura",run:async ok=>{caption("¡El delantero rival se escapa!","def");Object.assign(S,{defX:560,defOp:1,defRun:true,defRot:0,defY:0,ballMode:"free"});S.bx=528;S.by=GY-11;
     S.psx=-1;S.running=true;S.fast=true;
     await tween(900,u=>{S.defX=560-330*u;S.bx=S.defX-32;S.spin-=12;S.pdx=-90*u;});S.defRun=false;
-    if(ok){const b0=S.bx;await tween(380,u=>{S.pLeg=[-60*u,0,20*u,15];S.prot=10*u;S.bx=b0+(pX()-40-b0)*u;},E.out);S.running=false;S.fast=false;polvo(pX()-40,GY,12);caption("¡Cobertura salvadora!");
+    if(ok){const b0=S.bx;await tween(380,u=>{S.pLeg=[-60*u,0,20*u,15];S.prot=10*u;S.bx=b0+(pX()-40-b0)*u;},E.out);S.running=false;S.fast=false;polvo(pX()-40,GY,12);caption("¡Cobertura salvadora!","ok");
       tween(500,u=>{S.defRot=70*u;S.defOp=1-u;});await sleep(500);S.pLeg=null;S.prot=0;S.psx=1;S.ballMode="feet";}
     else{S.running=false;S.fast=false;await rivalPatea();await lento(()=>vuelo(S.bx,GY-11,...meta(GY-50),380,15));S.psx=1;}}},
-  tiroLejanoContra:{t:"Disparo lejano",run:async ok=>{caption("¡Disparo desde lejos!");await rivalEntra(620);await rivalPatea();const x0=S.bx;
+  tiroLejanoContra:{t:"Disparo lejano",run:async ok=>{caption("¡Disparo desde lejos!","def");await rivalEntra(620);await rivalPatea();const x0=S.bx;
     tween(600,u=>{const q=Math.sin(Math.PI*u);S.py=-q*(ok?50:20);S.pArm=[-175,-10,-150,-10];S.prot=-12*q;});
-    if(ok){await vuelo(x0,GY-11,pX()+8,GY-215*ESC.al,640,70);caption("¡Paradón! La manda a córner");sndKick();await vuelo(pX()+8,GY-215*ESC.al,S.propX-40,-30,500,20);S.pArm=null;S.py=0;S.prot=0;}
+    if(ok){await vuelo(x0,GY-11,pX()+8,GY-215*ESC.al,640,70);caption("¡Paradón! La manda a córner","ok");sndKick();await vuelo(pX()+8,GY-215*ESC.al,S.propX-40,-30,500,20);S.pArm=null;S.py=0;S.prot=0;}
     else{await lento(()=>vuelo(x0,GY-11,...meta(GY-150),660,70));S.pArm=null;S.py=0;S.prot=0;}}},
   centroAtrapado:{t:"Centro al área",run:async ok=>{Object.assign(S,{m1X:330,m1Op:1,m1Y:0});await centroRival();const x0=S.bx;
     tween(760,u=>{const t=clamp((u-.4)/.6),q=Math.sin(Math.PI*t);S.py=-q*(ok?48:14);S.pArm=[-170*t,-10,-170*t,-10];S.m1Y=-q*(ok?20:40);S.m1Arm=[-60*t,-20,60*t,-20];});
-    if(ok){await vuelo(x0,GY-11,pX()+12,GY-215*ESC.al,760,120);caption("¡Blocaje seguro!");await sleep(450);S.pArm=null;S.py=0;S.ballMode="feet";}
-    else{await vuelo(x0,GY-11,S.m1X+10,GY-190,760,120);caption("¡Cabezazo del 9 rival!");sndKick();await lento(()=>vuelo(S.m1X+10,GY-190,...meta(GY-120),380,5));S.pArm=null;S.py=0;}
+    if(ok){await vuelo(x0,GY-11,pX()+12,GY-215*ESC.al,760,120);await agarre(pX()+12,GY-215*ESC.al,"¡Blocaje seguro!");S.pArm=null;S.py=0;await sacaPortero(pX()+12,GY-215*ESC.al);}
+    else{await vuelo(x0,GY-11,S.m1X+10,GY-190,760,120);caption("¡Cabezazo del 9 rival!","def");sndKick();await lento(()=>vuelo(S.m1X+10,GY-190,...meta(GY-120),380,5));S.pArm=null;S.py=0;}
     S.m1Arm=null;S.m1Y=0;tween(400,u=>{S.m1Op=1-u;});}},
-  penaltiContra:{t:"Penalti en contra",run:async ok=>{caption("¡Penalti en contra!");Object.assign(S,{defX:575,defOp:1,defRot:0,defY:0,ballMode:"free"});S.bx=488;S.by=GY-11;await sleep(900);
-    caption("Concéntrate…");await sleep(500);await rivalPatea(false);tween(450,u=>{const q=Math.sin(Math.PI*u);S.py=-q*30;S.prot=(ok?-20:25)*q;S.pArm=[-170,-10,-170,-10];});
-    if(ok){await vuelo(488,GY-11,pX()+10,GY-150,450,20);caption("¡Penalti parado!");await sleep(500);S.pArm=null;S.ballMode="feet";S.prot=0;S.py=0;}
+  penaltiContra:{t:"Penalti en contra",run:async ok=>{caption("¡Penalti en contra!","def");Object.assign(S,{defX:575,defOp:1,defRot:0,defY:0,ballMode:"free"});S.bx=488;S.by=GY-11;await sleep(900);
+    caption("Concéntrate…","def");await sleep(500);await rivalPatea(false);tween(450,u=>{const q=Math.sin(Math.PI*u);S.py=-q*30;S.prot=(ok?-20:25)*q;S.pArm=[-170,-10,-170,-10];});
+    if(ok){await vuelo(488,GY-11,pX()+10,GY-150,450,20);await agarre(pX()+10,GY-150,"¡Penalti parado!");S.pArm=null;S.prot=0;S.py=0;await sacaPortero(pX()+10,GY-150);}
     else{await lento(()=>vuelo(488,GY-11,...meta(GY-60),450,20));S.pArm=null;S.prot=0;S.py=0;}}}
 };
 /* Cada puesto tiene su papel: el portero no marca, el defensa defiende y relanza, el medio recupera y asiste */
@@ -1725,11 +1895,14 @@ async function situacionDefensa(sit,res){
   await SIT_D[sit].run(ok);
   if(!ok){marcador.riv++;flip("golR",marcador.riv);tween(420,u=>{S.netP=Math.sin(Math.PI*u);},E.lin);S.shake=6;tween(500,u=>{S.shake=6*(1-u);});
     caption(`¡Gol de ${PARTIDOS[pActual].rival}!`,true);tone(220,.5,{type:"sawtooth",v:.06,to:110});await sleep(1400);}
-  else if(res!=="limpio"){caption({muro:"¡El muro aguanta! 🧱",parada:"¡Parada milagrosa! 🧤",guante:"¡Guante mágico! 🧤"}[res]);sndOk();await sleep(1100);}
+  else if(res!=="limpio"){caption({muro:"¡El muro aguanta! 🧱",parada:"¡Parada milagrosa! 🧤",guante:"¡Guante mágico! 🧤"}[res],"ok");sndOk();await sleep(1100);}
   tween(350,u=>{S.defOp=Math.min(S.defOp,1-u);});camNormal(450);
   const p0=S.propX,d0=S.pdx;await tween(450,u=>{S.propX=p0+(-300-p0)*u;S.pdx=d0*(1-u);},E.in);
   Object.assign(S,{ballMode:"feet",py:0,pLeg:null,pArm:null,prot:0,pdx:0,netP:0,defOp:0,defLeg:null,defY:0,m1Op:0,m1Y:0,m1Arm:null,psx:1,running:false,fast:false});
 }
+/* El portero agarra el balón: destello en los guantes, lo enseña y lo saca lejos de la portería */
+async function agarre(x,y,txt){S.ballMode="free";S.bx=x;S.by=y;polvo(x,y,10,"#ffffff");caption(txt,"ok");sndOk();await sleep(650);}
+async function sacaPortero(x,y){S.ballMode="free";S.bx=x;S.by=y;sndKick();await vuelo(x,y,920,-60,620,40);S.ballMode="feet";}
 async function fallo(){await tween(520,u=>{S.prot=Math.sin(u*Math.PI*3)*8*(1-u);},E.lin);}
 async function prepararPenaltis(){
   S.defOp=0;Object.assign(S,{ballMode:"feet",kpDive:false,kpX:0,kpY:0,kpRot:0,netB:0});
@@ -1746,11 +1919,11 @@ function overlayFinal(txt,tipo){
   $("gol").innerHTML=`${tipo==="V"?'<div class="rays"></div>':""}<div class="golTxt"><div class="big largo${tipo==="V"?"":" gris"}">${[...txt].map((c,k)=>`<span style="--d:${(k*0.06).toFixed(2)}s">${c}</span>`).join("")}</div><div class="banner">ESP ${marcador.esp} – ${marcador.riv} ${PARTIDOS[pActual].cod}</div></div>`;
   $("gol").classList.add("show");
 }
-function caption(t,ko){const c=$("cap");c.firstElementChild.textContent=t;c.classList.toggle("ko",!!ko);c.classList.remove("show");void c.offsetWidth;c.classList.add("show");}
+function caption(t,k){const c=$("cap");c.firstElementChild.textContent=t;c.classList.remove("ko","ok","def");if(k===true)c.classList.add("ko");else if(k)c.classList.add(k);c.classList.remove("show");void c.offsetWidth;c.classList.add("show");}
 function popup(t){const p=$("pop");p.textContent=t;p.classList.remove("show");void p.offsetWidth;p.classList.add("show");}
 function confeti(){
   const lay=$("confeti"),h=$("stage").clientHeight+40,cols=["#e4002b","#ffc400","#ffffff","#00c2d1"];
-  for(let i=0;i<80;i++){const c=document.createElement("i");c.className="conf";
+  for(let i=0;i<(ligero?28:80);i++){const c=document.createElement("i");c.className="conf";
     c.style.left=(Math.random()*100)+"%";c.style.background=cols[i%4];
     c.style.setProperty("--h",h+"px");c.style.setProperty("--r",(Math.random()*720-360).toFixed(0)+"deg");
     c.style.animationDuration=(1.6+Math.random()*1.6).toFixed(2)+"s";c.style.animationDelay=(Math.random()*.6).toFixed(2)+"s";
@@ -1804,18 +1977,18 @@ let marcador={esp:0,riv:0},resK=[],modoPen=false,pen=null,usos={};
 const VAL={V:3,E:1,D:0};
 const NIVELES=[0,100,250,450,700,1000,1400,1900,2500];
 const nivel=()=>NIVELES.filter(n=>prog.xp>=n).length;
-const HABS=[{n:2,t:"🍀 Segunda oportunidad",d:"Un error por partido no cuenta."},{n:3,t:"💡 Pista gratis",d:"Una pista por partido, sin penalización."},
-  {n:4,t:"🚀 Tiro lejano",d:"Si aciertas las 3 frases de ataque a la primera, marcas un gol extra."},{n:5,t:"👑 Líder",d:"Ganas un 20 % más de experiencia."}];
-const CELES=[["salto","Salto",1],["puno","Puño al aire",1],["avion","Avión",2],["oreja","¡No os oigo!",2],["baile","Baile",3],["corazon","Corazón",3],
-  ["rodillas","De rodillas",4],["robot","Robot",4],["voltereta","Voltereta",5],["patinazo","Patinazo",5],["saludo","Saludo militar",6],["siesta","La siesta",6],
-  ["giro","Giro en el aire",7],["arquero","Arquero",7]];
-function celesDesbloqueadas(){const gan=Object.values(prog.res).filter(r=>r.r==="V").length;return CELES.slice(0,Math.min(CELES.length,2+gan+Math.max(0,nivel()-1)));}
+const HABS=[{n:2,t:"💡 Pista gratis",d:"Una pista por partido, sin penalización."},
+  {n:3,t:"🚀 Tiro lejano",d:"Si aciertas todas las frases de ataque, marcas un gol extra."},{n:4,t:"👑 Líder",d:"Ganas un 20 % más de experiencia."}];
+const CELES=[["salto","Salto",1],["puno","Puño al aire",2],["avion","Avión",3],["corazon","Corazón",4],["baile","Baile",5],["rodillas","De rodillas",6],["voltereta","Voltereta",7]];
+function celesDesbloqueadas(){return CELES.filter(c=>c[2]<=nivel());}
 function celebracionElegida(){const ok=celesDesbloqueadas().map(c=>c[0]);
   if(prog.cele==="sorpresa"||!ok.includes(prog.cele))return ok[Math.floor(Math.random()*ok.length)];return prog.cele;}
 /* Carta tipo «Ultimate Team»: 6 atributos = las nociones del curso; la media sube con cada acierto */
+const CAT_CORTO={PRO:"Pronombres",PRE:"Presente",GUS:"Gustos",SER:"Ser y estar",IRR:"Irregulares",FUT:"Futuro"};
+const CAT_EJ={PRO:"yo, tú, él, nosotros…",PRE:"hablo, vives, ¿dónde?",GUS:"me gusta, le encanta",SER:"es, está, hay",IRR:"quiero, juego, mi, su",FUT:"voy a…, tengo que…"};
 const CATS=[["PRO","Pronombres"],["PRE","Presente y preguntas"],["GUS","Gustos"],["SER","Ser, estar, hay"],["IRR","Irregulares y rutina"],["FUT","Futuro y obligación"]];
 const media=()=>Math.round(CATS.reduce((t,[k])=>t+(prog.card[k]||50),0)/CATS.length);
-const TIERS=[[95,"icono","Icono"],[90,"heroe","Héroe"],[85,"especial","Oro especial"],[75,"oro","Oro"],[65,"plata","Plata"],[0,"bronce","Bronce"]];
+const TIERS=[[96,"leyenda","Leyenda"],[88,"icono","Icono"],[80,"heroe","Héroe"],[72,"especial","Oro especial"],[64,"oro","Oro"],[56,"plata","Plata"],[0,"bronce","Bronce"]];
 const tierDe=g=>{const t=TIERS.find(x=>g>=x[0]);return{k:t[1],n:t[2]};};
 const BANDERA=`<svg class="fband" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#c60b1e"/><rect y="5" width="30" height="10" fill="#ffc400"/></svg>`;
 function escudoSVG(){return `<svg class="fesc" viewBox="0 0 24 30" aria-hidden="true"><path d="M2,4 H22 V15 Q22,25 12,28.5 Q2,25 2,15 Z" fill="#c60b1e" stroke="#ffc400" stroke-width="2"/>
@@ -1900,10 +2073,15 @@ let mediaIni=50;
 function renderMini(anim){const m=$("miniCarta");m.innerHTML=cartaHTML("mc",true);if(anim){m.classList.remove("sube");void m.offsetWidth;m.classList.add("sube");}}
 function ganarCarta(f,fallos,extra){
   const c=f.cat||PARTIDOS[pActual].cat||"PRE",t0=tierDe(media()).k,d=(fallos===0?4:fallos===1?2:1)+(extra||0);
-  prog.card[c]=Math.min(99,(prog.card[c]||50)+d);guardarProg();
-  const t1=tierDe(media());renderMini(true);popup(`+${d} ${c}`);
-  if(t1.k!==t0){const u=$("cartaUp");u.innerHTML=`✨ ¡Tu carta evoluciona a <b>${t1.n.toUpperCase()}</b>!`;u.className="cartaUp "+t1.k;void u.offsetWidth;u.classList.add("show");
-    [523,659,784,1047].forEach((f,k)=>tone(f,.2,{type:"triangle",v:.06,at:k*.09}));}
+  prog.card[c]=Math.min(99,(prog.card[c]||50)+d);
+  /* y +1 en tres atributos más, para que la media suba a buen ritmo */
+  CATS.map(x=>x[0]).filter(k=>k!==c).sort(()=>Math.random()-.5).slice(0,3).forEach(k=>prog.card[k]=Math.min(99,(prog.card[k]||50)+1));
+  guardarProg();
+  const t1=tierDe(media());renderMini(true);popup(`+${d} ${CAT_CORTO[c]||c}`);
+  if(t1.k!==t0){[523,659,784,1047].forEach((f,k)=>tone(f,.2,{type:"triangle",v:.06,at:k*.09}));
+    const tp=$("tierPop");if(!tp||$("juego").hidden){const u=$("cartaUp");u.innerHTML=`✨ ¡Tu carta evoluciona a <b>${t1.n.toUpperCase()}</b>!`;u.className="cartaUp "+t1.k;void u.offsetWidth;u.classList.add("show");}
+    else{tp.innerHTML=`<div class="rv-rayos ${t1.k}"></div><div class="tpTxt">✨ ¡Tu carta evoluciona!</div><div class="tpCard">${cartaHTML("tp")}</div><div class="tpTxt">Carta ${t1.n}</div>`;tp.hidden=false;tp.className="tierPop";void tp.offsetWidth;tp.classList.add("show");
+      clearTimeout(tp._t);tp._t=setTimeout(()=>{tp.hidden=true;},2600);}}
 }
 let CN=[];
 function mostrarCeles(lista,done){
@@ -1942,12 +2120,12 @@ function disponible(i){
 }
 function mejor(a,b){if(!a)return b;const sc=x=>VAL[x.r]*1000+(x.esp-x.riv)*20+x.est;return sc(b)>sc(a)?b:a;}
 function fraseActual(){return modoPen?pen.preguntas[pen.ronda%pen.preguntas.length]:PARTIDOS[pActual].frases()[idx];}
-function frase(f,conHueco){
+function frase(f,conHueco,mal){
   const lbl=f.ops?(f.etiqueta||"elige"):f.verbo;
   const sa=(!f.antes||/[¿¡]$/.test(f.antes))?"":" ",sd=/^[,.;:!?…]/.test(f.despues)?"":" ";
   const h=conHueco&&f.ops?`<span class="hueco" id="gap">&nbsp;</span>`:conHueco
     ?`<input id="gap" class="gapin" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" style="width:${Math.max(8.5,f.ok[0].length+3)}ch" aria-label="${f.verbo} conjugado">`
-    :`<span class="done">${mayus(f,f.ok[0])}</span>`;
+    :mal?`<span class="done err">${esc(mal)}</span>`:`<span class="done">${mayus(f,f.ok[0])}</span>`;
   return `${f.antes}${sa}${h} <span class="inf">${lbl}</span>${sd}${f.despues}`;
 }
 function mostrarActual(){
@@ -1974,7 +2152,7 @@ function mostrarActual(){
 function renderResumen(){
   const F=PARTIDOS[pActual].frases(),n=Math.min(idx,N);
   $("resumen").hidden=(n===0);
-  $("texto").innerHTML=F.slice(0,n).map((f,i)=>`<span class="frase${i===n-1?" nueva":""}">${frase(f,false)}</span>`).join(" ");
+  $("texto").innerHTML=F.slice(0,n).map((f,i)=>`<span class="frase${i===n-1?" nueva":""}">${frase(f,false,errs[i]?(intentado[i]||"…"):null)}</span>`).join(" ");
 }
 const ICON={gol:"⚽",nogol:"✗",limpio:"🛡️",parada:"🧤",guante:"🧤",muro:"🧱",encajado:"🥅"};
 function renderMarcador(){
@@ -1982,25 +2160,22 @@ function renderMarcador(){
     $("marcador").innerHTML=`<div class="penal"><div><b>ESP</b>${fila(pen.esp)}</div><div><b>${PARTIDOS[pActual].cod}</b>${fila(pen.riv)}</div></div>`;return;}
   $("marcador").innerHTML=Array.from({length:N},(_,i)=>`<div class="seg ${esAtaque(i)?"atq":"dfn"}${i<idx?" on":""}${i===idx?" act":""}">${i<idx?(ICON[resK[i]]||"✓"):(esAtaque(i)?"⚔️":"🛡️")}</div>`).join("")+`<span class="cnt">${idx}/${N}</span>`;
 }
-function mostrarPista(){
-  const f=fraseActual(),n=errs[idx],p=$("pista");
-  let t=`<b>Pista:</b> ${f.pista}`;
-  if(n===2)t+=` Empieza por «<b>${f.ok[0].slice(0,3)}…</b>».`;
-  if(n>=3)t=`La respuesta es «<b>${f.ok[0]}</b>». ¡Escríbela!`;
-  p.innerHTML=t;p.hidden=false;
-}
 function renderAyudas(){
   const b=$("ayudas");if(modoPen||idx>=N){b.innerHTML="";return;}
   let h="";
   if(av.puesto==="centrocampista"&&!usos.vision)h+=`<button class="ayuda" id="ayVision" type="button">👁️ Visión de juego</button>`;
-  if(nivel()>=3&&!usos.pista)h+=`<button class="ayuda" id="ayPista" type="button">💡 Pista gratis</button>`;
+  if(nivel()>=2&&!usos.pista)h+=`<button class="ayuda" id="ayPista" type="button">💡 Pista gratis</button>`;
   b.innerHTML=h;
   if($("ayVision"))$("ayVision").onclick=()=>{usos.vision=true;const f=fraseActual();$("pista").innerHTML=`👁️ <b>Visión de juego:</b> empieza por «<b>${f.ok[0].slice(0,2)}…</b>».`;$("pista").hidden=false;renderAyudas();};
   if($("ayPista"))$("ayPista").onclick=()=>{usos.pista=true;const f=fraseActual();$("pista").innerHTML=`💡 <b>Pista:</b> ${f.pista}`;$("pista").hidden=false;renderAyudas();};
 }
-const MSG={gol:p=>p?(["portero","defensa"].includes(av.puesto)||(av.puesto==="centrocampista"&&guion[idx-1]&&guion[idx-1].sit!=="penalti")?"¡Muy bien! ¡Pase de gol!":"¡Muy bien! ¡Ocasión de gol!"):`¡Olfato de gol! Como ${G("delantero","delantera")}, marcas igualmente.`,
-  nogol:()=>"¡Bien! Pero a la segunda, la ocasión es menos clara…",limpio:()=>"¡Muy bien! Defensa perfecta.",
-  muro:()=>"¡Bien! Tu muro defensivo aguanta.",parada:()=>"¡Bien! Tu parada milagrosa evita el gol.",encajado:()=>"¡Bien! Pero el rival tiene una ocasión…"};
+const MSG={gol:p=>(["portero","defensa"].includes(av.puesto)||(av.puesto==="centrocampista"&&guion[idx-1]&&guion[idx-1].sit!=="penalti")?"¡Muy bien! ¡Pase de gol!":"¡Muy bien! ¡Ocasión de gol!"),
+  nogol:()=>"",limpio:()=>"¡Muy bien! Defensa perfecta.",muro:()=>"¡El muro aguanta!",parada:()=>"¡Parada milagrosa!",encajado:()=>""};
+function apuntarFallo(f,v){
+  const e={cat:f.cat||PARTIDOS[pActual].cat||"PRE",antes:f.antes,verbo:f.verbo||f.etiqueta||"elige",ok:f.ok[0],despues:f.despues,pista:f.pista,ops:f.ops||null,esc:!!f.esc,mio:v,p:pActual};
+  prog.fallos=(prog.fallos||[]).filter(x=>!(x.antes===e.antes&&x.ok===e.ok));prog.fallos.push(e);
+  if(prog.fallos.length>24)prog.fallos=prog.fallos.slice(-24);guardarProg();
+}
 async function comprobar(valor){
   if(ocupado)return;
   if(modoPen)return comprobarPenalti(valor);
@@ -2009,57 +2184,48 @@ async function comprobar(valor){
   if(!x)return;
   const v=respuesta(f,valor!==undefined?valor:x.value);
   if(!v){x.focus();fb.className="fb ko";fb.textContent="Escribe el verbo en el hueco.";return;}
-  const exacto=f.ok.map(norm).includes(v),casi=!exacto&&f.ok.map(o=>sinAc(norm(o))).includes(sinAc(v));
-  if(exacto||casi){
-    ocupado=true;$("comprobar").disabled=true;$("pista").hidden=true;
-    const k=idx,primera=errs[k]===0,ataque=esAtaque(k),pos=av.puesto;
-    const gan=Math.max(25,100-25*errs[k]);puntos+=gan;$("puntos").textContent=puntos;ganarCarta(f,errs[k]);
-    a.classList.remove("entra","ko");a.innerHTML=frase(f,false);a.classList.add("bien");sndOk();
-    marcarOpciones(v);
-    let res;
-    if(ataque)res=(primera||pos==="delantero")?"gol":"nogol";
-    else if(primera)res="limpio";
-    else if(pos==="defensa"&&errs[k]<2)res="muro";
-    else if(pos==="portero"&&!usos.parada){usos.parada=true;res="parada";}
-    else res="encajado";
-    resK[k]=res;
-    fb.className="fb ok";fb.textContent=casi?`¡Bien! Pero ojo con el acento: «${f.ok[0]}».`:MSG[res](primera);
-    if(document.activeElement)document.activeElement.blur();
-    $("stage").scrollIntoView({behavior:"smooth",block:"nearest"});
-    idx++;renderMarcador();$("ayudas").innerHTML="";
-    try{
-      if(ataque)await situacionAtaque(guion[k].sit,res==="gol");
-      else await situacionDefensa(guion[k].sit,res);
-      if(guion[k].min<=45&&guion[k+1]&&guion[k+1].min>45){caption("Segunda parte");await sleep(1000);}
-    }catch(e){console.error(e);}
-    renderResumen();ocupado=false;
-    if(idx<N){
-      fb.className="fb";fb.textContent=esAtaque(idx)?"⚔️ Si aciertas a la primera, ¡gol!":"🛡️ Si fallas, el rival tendrá una ocasión.";
-      mostrarActual();if(fino&&$("gap")&&$("gap").tagName==="INPUT")$("gap").focus({preventScroll:true});
-    }else{
-      if(nivel()>=4&&guion.every((g,i)=>g.t!=="A"||(resK[i]==="gol"&&errs[i]===0))){
-        if(av.puesto==="delantero"||av.puesto==="centrocampista"){await verPorteria();await tiro(true,"¡Tiro lejano de bonus!");}
-        else{salirDeCampo();await verPorteria();await remateCompanero(true,false,"¡Contraataque de bonus!");}
-        await resetCampo();}
-      await finDelTiempo();
-    }
+  const exacto=f.ok.map(norm).includes(v),casi=!exacto&&f.ok.map(o=>sinAc(norm(o))).includes(sinAc(v)),bien=exacto||casi;
+  const k=idx,ataque=esAtaque(k),pos=av.puesto;
+  ocupado=true;$("comprobar").disabled=true;$("pista").hidden=true;
+  let res;
+  if(bien){
+    puntos+=100;$("puntos").textContent=puntos;ganarCarta(f,0);
+    a.classList.remove("entra","ko");a.innerHTML=frase(f,false);a.classList.add("bien");sndOk();marcarOpciones(v);
+    res=ataque?"gol":"limpio";
+    fb.className="fb ok";fb.textContent=casi?`¡Bien! Pero ojo con el acento: «${f.ok[0]}».`:MSG[res](true);
   }else{
-    x.classList.remove("err");a.classList.remove("ko","entra");void x.offsetWidth;
-    x.classList.add("err");a.classList.add("ko");
-    if(f.ops)document.querySelectorAll("#opciones .opt").forEach(o=>{if(norm(o.dataset.v)===v){o.classList.add("mal");o.disabled=true;}});
-    if(v===intentado[idx])return;
-    intentado[idx]=v;sndKo();
-    if(nivel()>=2&&!usos.perdon){usos.perdon=true;fb.className="fb ko";fb.textContent="🍀 Segunda oportunidad: este error no cuenta. ¡Inténtalo otra vez!";return;}
+    errores++;errs[k]=1;intentado[k]=valor!==undefined?valor:x.value;apuntarFallo(f,v);
+    a.classList.remove("entra");a.innerHTML=frase(f,false,intentado[k]);a.classList.add("ko");sndKo();marcarOpciones(null,v);
+    res=ataque?"nogol":"encajado";
     const sinPron=f.ok.some(o=>{const n=norm(o);return n.includes(" ")&&sinAc(n.split(" ").slice(1).join(" "))===sinAc(v);});
     fb.className="fb ko";
-    fb.textContent=sinPron?(/se$/.test(f.verbo)?"¡Casi! Es un verbo pronominal: no olvides el pronombre (me, te, se, nos…).":"¡Casi! Falta el pronombre (me, te, le, nos, os, les)."):(esAtaque(idx)?"¡Uy! El defensa te corta el paso. Inténtalo otra vez.":"¡Cuidado! El rival se acerca a tu portería. Inténtalo otra vez.");
-    errores++;errs[idx]++;mostrarPista();
-    if(!animFallo){animFallo=true;caption("¡Fallo!",true);fallo().finally(()=>{animFallo=false;});}
+    fb.innerHTML=`✗ No es correcto.${sinPron?" Pista: faltaba el pronombre.":""} ${ataque?"Ocasión fallada…":(res==="encajado"?"¡El rival va a marcar!":MSG[res]())} <small>Lo corregirás en el vestuario.</small>`;
+    caption("¡Fallo!",true);
+  }
+  resK[k]=res;
+  if(document.activeElement)document.activeElement.blur();
+  $("stage").scrollIntoView({behavior:"smooth",block:"nearest"});
+  idx++;renderMarcador();$("ayudas").innerHTML="";
+  try{
+    if(ataque)await situacionAtaque(guion[k].sit,res==="gol");
+    else await situacionDefensa(guion[k].sit,res);
+    if(guion[k].min<=45&&guion[k+1]&&guion[k+1].min>45){caption("Segunda parte");await sleep(1000);}
+  }catch(e){console.error(e);}
+  renderResumen();ocupado=false;
+  if(idx<N){
+    fb.className="fb";fb.textContent=esAtaque(idx)?"⚔️ Si aciertas, ¡gol! Solo tienes un intento.":"🛡️ Si fallas, el rival marca. Solo tienes un intento.";
+    mostrarActual();if(fino&&$("gap")&&$("gap").tagName==="INPUT")$("gap").focus({preventScroll:true});
+  }else{
+    if(nivel()>=3&&guion.every((g,i)=>g.t!=="A"||resK[i]==="gol")){
+      if(av.puesto==="delantero"||av.puesto==="centrocampista"){await verPorteria();await tiro(true,"¡Tiro lejano de bonus!");}
+      else{salirDeCampo();await verPorteria();await remateCompanero(true,false,"¡Contraataque de bonus!");}
+      await resetCampo();}
+    await finDelTiempo();
   }
 }
 function marcarOpciones(buena,mala){
   document.querySelectorAll("#opciones .opt").forEach(o=>{const n=norm(o.dataset.v);o.disabled=true;
-    if(n===buena)o.classList.add("bien");else if(mala&&n===mala)o.classList.add("mal");});
+    if(buena&&n===buena)o.classList.add("bien");else if(mala&&n===mala)o.classList.add("mal");});
 }
 async function finDelTiempo(){
   if(pActual>=3&&marcador.esp===marcador.riv)await iniciarPenaltis();
@@ -2081,8 +2247,8 @@ async function comprobarPenalti(valor){
   const ok=f.ok.map(norm).includes(v)||f.ok.map(o=>sinAc(norm(o))).includes(sinAc(v));
   a.classList.remove("entra");a.innerHTML=frase(f,false);a.classList.add(ok?"bien":"ko");
   marcarOpciones(norm(f.ok[0]),ok?null:v);
-  if(ok){sndOk();ganarCarta(f,1,-1);}else{sndKo();errores++;}
-  fb.className="fb "+(ok?"ok":"ko");fb.textContent=ok?"¡Correcto!":`¡Fallado! La respuesta era «${f.ok[0]}».`;
+  if(ok){sndOk();ganarCarta(f,1,-1);}else{sndKo();errores++;apuntarFallo(f,v);}
+  fb.className="fb "+(ok?"ok":"ko");fb.textContent=ok?"¡Correcto!":"¡Fallado! Lo corregirás en el vestuario.";
   pen.esp.push(ok);await penaltiAnim(ok);
   const m=PARTIDOS[pActual];
   let rate=.72-(av.puesto==="portero"?.17:0);if(pen.ronda>=9)rate=0;
@@ -2103,7 +2269,7 @@ async function finPartido(){
   if(r==="V"){S.celeK=celebracionElegida();S.celebra=true;confeti();setTimeout(confeti,1200);publico(3);fuegos(6,300);}
   await sleep(2300);
   const est=errores===0?3:errores<=2?2:1,mvp=errores===0&&r!=="D",nivAntes=nivel();
-  let xp=(r==="V"?60:r==="E"?35:15)+est*15+(mvp?40:0);if(nivAntes>=5)xp=Math.round(xp*1.2);
+  let xp=(r==="V"?60:r==="E"?35:15)+est*15+(mvp?40:0);if(nivAntes>=4)xp=Math.round(xp*1.2);
   prog.xp+=xp;const nivDesp=nivel();prog.pend+=Math.max(0,nivDesp-nivAntes);
   if(mvp)prog.mvp++;
   if(mvp)CATS.forEach(([k])=>prog.card[k]=Math.min(99,(prog.card[k]||50)+1));
@@ -2133,6 +2299,8 @@ function pintarFin(d){
   let bot=d.r==="D"?`<button class="btn" id="otra" type="button">¡La revancha!</button>`
     :(ult&&d.r==="V"?`<button class="btn" id="verCopa" type="button">¡Ver la copa! 🏆</button>`:(sigOk?`<button class="btn" id="sigP" type="button">Siguiente partido ›</button>`:""));
   if(d.r!=="D")bot+=`<button class="btn sec2" id="otra" type="button">Repetir</button>`;
+  const nF=(prog.fallos||[]).length;
+  if(nF)bot=bot.replace("Siguiente partido ›","💪 Entrenar y jugar ›").replace("¡La revancha!","💪 Entrenar y revancha");
   bot+=`<button class="btn sec2" id="aCamino" type="button">Camino</button>`;
   const g=media();renderMini(true);
   fi.innerHTML=`<div class="finCarta">${cartaHTML("fc",false)}<div class="evo">Media ${mediaIni} → <b>${g}</b>${g>mediaIni?` <span>(+${g-mediaIni})</span>`:""}${d.mvp?"<br>🏅 +1 en todos los atributos":""}</div></div>
@@ -2142,6 +2310,7 @@ function pintarFin(d){
     <div class="est">${"⭐".repeat(d.est)}</div>
     <div class="xpbox">${xpHTML(d.xp)}</div>
     <div id="subida"></div>${aviso}
+    ${nF?`<div class="aviso ent">💪 Antes del próximo partido pasarás por el vestuario: corrige tus <b>${nF}</b> ${nF===1?"error":"errores"} y gana puntos para tu carta.</div>`:""}
     <div class="sabias"><b>¿Sabías que…?</b> En el Mundial de verdad: España ${m.real} ${m.rival}.${comp} ${m.nota}</div>
     <div class="botones">${bot}</div>`;
   fi.hidden=false;
@@ -2171,6 +2340,7 @@ function aplicarRival(m){
   rc.setAttribute("style",m.badge||`background:${m.kit.camiseta};color:${["#ffffff","#7cc0ec","#6cb4ee"].includes(m.kit.camiseta)?"#0d1433":"#fff"}`);
 }
 function jugarPartido(i){
+  if((prog.fallos||[]).length&&!ENT){abrirEntrenamiento(()=>jugarPartido(i));return;}
   pActual=i;const m=PARTIDOS[i];
   Object.assign(S,inicial());
   S.defOp=0;
@@ -2194,8 +2364,8 @@ async function introPartido(m){
   const ov=$("preOv"),bs=m.badge||`background:${m.kit.camiseta}`;
   $("preBox").innerHTML=`<div class="pre-fase">${m.fase} – Copa del Mundo 2026</div>
     <div class="pre-duelo"><div class="pre-yo">${frontHTML("pre")}</div><div class="pre-vs">VS</div>
-      <div class="pre-riv"><div class="pre-escudo" style="${bs}">${m.cod}</div><div class="pre-nom">${m.rival}</div></div></div>
-    <div class="pre-tema">📚 ${m.tema}</div><div class="pre-cuenta" id="preCuenta"></div>
+      <div class="pre-riv"><div class="pre-escudo flagbox">${bandera(m.cod)}<span class="codTxt">${m.cod}</span></div><div class="pre-nom">${m.rival}</div></div></div>
+    <div class="pre-tema">📚 ${m.tema}<br><span class="pre-nota">⭐ Hoy sube tu nota de <b>${CAT_CORTO[m.cat]||m.cat}</b></span></div><div class="pre-cuenta" id="preCuenta"></div>
     <button class="pre-skip" id="preSkip" type="button">Saltar ›</button>`;
   ov.hidden=false;ov.classList.remove("anim","sale");void ov.offsetWidth;ov.classList.add("anim");
   Object.assign(S,{pdx:-330,running:true,cOp:1,cX:-120,cSx:1,cRun:true});
@@ -2211,9 +2381,12 @@ async function introPartido(m){
   pitido();caption("¡Empieza el partido!");
   $("zonaJuego").hidden=false;ocupado=false;mostrarActual();
 }
-function mostrarCamino(){$("juego").hidden=true;$("camino").hidden=false;renderCamino();window.scrollTo({top:0,behavior:"smooth"});}
+function mostrarCamino(){$("juego").hidden=true;$("camino").hidden=false;renderCamino();window.scrollTo({top:0,behavior:"smooth"});
+  if(!prog.guiaVista&&av.nombre.trim()&&$("creador").hidden&&$("presenta").hidden&&$("guia").hidden)setTimeout(()=>abrirGuia(),400);}
 function renderCamino(){
-  const ganados=Object.values(prog.res).filter(x=>x.r==="V").length;
+  const ganados=Object.values(prog.res).filter(x=>x.r==="V").length,nF=(prog.fallos||[]).length,eb=$("entCamino");
+  eb.hidden=!nF;eb.innerHTML=`💪 Vestuario: ${nF} ${nF===1?"error":"errores"} por corregir (+3 puntos cada uno)`;
+  eb.disabled=!nF;eb.onclick=()=>abrirEntrenamiento();
   $("caminoHead").innerHTML=`<div class="headCard">${cartaHTML("cam",true)}</div>
     <div style="flex:1;min-width:0"><div class="nom">${esc(capi(nombreAv()))}${prog.campeon?" 🏆":""}</div>
     <div class="txt">Carta ${tierDe(media()).n} – Media ${media()}<br>Nivel ${nivel()} – ${ganados}/8 victorias</div>
@@ -2230,9 +2403,31 @@ function renderCamino(){
     const bs=m.badge||`background:${m.kit.camiseta}`;
     return `<li class="partido ${e}${i===PARTIDOS.length-1?" final":""}"><div class="fase">${m.fase}</div>
       <button type="button" class="pcard" data-i="${i}" ${!disp&&!r?"disabled":""}>
-        <span class="badges"><span class="bdg esp">ESP</span><span class="vs">vs</span><span class="bdg" style="${bs}">${m.cod}</span></span>
+        <span class="badges"><span class="bdg flagbdg">${bandera("ESP")}</span><span class="vs">vs</span><span class="bdg flagbdg">${bandera(m.cod)}</span></span>
         <span class="pinfo"><span class="riv">${i===PARTIDOS.length-1?"🏆 ":""}${m.rival}</span><br><span class="tema">${m.tema}</span></span>
         <span class="pest">${der}</span></button></li>`;}).join("");
+}
+/* Guía de la carta: qué son las 6 notas y cómo sube la nota general (español sencillo) */
+function abrirGuia(done){
+  const g=media(),t=tierDe(g);
+  $("guiaCard").innerHTML=`<div class="tag">❓ ¿Cómo funciona mi carta?</div>
+    <div class="gu-top"><div class="futw ${t.k} gu-mini">${cartaHTML("gu")}</div>
+      <div class="gu-intro"><p>Tu carta tiene <b>6 notas</b>: una por cada <b>tema del curso</b>.</p><p>El número grande es la <b>nota general</b>: la media de las 6.</p></div></div>
+    <h3>Las 6 notas</h3>
+    <div class="gu-notas">${CATS.map(([k,nm])=>`<div class="gu-n"><b>${k}</b><span><strong>${nm}</strong><em>${CAT_EJ[k]}</em></span></div>`).join("")}</div>
+    <h3>¿Cómo sube la nota?</h3>
+    <ul class="gu-sube">
+      <li><i>✅</i><span>Respuesta correcta en el partido → <b>+4</b> en la nota del tema del partido y <b>+1</b> en otras tres.</span></li>
+      <li><i>💪</i><span>Error corregido en el vestuario → <b>+3</b> en la nota de ese tema.</span></li>
+      <li><i>🏅</i><span>${G("Jugador","Jugadora")} del partido → <b>+1</b> en todas.</span></li>
+      <li><i>❌</i><span>Un error <b>no baja</b> la nota. Solo pierdes la ocasión de subir.</span></li>
+    </ul>
+    <h3>Las cartas</h3>
+    <div class="gu-tiers">${[...TIERS].reverse().map(([m,k,n])=>`<span class="gu-t ${k}${t.k===k?" act":""}"><b>${n}</b><small>${m?`desde ${m}`:"inicio"}</small></span>`).join("")}</div>
+    <p class="nota centro">Cuando tu nota general llega al número, tu carta cambia de color.</p>
+    <div class="dos"><button class="btn" id="guOk" type="button">¡Entendido!</button></div>`;
+  $("guia").hidden=false;
+  $("guOk").onclick=()=>{$("guia").hidden=true;prog.guiaVista=true;guardarProg();if(done)done();};
 }
 function abrirCarta(){
   const n=nivel(),pu=PUESTOS()[av.puesto],hp=habPuesto(),g=media(),t=tierDe(g),sig=[...TIERS].reverse().find(x=>x[0]>g);
@@ -2240,22 +2435,22 @@ function abrirCarta(){
     <div class="volteo" id="flipCarta" role="button" tabindex="0" aria-label="Dar la vuelta a la carta"><div class="cara frente">${frontHTML("carta")}</div><div class="cara dorso">${backHTML()}</div></div>
     <p class="nota centro">👆 Toca la carta para darle la vuelta</p>
     <p class="nota centro">${sig?`Te faltan <b>${sig[0]-g}</b> puntos de media para la carta <b>${sig[2]}</b>.`:"¡Tienes la mejor carta posible!"}</p>
-    <h3>Atributos</h3>
+    <h3>Mis 6 notas <button class="chip gu-btn" id="btnGuia" type="button">❓ ¿Cómo sube?</button></h3>
     <div class="attrs">${CATS.map(([k,nm])=>`<div class="at"><span><b>${k}</b> ${nm}</span><i><u style="width:${prog.card[k]}%"></u></i><b>${prog.card[k]}</b></div>`).join("")}</div>
-    <p class="nota">Cada acierto sube el atributo de la noción del partido: +4 a la primera, +2 a la segunda, +1 después.</p>
+    <p class="nota">Cada respuesta correcta: +4 en la nota del tema del partido y +1 en otras tres. Cada error corregido en el vestuario: +3.</p>
     <div class="xpbox osc">${xpHTML(0)}</div>
     <h3>Habilidades</h3>
     <ul class="habs"><li class="ok"><b>${pu[1]} ${hp[0]}</b> (${capi(pu[0])}): ${hp[1]}</li>${HABS.map(x=>`<li class="${n>=x.n?"ok":"no"}"><b>${n>=x.n?"":"🔒 "}${x.t}</b> (nivel ${x.n}): ${x.d}</li>`).join("")}</ul>
     <h3>Celebraciones de gol</h3>
     <div class="chips"><button class="chip" type="button" data-cel="sorpresa" aria-pressed="${prog.cele==="sorpresa"}">🎲 Sorpresa</button>${(()=>{const ok=celesDesbloqueadas().map(c=>c[0]);return CELES.map(([k,tt])=>`<button class="chip" type="button" data-cel="${k}" ${ok.includes(k)?"":"disabled"} aria-pressed="${prog.cele===k}">${ok.includes(k)?"":"🔒 "}${tt}</button>`).join("");})()}</div>
-    <p class="nota">Cada victoria nueva y cada nivel desbloquean una celebración.</p>
+    <p class="nota">Cada nivel desbloquea una celebración nueva.</p>
     <h3>Vitrina</h3>
     <div class="vitrina"><span>🏅 ${prog.mvp} × ${G("jugador","jugadora")} del partido</span><span>⚽ ${prog.goles} goles</span><span>🅰️ ${prog.asist||0} asistencias</span>
       <span class="${prog.mvp>=3?"":"lock"}">${prog.mvp>=3?"🎖️ Brazalete de capitán":"🔒 Brazalete de capitán (3 MVP)"}</span>
       <span class="${prog.goles+(prog.asist||0)>=12?"":"lock"}">${prog.goles+(prog.asist||0)>=12?"👟 Botas de oro":"🔒 Botas de oro (12 goles o asistencias)"}</span>
       ${prog.campeon?"<span>🏆 Campeón del mundo</span>":""}</div>
     <div class="dos"><button class="btn" id="cartaOk" type="button">Cerrar</button></div>`;
-  $("carta").hidden=false;
+  $("btnGuia").onclick=()=>abrirGuia();$("carta").hidden=false;
   const fl=$("flipCarta"),girar=()=>{if(fl.classList.contains("girando"))return;fl.classList.add("girando");setTimeout(()=>{fl.classList.toggle("volteada");fl.classList.remove("girando");},320);};
   fl.onclick=girar;fl.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();girar();}};
   $("cartaCard").querySelectorAll("[data-cel]").forEach(b=>b.onclick=()=>{prog.cele=b.dataset.cel;guardarProg();abrirCarta();});
@@ -2271,8 +2466,40 @@ const TROFEO=`<svg class="trofeo" viewBox="0 0 120 160" aria-hidden="true"><defs
   <rect x="26" y="130" width="68" height="20" rx="4" fill="#16245c" stroke="#7a5200" stroke-width="3"/>
   <text x="60" y="145" text-anchor="middle" font-family="Bebas Neue, Impact, sans-serif" font-size="14" fill="#ffc400">2026</text>
   <text x="60" y="54" text-anchor="middle" font-size="18" fill="#c8102e" stroke="#7a5200" stroke-width=".6">★★</text></svg>`;
+let CF=null;
+function escenaCopa(done){
+  const ov=$("copaEsc");abrirCopa.vista=true;
+  $("ceAv").innerHTML=frente("ce",coloresAv(),optsAv());CF=mkFront("ceAv");
+  /* Los compañeros: mismo equipaje, otros peinados y pieles */
+  const EQ=[[-245,.78,"2","corto","#f0c39b","#3b2416"],[-128,.86,"9","rapado","#6b4423","#111"],[128,.86,"11","tupe","#d9a070","#7a3b12"],[245,.78,"14","rizado","#b97a52","#121212"]];
+  const base=coloresAv();$("ceEq").innerHTML=EQ.map((q,i)=>`<g id="ceq${i}" transform="translate(${q[0]},${-8-(1-q[1])*30}) scale(${q[1]})">${frente("ceq"+i,{...base,piel:q[4],pelo:q[5],brazalete:false,guantes:undefined,mangaLarga:false},{...optsAv(),peinado:q[3],barba:i===1?"bigote":"no",dorsal:q[2],estrellas:true,cinta:false,pecas:false})}</g>`).join("");
+  CF.eq=EQ.map((q,i)=>mkFront("ceq"+i));
+  $("ceTrofeo").innerHTML=`<g transform="translate(-48,-312) scale(.8)">${TROFEO.replace('class="trofeo"','width="120" height="160"')}</g>`;
+  $("ceNom").textContent=`${capi(nombreAv())} levanta la Copa del Mundo`;
+  ov.hidden=false;ov.classList.remove("anim");void ov.offsetWidth;ov.classList.add("anim");
+  const lay=$("ceConf");lay.innerHTML="";const cols=["#e4002b","#ffc400","#ffffff","#00c2d1"];
+  const lluvia=()=>{for(let i=0;i<(ligero?30:70);i++){const c=document.createElement("i");c.className="conf";c.style.left=(Math.random()*100)+"%";c.style.background=cols[i%4];
+    c.style.setProperty("--h","110vh");c.style.setProperty("--r",(Math.random()*720-360).toFixed(0)+"deg");c.style.animationDuration=(2.2+Math.random()*2).toFixed(2)+"s";c.style.animationDelay=(Math.random()*1.2).toFixed(2)+"s";lay.appendChild(c);setTimeout(()=>c.remove(),5600);}};
+  lluvia();const iv=setInterval(lluvia,2600);
+  publico(5);[523,659,784,1047,1319].forEach((f,k)=>tone(f,.3,{type:"triangle",v:.07,at:.6+k*.14}));setTimeout(silbato,200);
+  $("ceOk").onclick=()=>{clearInterval(iv);ov.hidden=true;CF=null;abrirCopa(done);};
+}
+function animCopa(now){
+  if(!CF||$("copaEsc").hidden)return;
+  const t=now,sube=Math.min(1,Math.max(0,(t-(CF.t0||(CF.t0=t)))/900)),b=Math.sin(t*0.004)*2;
+  CF.inner.setAttribute("transform",`translate(0,${(-sube*6+b).toFixed(1)})`);
+  const aR=-12-150*sube,aL=12+150*sube;
+  CF.armR.setAttribute("transform",`translate(28,-136) rotate(${aR.toFixed(1)})`);CF.armL.setAttribute("transform",`translate(-28,-136) rotate(${aL.toFixed(1)})`);
+  (CF.eq||[]).forEach((f,i)=>{const ph=t*0.006+i*1.3,j=Math.max(0,Math.sin(ph))*26*sube,w=Math.sin(t*0.012+i)*14;
+    f.inner.setAttribute("transform",`translate(0,${(-j).toFixed(1)})`);
+    f.armR.setAttribute("transform",`translate(28,-136) rotate(${(-12-(150+w)*sube).toFixed(1)})`);f.armL.setAttribute("transform",`translate(-28,-136) rotate(${(12+(150-w)*sube).toFixed(1)})`);});
+  $("ceTrofeo").setAttribute("transform",`translate(0,${(-sube*8+b+(1-sube)*70).toFixed(1)}) rotate(${(Math.sin(t*0.003)*3*sube).toFixed(1)})`);
+  $("ceTrofeo").setAttribute("opacity",sube>0.15?"1":"0");
+}
 function abrirCopa(done){
   if(!$("copa").hidden){if(done)done();return;}
+  if(!$("copaEsc").hidden){if(done)done();return;}
+  if(!abrirCopa.vista){abrirCopa.vista=true;escenaCopa(done);return;}
   $("copaCard").innerHTML=`<div class="tag">Copa del Mundo 2026</div>
     <div class="copaFila">${TROFEO}<svg class="yo" viewBox="-70 -228 140 238" aria-hidden="true">${frente("copa",coloresAv(),optsAv())}</svg></div>
     <h2 id="copaTit">¡Campeones del mundo!</h2>
@@ -2280,13 +2507,17 @@ function abrirCopa(done){
     <ul class="logros">${PARTIDOS.map(m=>`<li>✅ ${m.tema}</li>`).join("")}</ul>
     <div class="dos"><button class="btn" id="copaOk" type="button">Volver al camino</button></div>`;
   $("copa").hidden=false;$("copaOk").focus({preventScroll:true});
-  $("copaOk").onclick=()=>{$("copa").hidden=true;mostrarCamino();if(done)done();};
+  $("copaOk").onclick=()=>{$("copa").hidden=true;abrirCopa.vista=false;mostrarCamino();if(done)done();};
 }
 $("ruta").addEventListener("click",e=>{const b=e.target.closest(".pcard");if(b&&!b.disabled)jugarPartido(+b.dataset.i);});
 $("volverCamino").onclick=mostrarCamino;
-$("resetTorneo").onclick=()=>{if(confirm("¿Seguro? Vas a borrar todos los partidos, la experiencia y las mejoras.")){prog=PROG0();guardarProg();actualizarAvatar();renderCamino();}};
+$("resetTorneo").onclick=()=>{const b=$("resetTorneo");
+  if(b.dataset.armado){delete b.dataset.armado;b.textContent="Reiniciar el torneo";prog=PROG0();guardarProg();actualizarAvatar();renderCamino();return;}
+  b.dataset.armado="1";b.textContent="¿Seguro? Pulsa otra vez para borrar todo";setTimeout(()=>{if(b.dataset.armado){delete b.dataset.armado;b.textContent="Reiniciar el torneo";}},4000);};
 $("comprobar").onclick=()=>comprobar();
 $("comprobar").addEventListener("pointerdown",e=>e.preventDefault());
+$("tgLigero").onclick=()=>activarLigero(!ligero,false);
+$("tgLigero").setAttribute("aria-pressed",ligero);
 $("tgSonido").onclick=e=>{mudo=!mudo;e.currentTarget.setAttribute("aria-pressed",!mudo);e.currentTarget.textContent=mudo?"🔇":"🔊";};
 
 /* ============================================================
@@ -2483,12 +2714,15 @@ function renderPanel(mantener){
   $("siguiente").textContent=tabI===TABS.length-1?"¡Al campo! ⚽":"Siguiente ›";
 }
 function irTab(i){tabI=Math.max(0,Math.min(TABS.length-1,i));visitadas.add(tabI);renderTabs();renderPanel(false);aplicarZoom(TABS[tabI].zoom);}
+const NUM_PUESTO={portero:1,defensa:4,centrocampista:8,delantero:7};
+function numeroPorPuesto(){if(!av.numeroFijo&&NUM_PUESTO[av.puesto])av.numero=NUM_PUESTO[av.puesto];}
 function actualizarAvatar(){
+  numeroPorPuesto();
   ESC={an:{delgado:.88,atletico:1,fuerte:1.14}[av.complexion]||1,al:{bajo:.92,mediano:1,alto:1.08}[av.estatura]||1};
   const c=coloresAv(),o=optsAv();
   const kp=kitPartido(),cj={...c,...CAMISETAS[kp]};
   $("jugador").innerHTML=figura("jug",cj,o);P=mkFig("jugador");
-  $("companero").innerHTML=figura("comp",{...CAMISETAS[kp],botas:"#15182a",piel:"#c98b5e",pelo:"#1b1410"},{peinado:"corto",dorsal:"9"});C=mkFig("companero");
+  $("companero").innerHTML=figura("comp",{...CAMISETAS[kp],botas:"#15182a",piel:"#c98b5e",pelo:"#1b1410"},{peinado:"corto",dorsal:String(av.numero)==="9"?"11":"9"});C=mkFig("companero");
   $("avPrev").innerHTML=frente("prev",c,{...o,an:ESC.an,al:ESC.al});PV=mkFront("avPrev");
   $("crTit").textContent=G("Crea tu jugador","Crea tu jugadora");
   renderTitulo();
@@ -2505,7 +2739,7 @@ $("opts").addEventListener("click",e=>{
 });
 $("opts").addEventListener("input",e=>{
   if(e.target.id==="inNombre")av.nombre=e.target.value;
-  else if(e.target.id==="inNum"){const n=parseInt(e.target.value,10);if(n>=1&&n<=99)av.numero=n;else return;}
+  else if(e.target.id==="inNum"){const n=parseInt(e.target.value,10);if(n>=1&&n<=99){av.numero=n;av.numeroFijo=true;}else return;}
   else return;
   guardarAv();actualizarAvatar();
 });
@@ -2565,14 +2799,151 @@ function cerrarCreador(){
 $("verCreador").onclick=abrirCreador;
 document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;
   if(!$("partidas").hidden){cerrarPartidas();return;}
+  if(!$("entrena").hidden){return;}
   if(!$("revela").hidden){$("rvOk").click();return;}
   if(!$("celeNueva").hidden){$("cnOk").click();return;}
+  if(!$("guia").hidden){$("guOk").click();return;}
   if(!$("carta").hidden){$("carta").hidden=true;renderCamino();return;}
-  if(!$("copa").hidden){$("copa").hidden=true;mostrarCamino();}else if(!crEl.hidden&&av.nombre.trim())cerrarCreador();else if(!presEl.hidden)cerrarPresentacion();});
+  if(!$("copaEsc").hidden){return;}
+  if(!$("copa").hidden){$("copa").hidden=true;abrirCopa.vista=false;mostrarCamino();}else if(!crEl.hidden&&av.nombre.trim())cerrarCreador();else if(!presEl.hidden)cerrarPresentacion();});
 estadoJuego();actualizarAvatar();renderTitulo();
 mostrarCamino();
 function conSlot(sl,fn){const sv={av,prog};av={...AV_DEF,...((sl&&sl.av)||{})};prog=progDesde(sl&&sl.prog);try{return fn();}finally{av=sv.av;prog=sv.prog;}}
 let armado=null,armadoT=0;
+/* ---------- Entrenamiento: repasar los errores con el curso ---------- */
+const LECCION={
+  PRO:{t:"Los pronombres",r:["<b>Sujeto:</b> yo, tú, él/ella/usted, nosotros/as, vosotros/as, ellos/ellas/ustedes. Se deducen de la terminación del verbo: habl<b>as</b> → tú, jug<b>áis</b> → vosotros.",
+    "<b>Usted</b> es para hablar con respeto a un adulto y va con el verbo en 3.ª persona.",
+    "<b>Verbos pronominales</b> (llamarse, levantarse, entrenarse…): el pronombre va delante → <b>me</b> llamo, <b>te</b> llamas, <b>se</b> llama, <b>nos</b> llamamos, <b>os</b> llamáis, <b>se</b> llaman."]},
+  PRE:{t:"El presente y las preguntas",r:["<b>-AR:</b> habl-o, -as, -a, -amos, -áis, -an. <b>-ER:</b> com-o, -es, -e, -emos, -éis, -en. <b>-IR:</b> viv-o, -es, -e, -imos, -ís, -en.",
+    "<b>Preguntar:</b> ¿Qué? (quoi), ¿Quién? (qui), ¿Dónde? (où), ¿Cuándo? (quand), ¿Cómo? (comment), ¿Cuánto/s? (combien), ¿Por qué? (pourquoi). Llevan tilde y van entre ¿ ?."]},
+  GUS:{t:"Los gustos",r:["<b>Gustar / encantar / apasionar</b> se conjugan con la cosa que gusta: me gust<b>a</b> el fútbol (singular), me gust<b>an</b> los goles (plural). Con un infinitivo: me gust<b>a</b> jugar.",
+    "<b>El pronombre</b> depende de la persona: (a mí) <b>me</b>, (a ti) <b>te</b>, (a él/ella) <b>le</b>, (a nosotros) <b>nos</b>, (a vosotros) <b>os</b>, (a ellos) <b>les</b>.",
+    "<b>También</b> responde a una frase afirmativa; <b>tampoco</b> a una negativa."]},
+  SER:{t:"Ser, estar y hay",r:["<b>SER</b> (soy, eres, es, somos, sois, son): lo que algo es → identidad, carácter, descripción, nacionalidad, hora.",
+    "<b>ESTAR</b> (estoy, estás, está, estamos, estáis, están): dónde está algo y cómo se siente hoy (estado pasajero).",
+    "<b>HAY</b> (siempre igual): «il y a» → hay un balón, hay miles de personas."]},
+  IRR:{t:"Irregulares, rutina y posesivos",r:["<b>Diptongos:</b> e → ie (querer: quiero, quieres, quiere… pero queremos), o → ue (poder: puedo… podemos), u → ue (jugar: juego… jugamos). Con nosotros y vosotros no hay diptongo.",
+    "<b>Irregulares en yo:</b> tengo, hago, salgo, pongo, digo, voy, soy, estoy.",
+    "<b>La rutina:</b> me levanto, me ducho, me acuesto (el pronombre delante). <b>La hora:</b> es la una / son las dos, las ocho… a las nueve.",
+    "<b>Posesivos:</b> mi/mis, tu/tus, su/sus, nuestro/a/os/as, vuestro/a/os/as. Concuerdan con la cosa poseída: <b>sus</b> botas."]},
+  FUT:{t:"Planes y obligaciones",r:["<b>IR A + infinitivo</b> (futuro próximo): voy, vas, va, vamos, vais, van → voy a marcar.",
+    "<b>TENER QUE + infinitivo</b> (obligación personal): tengo que correr. <b>HAY QUE + infinitivo</b> (obligación general): hay que entrenar.",
+    "<b>Muy + adjetivo/adverbio</b> (muy bien, muy rápido); <b>mucho</b> + nombre o detrás del verbo (corre mucho)."]}
+};
+let ENT=null;
+let entDespues=null,ENTF=null,entAnim={k:"idle",t0:0,ph:0};
+function abrirEntrenamiento(despues){
+  const lista=(prog.fallos||[]).slice();
+  if(!lista.length){if(despues)despues();return;}
+  entDespues=despues||null;
+  ENT={lista,i:0,ok:0,fase:"intro",m0:media(),tries:0};
+  $("entrena").hidden=false;$("vestuario").innerHTML=vestuarioSVG();ENTF=mkFig("entAv");entAnim={k:"entra",t0:performance.now(),ph:0};
+  pintarEntrenamiento();
+}
+function vestuarioSVG(){
+  let taq="";for(let i=0;i<7;i++)taq+=`<g transform="translate(${30+i*78},40)"><rect width="66" height="150" rx="4" fill="${i%2?'#2b3f8f':'#24367c'}" stroke="#15204d" stroke-width="2"/><rect x="8" y="12" width="50" height="6" rx="3" fill="#15204d"/><rect x="8" y="26" width="50" height="6" rx="3" fill="#15204d"/><circle cx="54" cy="80" r="3" fill="#ffc400"/><text x="33" y="138" text-anchor="middle" font-family="Bebas Neue, Impact, sans-serif" font-size="16" fill="#8fa3ff">${[7,9,10,11,14,19,24][i]}</text></g>`;
+  return `<svg viewBox="0 0 600 340" class="vest" aria-hidden="true">
+    <defs><linearGradient id="vsuelo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a4a7a"/><stop offset="1" stop-color="#222d55"/></linearGradient>
+      <pattern id="vbald" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#2c3a6b"/><rect x="1" y="1" width="38" height="38" fill="#31417a"/></pattern></defs>
+    <rect width="600" height="340" fill="#1b2650"/><rect width="600" height="210" fill="url(#vbald)"/>
+    <rect y="210" width="600" height="130" fill="url(#vsuelo)"/><rect y="208" width="600" height="4" fill="#4b5c96"/>
+    ${taq}
+    <g transform="translate(20,250)"><rect width="200" height="12" rx="4" fill="#8b5a2b" stroke="#4a2e12" stroke-width="2"/><rect x="18" y="12" width="10" height="34" fill="#4a2e12"/><rect x="172" y="12" width="10" height="34" fill="#4a2e12"/></g>
+    <g id="cintaG" transform="translate(395,232)"><rect x="0" y="40" width="170" height="16" rx="6" fill="#1a1f33" stroke="#0b0e1c" stroke-width="2"/><rect x="6" y="43" width="158" height="10" rx="4" fill="#3b4466"/>
+      <g id="cintaLineas">${Array.from({length:9},(_,i)=>`<rect x="${8+i*18}" y="44" width="4" height="8" fill="#6a76a8"/>`).join("")}</g>
+      <rect x="150" y="-30" width="8" height="74" rx="3" fill="#2a3150"/><rect x="118" y="-34" width="52" height="14" rx="5" fill="#0d1433" stroke="#2a3150" stroke-width="2"/><rect x="124" y="-30" width="40" height="6" rx="2" fill="#ffc400" opacity=".7"/></g>
+    <g id="rackG" transform="translate(236,292)"><rect width="110" height="10" rx="3" fill="#2a3150"/>${[0,1,2].map(i=>`<g transform="translate(${12+i*36},-8)"><rect x="0" y="2" width="30" height="5" rx="2" fill="#555c77"/><rect x="-5" y="-3" width="9" height="15" rx="2" fill="#0d1433"/><rect x="26" y="-3" width="9" height="15" rx="2" fill="#0d1433"/></g>`).join("")}</g>
+    <g id="entAv" transform="translate(130,300)">${figura("entF",coloresAv(),optsAv())}</g>
+    <g id="pesa" opacity="0"><rect x="-26" y="-4" width="52" height="8" rx="3" fill="#555c77"/><rect x="-34" y="-11" width="12" height="22" rx="3" fill="#0d1433"/><rect x="22" y="-11" width="12" height="22" rx="3" fill="#0d1433"/></g>
+    <rect width="600" height="340" fill="url(#vig)" opacity=".4"/>
+  </svg>`;
+}
+function animarVestuario(now){
+  if(!ENTF||$("entrena").hidden)return;
+  const t=now-entAnim.t0,k=entAnim.k;let x=130,y=300,pp=idle(now,0),rot=0,sx=1,py=0;
+  const pesa=$("pesa"),lineas=$("cintaLineas");
+  if(k==="entra"){const u=Math.min(1,t/1500);x=-60+190*u;entAnim.ph+=0.22;pp=run(entAnim.ph);if(u>=1){entAnim.k="idle";entAnim.t0=now;}}
+  else if(k==="pesas"){const q=Math.sin(t*0.006);const lift=(q+1)/2;pp={leg:[-18,18,18,18],arm:[-30-120*lift,-20,-30-120*lift,-20],bob:lift*3};
+    pesa.setAttribute("opacity","1");pesa.setAttribute("transform",`translate(${x+2},${y-96-94*lift})`);}
+  else if(k==="cinta"){x=480;y=272;entAnim.ph+=0.3;pp=run(entAnim.ph);rot=-6;
+    if(lineas)lineas.setAttribute("transform",`translate(${(-(t*0.08)%18).toFixed(1)},0)`);}
+  else if(k==="fallo"){const q=Math.sin(t*0.01);pp={leg:[-6,10,8,12],arm:[20,-40,20,-40],bob:0};rot=10+q*2;py=0;}
+  else if(k==="festejo"){const j=Math.abs(Math.sin(t*0.011));py=-j*26;pp={leg:[-20*j,15+40*j,16,24+30*j],arm:[-165,-15,165,15],bob:0};}
+  if(k!=="pesas")pesa.setAttribute("opacity","0");
+  pose(ENTF,{x,y:y+py,rot,sx:sx*ESC.an,sy:ESC.al,...pp});animarPelo(ENTF,now,k==="cinta"||k==="entra",entAnim.ph,false);
+}
+function pintarEntrenamiento(){
+  const c=$("entCard");
+  if(ENT.i>=ENT.lista.length){
+    const n=ENT.ok;entAnim={k:n?"festejo":"idle",t0:performance.now(),ph:0};
+    const t0=tierDe(ENT.m0),t1=tierDe(media());
+    c.innerHTML=`<div class="tag">💪 Entrenamiento terminado</div>
+      <div class="enRes"><b>${n}</b> de ${ENT.lista.length} errores corregidos</div>
+      <div class="enFinal"><div class="futw ${t1.k} enMini">${cartaHTML("enFin")}</div>
+        <div class="enMediaBig"><small>Media general</small><div><span>${ENT.m0}</span> → <b id="enMediaN">${ENT.m0}</b></div><small class="enTier">${t0.k!==t1.k?`¡Carta ${t1.n}!`:t1.n}</small></div></div>
+      <p class="presDesc">${n?`Tu carta sube <b>+${n*3}</b> puntos.`:"Esta vez no has corregido ningún error. Lee bien la regla: lo volverás a ver en el próximo vestuario."}
+        ${(prog.fallos||[]).length?`<br>Todavía te quedan <b>${prog.fallos.length}</b> por repasar.`:"<br>¡No te queda ningún error pendiente!"}</p>
+      <div class="dos"><button class="btn" id="enOk" type="button">${entDespues?"¡Al partido! ⚽":"Volver"}</button></div>`;
+    $("enOk").onclick=cerrarEntrenamiento;
+    const nEl=$("enMediaN"),mf=media();if(mf>ENT.m0){const t=performance.now();const paso=()=>{const u=Math.min(1,(performance.now()-t)/1200);nEl.textContent=Math.round(ENT.m0+(mf-ENT.m0)*u);if(u<1)requestAnimationFrame(paso);else nEl.classList.add("salta");};setTimeout(paso,400);}
+    return;
+  }
+  const e=ENT.lista[ENT.i],L=LECCION[e.cat]||LECCION.PRE,prog_=`${ENT.i+1} / ${ENT.lista.length}`;
+  if(ENT.fase==="intro"){
+    c.innerHTML=`<div class="tag">💪 El vestuario</div>
+      <h2 id="enTit" class="enH">Corrige tus ${ENT.lista.length} ${ENT.lista.length===1?"error":"errores"}</h2>
+      <ol class="enPasos"><li><b>Lee la regla</b> del curso que explica tu error.</li><li><b>Vuelve a responder</b> a la misma pregunta.</li><li>Cada error corregido: <b>+3</b> en la nota de ese tema (${[...new Set(ENT.lista.map(e=>CAT_CORTO[e.cat]||e.cat))].join(", ")}).</li></ol>
+      <p class="nota centro">Si vuelves a fallar, no pasa nada: la pregunta volverá en el próximo vestuario.</p>
+      <div class="dos"><button class="btn" id="enGo" type="button">¡Empezar!</button></div>`;
+    $("enGo").onclick=()=>{ENT.fase="leccion";pintarEntrenamiento();};return;
+  }
+  if(ENT.fase==="leccion"){
+    const d=document.createElement("div");d.innerHTML=frase({...e,ok:[e.ok],ops:null},false);
+    c.innerHTML=`<div class="tag">💪 Entrenamiento · ${prog_}</div>${mediaChip()}
+      <div class="enErr"><div class="enL">Tu error:</div><p class="enFrase">${e.antes}${e.antes&&!/[¿¡]$/.test(e.antes)?" ":""}<s>${esc(e.mio)}</s> <span class="inf">${e.verbo||"elige"}</span> ${e.despues}</p></div>
+      <div class="enLec"><div class="enL">Paso 1 · Lee la regla · ${L.t}</div><ul>${L.r.map(r=>`<li>${r}</li>`).join("")}</ul>
+        <div class="enPista">💡 ${esc(e.pista)}</div></div>
+      <div class="dos"><button class="btn" id="enGo" type="button">${ENT.tries?"¡Ahora sí! Lo intento otra vez":"¡Lo tengo! Vuelvo a intentarlo"}</button></div>`;
+    if(ENT.tries)c.querySelector(".enLec").classList.add("otraVez");
+    $("enGo").onclick=()=>{ENT.fase="pregunta";pintarEntrenamiento();};
+  }else{
+    const f={antes:e.antes,verbo:e.verbo,ok:[e.ok],despues:e.despues,ops:e.ops,esc:e.esc,pista:e.pista};
+    const h=f.ops?`<span class="hueco" id="enGap">&nbsp;</span>`:`<input id="enGap" class="gapin" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" style="width:${Math.max(8.5,e.ok.length+3)}ch">`;
+    const sa=(!f.antes||/[¿¡]$/.test(f.antes))?"":" ",sd=/^[,.;:!?…]/.test(f.despues)?"":" ";
+    c.innerHTML=`<div class="tag">💪 Entrenamiento · ${prog_}</div>${mediaChip()}
+      <div class="enL">Paso 2 · ${f.ops?"Elige la respuesta correcta":f.esc?"Escribe la palabra que falta":"Conjuga el verbo"}</div>
+      <p class="actual enQ">${f.antes}${sa}${h} <span class="inf">${f.verbo||"elige"}</span>${sd}${f.despues}</p>
+      <div class="opciones" id="enOps">${f.ops?[...f.ops].sort(()=>Math.random()-.5).map(t=>`<button type="button" class="opt" data-v="${esc(t)}">${esc(t)}</button>`).join(""):""}</div>
+      <p class="fb" id="enFb"></p>
+      <div class="dos">${f.ops?"":`<button class="btn" id="enVal" type="button">Validar</button>`}</div>`;
+    const resolver=val=>{
+      const v=respuesta(f,val),ok=f.ok.map(norm).includes(v)||f.ok.map(o=>sinAc(norm(o))).includes(sinAc(v));
+      if(!v)return;
+      const q=c.querySelector(".enQ"),fb=$("enFb");
+      c.querySelectorAll("#enOps .opt").forEach(o=>{o.disabled=true;const n=norm(o.dataset.v);if(ok&&n===v)o.classList.add("bien");else if(n===v)o.classList.add("mal");});
+      if($("enVal"))$("enVal").disabled=true;
+      const d=c.querySelector(".dos"),sig=()=>{ENT.i++;ENT.tries=0;ENT.fase="leccion";entAnim={k:"idle",t0:performance.now(),ph:0};pintarEntrenamiento();};
+      if(ok){sndOk();q.classList.remove("ko");q.classList.add("bien");ENT.ok++;entAnim={k:ENT.i%2?"cinta":"pesas",t0:performance.now(),ph:0};
+        prog.fallos=(prog.fallos||[]).filter(x=>!(x.antes===e.antes&&x.ok===e.ok));
+        const m0=media();prog.card[e.cat]=Math.min(99,(prog.card[e.cat]||50)+3);guardarProg();
+        fb.className="fb ok";fb.innerHTML=`¡Corregido! <b>+3</b> en tu nota de <b>${CAT_CORTO[e.cat]||e.cat}</b>.`;animarMedia(m0,media());
+        d.innerHTML=`<button class="btn" id="enNext" type="button">${ENT.i+1<ENT.lista.length?"Siguiente ›":"Terminar"}</button>`;$("enNext").onclick=sig;}
+      else{sndKo();q.classList.add("ko");ENT.tries++;entAnim={k:"fallo",t0:performance.now(),ph:0};fb.className="fb ko";
+        if(ENT.tries<3){fb.innerHTML=`Todavía no. Relee la regla con calma y vuelve a intentarlo (intento ${ENT.tries} de 3).`;
+          d.innerHTML=`<button class="btn" id="enRe" type="button">📖 Releer la regla</button>`;$("enRe").onclick=()=>{ENT.fase="leccion";entAnim={k:"idle",t0:performance.now(),ph:0};pintarEntrenamiento();};}
+        else{fb.innerHTML=`Tres intentos. Esta vez se queda pendiente: la volverás a ver en el próximo vestuario.`;
+          d.innerHTML=`<button class="btn" id="enNext" type="button">${ENT.i+1<ENT.lista.length?"Siguiente ›":"Terminar"}</button>`;$("enNext").onclick=sig;}}
+    };
+    c.querySelectorAll("#enOps .opt").forEach(o=>o.onclick=()=>resolver(o.dataset.v));
+    if($("enVal")){$("enVal").onclick=()=>resolver($("enGap").value);$("enGap").addEventListener("keydown",ev=>{if(ev.key==="Enter"){ev.preventDefault();resolver($("enGap").value);}});if(fino)$("enGap").focus();}
+  }
+}
+function mediaChip(){const t=tierDe(media());return `<div class="enMedia ${t.k}" id="enMedia"><small>Media</small><b id="enMediaV">${media()}</b><em>${t.n}</em></div>`;}
+function animarMedia(m0,m1){const el=$("enMediaV"),box=$("enMedia");if(!el)return;const t=performance.now();
+  const paso=()=>{const u=Math.min(1,(performance.now()-t)/900);el.textContent=Math.round(m0+(m1-m0)*u);if(u<1)requestAnimationFrame(paso);else{box.className="enMedia "+tierDe(m1).k;box.querySelector("em").textContent=tierDe(m1).n;}};
+  box.classList.remove("sube");void box.offsetWidth;box.classList.add("sube");paso();}
+function cerrarEntrenamiento(){$("entrena").hidden=true;ENT=null;ENTF=null;const d=entDespues;entDespues=null;if(d){d();return;}if(!$("camino").hidden)renderCamino();if(!$("fin").hidden&&$("aEntrenar")){const n=(prog.fallos||[]).length;$("aEntrenar").textContent=`💪 Entrenar (${n})`;$("aEntrenar").disabled=!n;}}
 function abrirPartidas(){
   $("ptCard").innerHTML=`<div class="tag">Partidas guardadas</div><h2 id="ptTit">¿Con quién juegas?</h2>
     <div class="slots">${partidas.slots.map((sl,i)=>{
