@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Entrenamiento para el examen · Sesión 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1E1B4B;--muted:#5B6180;--bg:#F4F6FF;--card:#fff;--line:#D7DCF0;--p1:#7C3AED;--p2:#2563EB;--p3:#16A34A;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#E8E9FF;--muted:#A9B0D6;--bg:#0E1330;--card:#171E45;--line:#2C356B}}
+:root[data-theme="dark"]{--ink:#E8E9FF;--muted:#A9B0D6;--bg:#0E1330;--card:#171E45;--line:#2C356B}
+*{box-sizing:border-box}html{height:100%;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 120px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Atkinson Hyperlegible',Arial,sans-serif;font-size:19px;line-height:1.5}
+header{background:#0B1437;color:#fff;padding:12px 18px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+header h1{margin:0;font-family:'Audiowide',sans-serif;font-weight:400;font-size:22px}
+.steps{display:flex;gap:8px;margin-top:10px}.steps a{flex:1;text-decoration:none;color:#fff;border-radius:12px;padding:8px 10px;font-weight:700;font-size:15px;line-height:1.25}
+.steps a small{display:block;font-weight:400;opacity:.9}
+main{max-width:820px;margin:0 auto;padding:18px 16px 60px}
+.intro{background:var(--card);border-left:10px solid var(--p1);border-radius:18px;padding:14px 18px;margin-bottom:8px}
+.intro p{margin:4px 0}
+section{margin:26px 0}
+.sh{display:flex;align-items:center;gap:12px;border-radius:18px;padding:12px 16px;color:#fff}
+.sh .n{width:44px;height:44px;border-radius:50%;background:#fff;font-family:Audiowide;font-size:22px;display:grid;place-items:center;flex:none}
+.sh h2{margin:0;font-size:22px;flex:1;font-family:'Audiowide',sans-serif;font-weight:400}.sh span{font-weight:700;white-space:nowrap}
+.do{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:10px 16px;margin:10px 0}
+.do b{display:block;margin-bottom:2px}
+.tarjeta{border:3px solid #0891B2;border-radius:18px;overflow:hidden;background:var(--card);margin:10px 0}
+.tarjeta .top{background:#0891B2;color:#fff;padding:8px 14px;font-weight:700}
+.tarjeta h3{margin:10px 14px 2px;font-size:22px}.tarjeta .meta{margin:0 14px;color:var(--muted);font-weight:700;font-size:16px}
+.tarjeta p{margin:8px 14px 12px;font-size:20px}.tarjeta .gl{font-size:16px;background:rgba(8,145,178,.1);border-radius:12px;padding:8px 10px;margin:0 10px 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:block;font-weight:700;margin:8px 0 4px}
+input,textarea{width:100%;font:inherit;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
+textarea{min-height:110px;resize:vertical}
+.zone{border-left:8px solid var(--zc);background:var(--card);border-radius:14px;padding:10px 14px;margin:10px 0}
+.zone b{color:var(--zc)}.zone small{display:block;color:var(--muted);font-weight:700;margin-bottom:6px}
+.chk label{display:flex;gap:10px;align-items:center;font-weight:400}.wc{font-weight:700;margin-top:6px}.wc.ok{color:#16A34A}.wc.no{color:#DC2626}.bar{display:grid;grid-template-columns:1fr auto;gap:6px 10px;background:var(--card);border-radius:14px;padding:10px 14px;border:2px solid var(--line)}.bar b{font-size:16px}.bar span{text-align:right;white-space:nowrap}.chk input{width:22px;height:22px}
+.btn{border:0;border-radius:999px;padding:12px 22px;font:inherit;font-weight:700;cursor:pointer;background:var(--p3);color:#fff;min-height:48px}
+.locked{background:var(--card);border:2px dashed var(--line);border-radius:16px;padding:14px 16px;color:var(--muted)}
+table{width:100%;border-collapse:separate;border-spacing:0 6px}td{background:var(--card);padding:8px 10px;vertical-align:top}
+td:first-child{border-radius:12px 0 0 12px;font-weight:700;width:34%}td:last-child{border-radius:0 12px 12px 0;white-space:nowrap;text-align:center}
+td input{width:62px;text-align:center;padding:6px}
+.model{background:#DCF8C6;color:#1E1B4B;border-radius:16px;padding:12px 16px;line-height:1.7}
+.model u{text-decoration:none;color:#fff;background:#2563EB;border-radius:6px;padding:0 4px}.model mark{background:#FBCFE8;border-radius:6px}.model i{color:#0E7490;font-weight:700;font-style:normal}.model .op{background:#FFEDD5;border-radius:6px}
+.sol{font-size:16px;color:#15803D;font-weight:700}
+.total{font-family:'Audiowide',sans-serif;font-size:24px;text-align:right;margin:8px 0}
+.msg{white-space:pre-wrap;background:var(--card);border-radius:14px;padding:10px 14px;border:2px solid var(--line)}
+.fb{font-weight:700;margin-top:6px}
+@media (max-width:600px){.grid{grid-template-columns:1fr}.steps a small{display:none}}
+</style></head><body>
+<header><h1>Entrenamiento para el examen</h1>
+<nav class="steps"><a href="#p0" style="background:#0891B2">0 · Me preparo<small>5 min</small></a><a href="#p1" style="background:var(--p1)">1 · Comprendo<small>20 min</small></a><a href="#p2" style="background:var(--p2)">2 · Me expreso<small>30 min</small></a><a href="#p3" style="background:var(--p3)">3 · Me corrijo<small>10 min</small></a></nav></header>
+<main>
+<div class="intro"><p><b>Hoy haces el examen de entrenamiento.</b> Es exactamente el examen final, con otra noticia.</p><p><b>Cómo se desarrolla:</b> primero <b>comprendo</b> el documento (parte 1, 4 puntos), después <b>me expreso</b> (parte 2, 16 puntos). Arriba ves los pasos: puedes volver atrás cuando quieras.</p>
+<label for="nm">Tu nombre</label><input id="nm" data-k="name" autocomplete="off"></div>
+
+<section id="p0"><div class="sh" style="background:#0891B2"><span class="n" style="color:#0891B2">0</span><h2>Me preparo: así te evalúo</h2><span>5 min</span></div>
+<div class="bar"><b>1 · Comprendo el documento <small>(Lire et comprendre)</small></b><span>/ 4</span><b>2 · Pertinencia del contenido <small>(Écrire)</small></b><span>/ 4</span><b>3 · Corrección de la lengua: pasado (él / ella / usted) y presente <small>(Écrire)</small></b><span>/ 4</span><b>4 · Vocabulario de la ficha <small>(Écrire)</small></b><span>/ 4</span><b>5 · Opinión justificada con «porque» <small>(Réagir)</small></b><span>/ 4</span><b>Total</b><span><b>/ 20</b></span></div>
+<div class="do chk"><b>Antes de empezar, me autoevalúo. Marca lo que sabes hacer:</b>
+<label><input type="checkbox" data-k="a1"> Sé contar lo que pasó con verbos en pasado (él / ella / usted): presentó, creó, descubrió…</label>
+<label><input type="checkbox" data-k="a2"> Sé explicar lo que hace la IA en presente: la IA puede…, parece… pero no es…</label>
+<label><input type="checkbox" data-k="a3"> Conozco las palabras de mi ficha de vocabulario</label>
+<label><input type="checkbox" data-k="a4"> Sé dar mi opinión con «para mí…» y «porque…»</label></div>
+</section>
+
+<section id="p1"><div class="sh" style="background:var(--p1)"><span class="n" style="color:var(--p1)">1</span><h2>Comprendo el documento</h2><span>20 min · 4 pts</span></div>
+<div class="do"><b>Lo que tienes que hacer</b>Lee la noticia de entrenamiento. Responde a las 4 preguntas con frases.</div>
+<div class="tarjeta"><div class="top">Noticia de entrenamiento</div><h3>Latam-GPT, la IA de América Latina</h3><div class="meta">Santiago de Chile · febrero de 2026</div>
+<p>El 10 de febrero de 2026, en Santiago de Chile, el presidente Gabriel Boric presenta Latam-GPT, la primera gran inteligencia artificial de América Latina. Más de 30 instituciones de 12 países trabajan en el proyecto. La IA aprende con textos de la región, en español y en portugués. Así, conoce mejor nuestra historia y nuestras culturas. Los científicos esperan ayudar a escuelas, hospitales y empresas.</p>
+<div class="gl"><b>Vocabulario:</b> presentar = présenter · trabajar = travailler · aprender = apprendre · conocer = connaître · esperar = espérer · las empresas = les entreprises</div></div>
+<label for="q1">1 · ¿Quién usa o crea la inteligencia artificial en la noticia? ¿Dónde y cuándo?</label><textarea id="q1" data-k="q1" style="min-height:70px"></textarea>
+<label for="q2">2 · ¿Qué hace exactamente la inteligencia artificial en esta noticia?</label><textarea id="q2" data-k="q2" style="min-height:70px"></textarea>
+<label for="q3">3 · ¿Qué pasa después? ¿Qué esperan las personas?</label><textarea id="q3" data-k="q3" style="min-height:70px"></textarea>
+<label for="q4">4 · En esta noticia, ¿la IA nos ayuda o nos engaña? Copia una frase del texto que lo demuestra.</label><textarea id="q4" data-k="q4" style="min-height:70px"></textarea>
+</section>
+
+<section id="p2"><div class="sh" style="background:var(--p2)"><span class="n" style="color:var(--p2)">2</span><h2>Me expreso</h2><span>30 min · 16 pts</span></div>
+<div class="do"><b>Lo que tienes que hacer</b>Tu amigo Pablo, de Sevilla, no conoce esta noticia. <b>Escríbele un mensaje de 80 a 100 palabras</b>: cuéntale lo que pasó, explícale lo que hace la IA y dale tu opinión.</div>
+<p><b>¡Hola Pablo! ¿Qué tal?</b></p>
+<textarea data-k="msg" id="msg" aria-label="Mi mensaje a Pablo" style="min-height:260px"></textarea>
+<div class="wc" id="wc">0 palabras</div>
+<p><b>¡Un abrazo!</b></p>
+<button class="btn" id="fin" style="background:var(--p2)">He terminado: ver la corrección</button><div class="fb" id="ffb"></div>
+</section>
+
+<section id="p3"><div class="sh" style="background:var(--p3)"><span class="n" style="color:var(--p3)">3</span><h2>Me corrijo</h2><span>10 min</span></div>
+<div id="corr"></div>
+</section>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const $=s=>document.querySelector(s);const KEY='entrenamiento-s5-v2';
+let S={a:{},done:false};try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const words=t=>(String(t||'').trim().match(/[\p{L}\p{N}'’]+/gu)||[]).length;
+function wc(){const n=words(S.a.msg);const e=$('#wc');if(!e)return;e.textContent=n+(n===1?' palabra':' palabras')+(n<80?' · te faltan '+(80-n):n>100?' · sobran '+(n-100):' · ¡perfecto!');e.className='wc '+(n>=80&&n<=100?'ok':'no')}
+function bind(root=document){root.querySelectorAll('[data-k]').forEach(el=>{const k=el.dataset.k;if(el.type==='checkbox'){el.checked=!!S.a[k];el.onchange=()=>{S.a[k]=el.checked;save()}}else{el.value=S.a[k]??'';el.oninput=()=>{S.a[k]=el.value;save();if(k==='msg')wc();if(el.closest('#corr'))total()}}})}
+const CRIT=[['s1','1 · Comprendo el documento','Mis 4 respuestas de la parte 1 (1 punto por respuesta)',4],['s2','2 · Pertinencia del contenido','Cuento lo que pasó, explico lo que hace la IA, respondo a Pablo',4],['s3','3 · Corrección de la lengua','Verbos en pasado (él / ella / usted) bien escritos, presente correcto',4],['s4','4 · Vocabulario','3 palabras de la ficha o más, bien empleadas',4],['s5','5 · Opinión justificada','«Para mí…» + «porque…», y matizo si quiero',4]];
+function total(){const t=CRIT.reduce((s,[k,,,m])=>s+Math.min(m,Math.max(0,Number(S.a[k]||0))),0);const e=$('#tot');if(e)e.textContent='Mi nota de entrenamiento: '+t+' / 20';return t}
+function corr(){const c=$('#corr');
+ if(!S.done){c.innerHTML='<div class="locked">La corrección aparece aquí cuando pulsas «He terminado: ver la corrección» (paso 2).</div>';return}
+ const sol=[['1 · ¿Quién? ¿Dónde y cuándo?','q1','El presidente Gabriel Boric (y más de 30 instituciones) · en Santiago de Chile · el 10 de febrero de 2026'],['2 · ¿Qué hace la IA?','q2','Aprende con textos de la región, en español y en portugués, y conoce mejor la historia y las culturas latinoamericanas'],['3 · ¿Qué pasa después?','q3','Los científicos esperan ayudar a escuelas, hospitales y empresas'],['4 · ¿Ayuda o engaña? Prueba','q4','Nos ayuda: «esperan ayudar a escuelas, hospitales y empresas»']];
+ c.innerHTML=`<div class="do"><b>Lo que tienes que hacer</b>1. Compara tus respuestas con la corrección. 2. Compara tu mensaje con el mensaje modelo. 3. Cuenta tus puntos con el baremo del examen.</div>
+ <h3>1 · Corrección de la parte 1</h3><table>${sol.map(([q,k,s])=>`<tr><td>${q}</td><td style="text-align:left;white-space:normal">${esc(S.a[k]||'—')}<div class="sol">Corrección: ${s}</div></td></tr>`).join('')}</table>
+ <h3>2 · Mi mensaje y el mensaje modelo</h3><div class="msg">¡Hola Pablo! ¿Qué tal?\n${esc(S.a.msg)}\n¡Un abrazo! ${esc(S.a.name)}</div><p class="wc">${words(S.a.msg)} palabras (el examen pide de 80 a 100)</p>
+ <p><b>Mensaje modelo (92 palabras):</b></p><div class="model"><b>¡Hola Pablo! ¿Qué tal?</b> Ayer leí una noticia increíble. El 10 de febrero de 2026, en Santiago de Chile, el presidente Gabriel Boric <u>presentó</u> Latam-GPT, la primera gran <mark>inteligencia artificial</mark> de América Latina. El proyecto <u>reunió</u> a más de 30 instituciones de 12 países. La IA <u>aprendió</u> con textos en español y en portugués, y por eso conoce bien nuestras culturas. <i>Hoy, la IA puede ayudar a las escuelas y a los hospitales.</i> <span class="op">Para mí, esta IA nos <mark>ayuda</mark> porque es <mark>útil</mark> y respeta nuestra lengua. Pero hay que tener cuidado: una IA también puede <mark>engañar</mark>.</span> ¡Un abrazo! Lucas</div>
+ <p style="font-size:15px">En azul: los verbos en pasado (él / ella / usted) · en turquesa: lo que hace la IA (presente) · en naranja: la opinión matizada con «porque» · en rosa: palabras de la ficha.</p>
+ <h3>3 · Cuento mis puntos (baremo del examen)</h3><table>${CRIT.map(([k,t,d,m])=>`<tr><td>${t}<div style="font-weight:400;font-size:15px;color:var(--muted)">${d}</div></td><td><input type="number" min="0" max="${m}" data-k="${k}" aria-label="${t}"> / ${m}</td></tr>`).join('')}</table>
+ <div class="total" id="tot"></div>
+ <label for="mej">Para el examen, voy a mejorar…</label><textarea id="mej" data-k="mej"></textarea>
+ <p><button class="btn" id="pdf">Descargar mi entrenamiento (PDF)</button></p><div class="fb" id="pfb"></div>`;
+ bind(c);c.querySelectorAll('input[type=number]').forEach(i=>i.addEventListener('input',()=>{if(+i.value>+i.max){i.value=i.max;S.a[i.dataset.k]=i.value;save()}total()}));total();$('#pdf').onclick=pdf}
+$('#fin').onclick=()=>{const miss=[];if(!['q1','q2','q3','q4'].every(k=>(S.a[k]||'').trim()))miss.push('las 4 respuestas de la parte 1');const n=words(S.a.msg);if(n<40)miss.push('tu mensaje a Pablo (tienes '+n+' palabras)');
+ const f=$('#ffb');if(miss.length){f.style.color='#DC2626';f.textContent='Falta: '+miss.join(' y ')+'.';return}
+ S.done=true;save();corr();f.style.color='#16A34A';f.textContent='¡Muy bien! Pasa al paso 3.';location.hash='#p3'};
+async function pdf(){const m=$('#pfb');if(!window.jspdf){m.textContent='El PDF no está disponible sin conexión.';return}
+ const {jsPDF}=window.jspdf;const d=new jsPDF({unit:'mm',format:'a4'});let y=18;
+ const line=(t,size=11,bold=false)=>{d.setFont('helvetica',bold?'bold':'normal');d.setFontSize(size);d.splitTextToSize(String(t||'—'),180).forEach(l=>{if(y>282){d.addPage();y=18}d.text(l,15,y);y+=size*0.5})};
+ line('Entrenamiento para el examen · Sesión 5',16,true);line('Nombre: '+(S.a.name||'—'));y+=3;
+ line('1 · Comprendo el documento',12,true);['q1','q2','q3','q4'].forEach((k,i)=>line((i+1)+'. '+(S.a[k]||'—')));y+=3;
+ line('2 · Me expreso ('+words(S.a.msg)+' palabras)',12,true);line('¡Hola Pablo! ¿Qué tal?');line(S.a.msg);line('¡Un abrazo!');y+=3;
+ line('3 · Mis puntos',12,true);CRIT.forEach(([k,t,,mx])=>line(t+': '+(S.a[k]||0)+' / '+mx));line('Total: '+total()+' / 20',12,true);line('Voy a mejorar: '+(S.a.mej||'—'));
+ const blob=d.output('blob');const fname='Entrenamiento_'+(String(S.a.name||'alumno').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+/g,'_')||'alumno')+'.pdf';
+ let dl=null;try{dl=await window.claude?.use?.('downloads')}catch(e){}
+ try{if(dl){await dl.save({filename:fname,data:blob})}else{const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=fname;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}m.textContent='Guardado: '+fname}
+ catch(e){m.textContent=e&&e.code==='declined'?'Descarga cancelada.':'La descarga no está disponible aquí.'}}
+bind();wc();corr();
+</script></body></html>
