@@ -314,7 +314,7 @@ function report(){const a=S.ans,k=S.act,A=ACT[k],done=actDone(k),secs=[];const v
   it.push({q:'4. Mi opinión',me:filled(k+'op')?'La IA '+a[k+'op']+' porque '+v(a[k+'porque']):null});
   if(k==='B'&&filled('Bnombre'))it.push({q:'Bonus · Mi nombre significa…',me:a.Bnombre});
   secs.push({t:A.label+' · '+A.title,c:k==='A'?[22,163,74]:[37,99,235],it,note:done?null:'La corrección aparecerá cuando termines las 4 etapas.'})}
- const med=[{q:'Mi mensaje · Mi vídeo fue sobre…',me:a.m0},{q:'Mi mensaje · En (fecha), … (pasado)',me:a.m1},{q:'Mi mensaje · Para mí, la IA…',me:a.m2}];
+ const med=[{q:'Mi mensaje · Vi un vídeo sobre…',me:a.m0},{q:'Mi mensaje · En (fecha), … (pasado)',me:a.m1},{q:'Mi mensaje · Aprendí que… / Para mí…',me:a.m2}];
  ['¿Dónde?','¿Qué hace la IA?','¿Nos ayuda o nos engaña?'].forEach((r,j)=>med.push({q:'Comparación · '+r,me:'A (el fútbol): '+v(a['cA'+j])+'   |   B (Illariy): '+v(a['cB'+j])}));
  med.push({q:'Juntos',me:filled('jv')?'Para nosotros, en el vídeo '+a.jv+' porque '+v(a.jporque):null});
  secs.push({t:'Mediación',c:[234,88,12],it:med});
@@ -375,10 +375,11 @@ function repScreen(){const k=S.act,a=ACT[k];if(!a)return go('portada');setAcc(a.
  <div class="news" style="--bn:#7C3AED"><div class="bar"><b>Interrogación flash</b><span>3.ª persona · él / ella / usted</span></div><div class="body">${REP.map(p=>`<p style="margin:0">${seg(p)}</p>`).join('')}</div></div>${checkBtn('crep')}</div>`;
  bindInputs();$('#crep').onclick=()=>runCheck($('#app'),'crep');
  bottom(()=>go('portada'),()=>go('act',0),'Empezar la etapa 1')}
+const YOX=[['Él vio un vídeo. → Yo',{id:'y1',a:['vi'],h:'ver'},'un vídeo sobre la IA.'],['Ella aprendió mucho. → Yo',{id:'y2',a:['aprendí'],h:'aprender'},'que la IA ayuda a los árbitros.'],['Él leyó la noticia. → Yo',{id:'y3',a:['leí'],h:'leer'},'la noticia ayer.'],['El vídeo fue interesante. → Yo',{id:'y4',a:['fui'],h:'ir'},'a Perú con Illariy… ¡virtualmente!']];
 const SERX=[['Ayer, el vídeo',{id:'s1',a:['fue'],h:'ser'},'muy interesante.'],['El árbitro',{id:'s2',a:['miró'],h:'mirar'},'la pantalla.'],['La presentadora',{id:'s3',a:['aprendió'],h:'aprender'},'quechua.'],['La universidad',{id:'s4',a:['decidió'],h:'decidir'},'crear a Illariy.'],['El sistema',{id:'s5',a:['tuvo'],h:'tener'},'un error.'],['La Liga MX',{id:'s6',a:['dijo'],h:'decir'},'que el VAR sigue.'],['La IA',{id:'s7',a:['pudo'],h:'poder'},'ayudar al árbitro.']];
 function serScreen(){const k=S.act,a=ACT[k];if(!a)return go('portada');setAcc('var(--M)','var(--Ma)');
  const ex=k==='A'?'El gol del América ____ anulado por el sistema.':'Illariy ____ creada por investigadores de San Marcos.';
- $('#app').innerHTML=`<div class="pop"><div class="stephead"><span class="pill">Antes de la mediación</span><strong>El pasado: 3 grupos + irregulares</strong></div>
+ $('#app').innerHTML=`<div class="pop"><div class="stephead"><span class="pill">Antes de la mediación</span><strong>El pasado: él / ella… y yo</strong></div>
  <div class="extitle"><b>!</b><h2>¿CÓMO FUE?</h2></div>
  ${consigna('Vas a contar tu vídeo a otra pareja. Para decir lo que pasó, necesitas el pasado (él / ella / usted).')}
  <div class="news" style="--bn:#DB2777"><div class="bar"><b>Mi vídeo</b><span>${a.title}</span></div><div class="body"><p style="margin:0">${esc(ex)}</p><p style="margin:8px 0 0">→ ser → <b>fue</b> (irregular).</p></div></div>
@@ -386,8 +387,13 @@ function serScreen(){const k=S.act,a=ACT[k];if(!a)return go('portada');setAcc('v
  <div class="wrapx"><table class="cmp"><thead><tr><th style="background:#EA580C">-AR → -ó</th><th style="background:#EA580C">-ER → -ió</th><th style="background:#EA580C">-IR → -ió</th><th style="background:#1E1B4B">Irregulares</th></tr></thead><tbody><tr><td>mirar → <b>miró</b><br>usar → <b>usó</b></td><td>aprender → <b>aprendió</b><br>ver → <b>vio</b></td><td>descubrir → <b>descubrió</b><br>decidir → <b>decidió</b></td><td>ser / ir → <b>fue</b><br>hacer → <b>hizo</b><br>decir → <b>dijo</b><br>tener → <b>tuvo</b><br>poder → <b>pudo</b></td></tr></tbody></table></div>
  <p><b>¡Ojo!</b> Hoy: él mir<b>a</b> · Ayer: él mir<b>ó</b>. Los irregulares no llevan acento.</p>
  <h3 class="sub">Practico</h3>
- <div class="news" style="--bn:#DB2777"><div class="bar"><b>Él / ella / usted</b><span>Conjuga</span></div><div class="body">${SERX.map(p=>`<p style="margin:0">${seg(p)}</p>`).join('')}</div></div>${checkBtn('cser')}</div>`;
- bindInputs();$('#cser').onclick=()=>runCheck($('#app'),'cser');
+ <div class="news" style="--bn:#DB2777"><div class="bar"><b>Él / ella / usted</b><span>Conjuga</span></div><div class="body">${SERX.map(p=>`<p style="margin:0">${seg(p)}</p>`).join('')}</div></div>${checkBtn('cser')}
+ <div class="extitle" style="margin-top:26px"><b>!</b><h2>¿Y YO? LO QUE HICE</h2></div>
+ ${consigna('En la mediación vas a hablar de TI: «¿Qué vídeo viste?». Con «él» no basta: necesitas la 1.ª persona (yo).')}
+ <div class="wrapx"><table class="cmp"><thead><tr><th style="background:#DB2777">Él / ella</th><th style="background:#0891B2">Yo</th><th style="background:#1E1B4B">La regla</th></tr></thead><tbody><tr><td>mir<b>ó</b> · present<b>ó</b></td><td>mir<b>é</b> · present<b>é</b></td><td>-AR: <b>-ó → -é</b></td></tr><tr><td>aprend<b>ió</b> · descubr<b>ió</b> · le<b>yó</b></td><td>aprend<b>í</b> · descubr<b>í</b> · le<b>í</b></td><td>-ER / -IR: <b>-ió → -í</b></td></tr><tr><td>vio · fue · hizo</td><td><b>vi</b> · <b>fui</b> · <b>hice</b></td><td>irregulares: ¡de memoria!</td></tr></tbody></table></div>
+ <p><b>¡Ojo al acento!</b> yo mir<b>é</b> (ayer) ≠ él mir<b>e</b>… y <b>vi</b> no lleva acento.</p>
+ <div class="news" style="--bn:#0891B2"><div class="bar"><b>Yo</b><span>Pasa a la 1.ª persona</span></div><div class="body">${YOX.map(p=>`<p style="margin:0">${seg(p)}</p>`).join('')}</div></div>${checkBtn('cyo')}</div>`;
+ bindInputs();$('#cser').onclick=()=>runCheck($('#app'),'cser');$('#cyo').onclick=()=>runCheck($('#app'),'cyo');
  bottom(()=>go('corr'),()=>go('med1'),'Ir a la mediación')}
 /* ---------- screens ---------- */
 function portada(){setAcc('var(--violet)','#EDE9FE');$('#navbtns').hidden=true;
@@ -414,8 +420,8 @@ function actScreen(){const k=S.act,a=ACT[k],i=S.step,[type,title]=STEPS[i];setAc
  ['c3','c4','c5'].forEach(id=>{const b=$('#'+id);if(b)b.onclick=()=>runCheck(b.closest('.bonusbox')||$('#app'),id)});
  bottom(()=>i?go('act',i-1):go('rep'),()=>i<3?go('act',i+1):go('corr'),i<3?'Siguiente':'Ver la corrección')}
 function med1(){setAcc('var(--M)','var(--Ma)');
- $('#app').innerHTML=`<div class="pop"><div class="stephead"><span class="pill">Mediación</span><strong>Explica tu vídeo</strong></div><div class="extitle"><b>1</b><h2>PREPARA TU MENSAJE</h2></div>${consigna('Prepara 3 frases en pasado para explicar tu vídeo a un compañero que eligió la otra actividad.')}
- <div class="phone"><div class="in"><div class="hd">${img('robot')}Mi mensaje para mi compañero</div>${['Mi vídeo fue sobre…','En (fecha), … (él / ella + verbo en pasado)','Para mí, la IA nos ayuda / nos engaña / las dos cosas porque…'].map((t,j)=>`<div class="bubble"><label for="m${j}">${t}</label><textarea id="m${j}" data-k="m${j}"></textarea></div>`).join('')}</div></div>
+ $('#app').innerHTML=`<div class="pop"><div class="stephead"><span class="pill">Mediación</span><strong>Explica tu vídeo</strong></div><div class="extitle"><b>1</b><h2>PREPARA TU MENSAJE</h2></div>${consigna('Prepara 3 frases en pasado para explicar tu vídeo a un compañero que eligió la otra actividad: una con YO (vi, aprendí), una con ÉL / ELLA (presentó, creó…), y tu opinión.')}
+ <div class="phone"><div class="in"><div class="hd">${img('robot')}Mi mensaje para mi compañero</div>${['Vi un vídeo sobre… (yo)','En (fecha), … (él / ella + verbo en pasado)','Aprendí que… y para mí, la IA nos ayuda / nos engaña / las dos cosas porque…'].map((t,j)=>`<div class="bubble"><label for="m${j}">${t}</label><textarea id="m${j}" data-k="m${j}"></textarea></div>`).join('')}</div></div>
  <h3 class="sub">Frases útiles</h3><div class="row">${['El vídeo fue…','Mira, en mi vídeo…','¿Entiendes?','¿Puedes repetir, por favor?','¿Qué significa…?','¡Qué interesante!'].map(t=>`<span class="chip" style="cursor:default">${t}</span>`).join('')}</div></div>`;
  bindInputs();bottom(()=>S.act?go('ser'):go('portada'),()=>go('med2'))}
 function med2(){setAcc('var(--M)','var(--Ma)');
@@ -424,7 +430,7 @@ function med2(){setAcc('var(--M)','var(--Ma)');
  <div class="wrapx"><table class="cmp"><thead><tr><th style="background:transparent"></th><th style="background:#16A34A">A · El fútbol</th><th style="background:#2563EB">B · Illariy</th></tr></thead><tbody>${rows.map((r,j)=>`<tr><td>${r}</td><td><textarea data-k="cA${j}" aria-label="${r} A"></textarea></td><td><textarea data-k="cB${j}" aria-label="${r} B"></textarea></td></tr>`).join('')}</tbody></table></div>
  <div class="extitle"><b>3</b><h2>JUNTOS</h2></div>${consigna('Juntos, decidid: ¿en qué vídeo la IA es más útil? ¿Por qué?')}
  <div class="row"><b>Para nosotros, en el vídeo</b><button class="chip" data-t="jv" data-v="A">A</button><button class="chip" data-t="jv" data-v="B">B</button><b>porque…</b></div><textarea data-k="jporque"></textarea>
- <div class="news" style="--bn:#0891B2"><div class="bar"><b>Para la próxima clase</b><span>De memoria</span></div><div class="body"><p style="margin:0">Aprende los 5 verbos irregulares (fue, hizo, dijo, tuvo, pudo) y tus 3 frases del mensaje, corregidas.</p><p class="aidonly" style="margin:6px 0 0">★ Versión con ayuda: aprende solo fue, hizo y tuvo.</p></div></div></div>`;
+ <div class="news" style="--bn:#0891B2"><div class="bar"><b>Para la próxima clase</b><span>De memoria</span></div><div class="body"><p style="margin:0">Aprende los irregulares (fue / fui, hizo / hice, vio / vi, dijo, tuvo, pudo) y tus 3 frases del mensaje, corregidas.</p><p class="aidonly" style="margin:6px 0 0">★ Versión con ayuda: aprende solo fue, hizo y tuvo.</p></div></div></div>`;
  bindInputs();toggles();bottom(()=>go('med1'),()=>go('bonus'),'Ir a los bonus')}
 function bonusLocked(){if(ADMIN)return false;if(actDone(S.act)&&medDone())return false;
  const items=[[actDone(S.act),S.act?'Mi actividad '+S.act+': las 4 etapas':'Elegir mi actividad (A o B)',()=>S.act?go('corr'):go('portada')],[medDone(),'La mediación: mi mensaje, el cuadro, «Juntos»',()=>go(filled('m0')&&filled('m1')&&filled('m2')?'med2':'med1')]];
